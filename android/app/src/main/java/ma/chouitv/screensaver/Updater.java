@@ -144,16 +144,15 @@ final class Updater {
         return b.toString();
     }
 
-    /** The lines under the settings: this version and whether it is the newest (Latin digits, a version number), then the signature. */
+    /** The lines under the settings: this version and whether it is the newest (Latin digits, a version number), then the signature (one line). */
     static String[] versionLines(Context c) {
         String mine = BuildConfig.VERSION_NAME;
         String latest = new Prefs(c).raw().getString("latestVersion", null);
         Integer newer = Versions.compare(latest, mine);   // major first, then minor: 4.0 is newer than 3.12
-        String state = latest == null || Versions.parse(latest) == null ? ""
-            : newer == null || newer <= 0 ? " · هذا أحدث إصدار" : " · يتوفر " + latest;
+        String state = latest != null && Versions.parse(latest) != null && newer != null && newer > 0 ? " · يتوفر " + latest : "";
+        // one line: name, version, build day, author (the day only; the isolate keeps the digits in reading order)
         return new String[] {
-            "الإصدار " + mine + state,
-            "تطوير EMChouit · بُني في \u2066" + BuildConfig.BUILD_DATE + "\u2069",
+            "ChouiTV " + mine + " · \u2066" + BuildConfig.BUILD_DATE.substring(0, 10) + "\u2069 · EMChouit" + state,
         };
     }
 
