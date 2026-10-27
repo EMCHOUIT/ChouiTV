@@ -343,20 +343,21 @@ public class SettingsActivity extends Activity {
 
         header("التطبيق");
         row("التحديث التلقائي للصفحة", prefs.autoUpdate() ? "يعمل · عند بدء الشاشة، كل ٦ ساعات" : "متوقف", R.drawable.ic_sync, new Runnable() { public void run() { pickOnOff("التحديث التلقائي للصفحة", prefs.autoUpdate(), v -> prefs.setAutoUpdate(v)); } });
-        View last = row("تحديث الشاشة الآن", "ينزّل أحدث نسخة من الشاشة", R.drawable.ic_sync, new Runnable() { public void run() { updateNow(); } });
-        noConv = true;   // a version number stays in Latin digits
-        note(last, Updater.versionLines(this));
-        noConv = false;
+        row("تحديث الشاشة الآن", "ينزّل أحدث نسخة من الشاشة", R.drawable.ic_sync, new Runnable() { public void run() { updateNow(); } });
 
         header("نسخ الإعدادات");
         row("تصدير الإعدادات", "يحفظ إعداداتك كلها في ملف chouitv-settings.json بمجلد التنزيلات", R.drawable.ic_sync,
             new Runnable() { public void run() { exportSettings(); } });
         row("استيراد الإعدادات", "يقرأ الملف من التنزيلات ويعرض ما سيتغيّر قبل التطبيق", R.drawable.ic_sync,
             new Runnable() { public void run() { importSettings(); } });
+        View last = list.getChildAt(list.getChildCount() - 1);
         if (SettingsBackup.hasUndo(this)) {
-            row("التراجع عن آخر استيراد", "يعيد الإعدادات كما كانت قبله", R.drawable.ic_sync,
+            last = row("التراجع عن آخر استيراد", "يعيد الإعدادات كما كانت قبله", R.drawable.ic_sync,
                 new Runnable() { public void run() { undoImport(); } });
         }
+        noConv = true;   // a version number stays in Latin digits
+        note(last, Updater.versionLines(this));   // at the very end: only the last row jumps to the bottom, not one in the middle
+        noConv = false;
 
         focusRows(keep, tabFocus);
         list.post(() -> rendering = false);

@@ -153,7 +153,7 @@ final class Updater {
             : newer == null || newer <= 0 ? " · هذا أحدث إصدار" : " · يتوفر " + latest;
         return new String[] {
             "الإصدار " + mine + state,
-            "تطوير EMChouit",
+            "تطوير EMChouit · بُني في \u2066" + BuildConfig.BUILD_DATE + "\u2069",
         };
     }
 

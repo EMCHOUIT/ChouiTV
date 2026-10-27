@@ -15,6 +15,8 @@ android {
         versionCode((System.getenv('GITHUB_RUN_NUMBER') ?: '1') as int)
         versionName "3.${System.getenv('GITHUB_RUN_NUMBER') ?: '0'}"
         // the branch the page, fonts and photos are fetched from: CI passes the one it builds, a local build follows master
+        // when this build was made, shown under the settings (Morocco time, the TVs' own clock)
+        buildConfigField "String", "BUILD_DATE", "\"${new java.text.SimpleDateFormat('yyyy-MM-dd HH:mm').with { setTimeZone(TimeZone.getTimeZone('GMT')); format(new Date()) }}\""
         buildConfigField "String", "BRANCH", "\"${System.getenv('CHOUITV_BRANCH') ?: 'main'}\""
     }
 
