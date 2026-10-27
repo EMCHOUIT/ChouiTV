@@ -1,5 +1,16 @@
 <p align="center"><a href="#install"><img src="docs/media/hero.png" alt="ChouiTV · تلفزيونك بلمسة مغربية" width="100%"></a></p>
 
+<p align="center">
+<b>🇲🇦 العربية</b> &nbsp;·&nbsp; <a href="README.fr.md">🇫🇷 Français</a> &nbsp;·&nbsp; <a href="README.en.md">🇬🇧 English</a>
+</p>
+
+<p align="center">
+<a href="https://github.com/EMCHOUIT/ChouiTV/releases/latest"><img src="https://img.shields.io/github/v/release/EMCHOUIT/ChouiTV?label=version&color=D6AF6B&labelColor=0A1D14" alt="آخر إصدار"></a>
+<img src="https://img.shields.io/badge/Android%20TV-Google%20TV-3F7A5C?labelColor=0A1D14" alt="Android TV و Google TV">
+<a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-D6AF6B?labelColor=0A1D14" alt="رخصة MIT"></a>
+<img src="https://img.shields.io/badge/no%20ads%20·%20no%20account-3F7A5C?labelColor=0A1D14" alt="بلا إعلانات ولا حسابات">
+</p>
+
 <div dir="rtl" align="right">
 
 <p align="center">
@@ -25,156 +36,59 @@
 
 <a id="new"></a>
 
-## ✨ جديد في ChouiTV 3.173
+## 🆕 جديد في الإصدار 3.173
 
-إصدار يجمع **ما أُضيف منذ 3.165**: أذان بخيارات لكل صلاة، نسخ احتياطي لإعداداتك بضغطة، شبكة قرّاء مرتبة، و**311 قناة**، وتوقيع يدلّك على النسخة التي عندك.
+> يجمع هذا الإصدار **كل ما أُضيف منذ 3.165**.
 
----
+<table dir="rtl">
+<tr>
+<td width="50%" valign="top">
 
-### 💾 انسخ إعداداتك واستعدها
-<p align="center"><img src="https://raw.githubusercontent.com/EMCHOUIT/ChouiTV/main/docs/media/whatsnew-backup.png" alt="تصدير واستيراد الإعدادات" width="100%"></p>
+### 💾 نسخ الإعدادات
+<img src="docs/media/whatsnew-backup.png" alt="تصدير واستيراد">
 
-- 📤 **تصدير الإعدادات**: ملف واحد `chouitv-settings.json` في مجلد التنزيلات، فيه إعدادات الشاشة والأذان والمفضّلة.
-- 📥 **استيراد الإعدادات**: يعرض لك **ما سيتغيّر** قبل أن يُطبَّق شيء.
-- ↩️ **التراجع عن آخر استيراد**: يعيد الإعدادات كما كانت.
-- 🚚 مفيد لنقل إعداداتك من تلفزيون إلى آخر، وللتثبيت على جهاز جديد.
+- 📤 **تصدير**: ملف `chouitv-settings.json` في التنزيلات
+- 📥 **استيراد**: يعرض **ما سيتغيّر** قبل التطبيق
+- ↩️ **تراجع** عن آخر استيراد
+- 🚚 مثالي لنقل إعداداتك بين تلفزيونين
 
----
+</td>
+<td width="50%" valign="top">
 
 ### 🕌 الأذان كما تريده
-<p align="center"><img src="https://raw.githubusercontent.com/EMCHOUIT/ChouiTV/main/docs/media/whatsnew-adhan.png" alt="الأذان" width="100%"></p>
+<img src="docs/media/whatsnew-adhan.png" alt="الأذان">
 
-- 🔘 مفتاح **الأذان التلقائي** في أول القسم، وتحته أوقات اليوم.
-- 🕋 **تشغيل أو إيقاف كل صلاة على حدة**: الفجر، الظهر، العصر، المغرب، العشاء.
-- 🔕 **أي زر في الريموت يوقف الأذان فورًا**، حتى أثناء شاشة التوقف.
-- 🇲🇦 حساب الأوقات بطريقة **وزارة الأوقاف المغربية**، والمنطقة الزمنية GMT.
+- 🔘 مفتاح **الأذان التلقائي** في أول القسم
+- 🕋 **كل صلاة** تُفعَّل أو تُوقَف وحدها
+- 🔕 **أي زر** في الريموت يوقفه، حتى أثناء شاشة التوقف
+- 🇲🇦 طريقة **وزارة الأوقاف**، والمنطقة GMT
 
----
+</td>
+</tr>
+<tr>
+<td valign="top">
 
-### 🎙️ القرّاء في شبكة مرتبة
-<p align="center"><img src="https://raw.githubusercontent.com/EMCHOUIT/ChouiTV/main/docs/media/whatsnew-reciters.png" alt="القرّاء" width="100%"></p>
+### 🎙️ القرّاء في شبكة
+<img src="docs/media/whatsnew-reciters.png" alt="القرّاء">
 
-- 🧱 **أربعة قرّاء في كل صف**، وبطاقة لكل قارئ بعدد سوره.
-- ↔️ أسهم **يمين/يسار** تنقلك بين أقسام «الاستماع»: القرّاء، إذاعات مغربية، القرآن مباشر، الأذان.
+- 🧱 **أربعة قرّاء في كل صف** مع عدد سورهم
+- ↔️ **يمين/يسار** يغيّر القسم: القرّاء، إذاعات مغربية، القرآن مباشر، الأذان
 
----
+</td>
+<td valign="top">
 
 ### 🏷️ توقيع بتاريخ البناء
-<p align="center"><img src="https://raw.githubusercontent.com/EMCHOUIT/ChouiTV/main/docs/media/whatsnew-signature.png" alt="التوقيع" width="100%"></p>
+<img src="docs/media/whatsnew-signature.png" alt="التوقيع">
 
-- 🧾 أسفل الإعدادات سطر واحد: `ChouiTV 3.173 · 2026-10-27 · EMChouit`، فتعرف النسخة وتاريخ بنائها بنظرة.
-- 🔔 تظهر عبارة «يتوفر ...» فقط حين يوجد إصدار أحدث.
-- 🧭 إصلاح التنقل: صار الصعود والنزول بين صفوف النظام والنسخ الاحتياطي سلسًا.
+- 🧾 `ChouiTV 3.173 · 2026-10-27 · EMChouit` أسفل الإعدادات
+- 🔔 عبارة «يتوفر ...» تظهر فقط حين يوجد إصدار أحدث
+- 🧭 إصلاح التنقل صعودًا ونزولًا في «الرئيسية والنظام»
 
----
+</td>
+</tr>
+</table>
 
-### 📡 وأيضًا منذ 3.165
-
-| | |
-|---|---|
-| 📺 | تطبيق **القنوات** بـ **311 قناة** عربية، ويُثبَّت مع التثبيت الجديد |
-| 🕰️ | خيار **المنطقة الزمنية** وطريقة حساب الصلاة في الإعدادات |
-| 🧹 | خطوة **تنظيف** اختيارية قبل التثبيت: تسأل أولًا ثم تنفّذ |
-| 🆔 | أسماء الحزم صارت `ma.chouitv.*`، مع سكربت ينقل إعداداتك من النسخة القديمة |
-| 🔤 | الخط **Thmanyah** في الصفحات والشاشات |
-
----
-
-### ⬇️ التثبيت والتحديث
-
-- 🔄 من يملك ChouiTV 3.166 أو أحدث يصله التحديث تلقائيًا.
-- 🆕 تلفزيون جديد: اتبع [دليل التثبيت في الصفحة الرئيسية](#install).
-- 📦 الملفان أدناه: `chouitv-home.apk` (الشاشة الرئيسية والاستماع) و `chouitv-screensaver.apk` (شاشة التوقف والإعدادات).
-
-</div>
-
-<details>
-<summary><b>🇫🇷 Français</b></summary>
-
-## ✨ Nouveautés de ChouiTV 3.173
-
-Cette version réunit **tout ce qui a été ajouté depuis 3.165** : un adhan réglable prière par prière, la sauvegarde de vos réglages en un geste, une grille de récitants bien rangée, **311 chaînes**, et une signature qui indique la version et sa date de build.
-
-### 💾 Sauvegardez et restaurez vos réglages
-<p align="center"><img src="https://raw.githubusercontent.com/EMCHOUIT/ChouiTV/main/docs/media/whatsnew-backup.png" alt="Export / import" width="100%"></p>
-- 📤 **Exporter** : un seul fichier `chouitv-settings.json` dans Téléchargements (écran, adhan, favoris).
-- 📥 **Importer** : l'écran vous montre **ce qui va changer** avant d'appliquer quoi que ce soit.
-- ↩️ **Annuler le dernier import** remet les réglages comme avant.
-- 🚚 Pratique pour passer d'une TV à l'autre ou installer un nouvel appareil.
-
-### 🕌 L'adhan comme vous le voulez
-<p align="center"><img src="https://raw.githubusercontent.com/EMCHOUIT/ChouiTV/main/docs/media/whatsnew-adhan.png" alt="Adhan" width="100%"></p>
-- 🔘 Interrupteur de l'**adhan automatique** tout en haut de l'onglet, horaires du jour dessous.
-- 🕋 **Activez ou coupez chaque prière** séparément : Fajr, Dhuhr, Asr, Maghrib, Isha.
-- 🔕 **N'importe quelle touche de la télécommande arrête l'adhan**, même pendant l'économiseur d'écran.
-- 🇲🇦 Horaires calculés selon la méthode du **ministère marocain des Habous (Awqaf)**, fuseau GMT.
-
-### 🎙️ Les récitants en grille
-<p align="center"><img src="https://raw.githubusercontent.com/EMCHOUIT/ChouiTV/main/docs/media/whatsnew-reciters.png" alt="Récitants" width="100%"></p>
-- 🧱 **Quatre récitants par ligne**, une carte par récitant avec son nombre de sourates.
-- ↔️ **Gauche/droite** change de section : Récitants, Radios marocaines, Coran en direct, Adhan.
-
-### 🏷️ Une signature avec la date de build
-<p align="center"><img src="https://raw.githubusercontent.com/EMCHOUIT/ChouiTV/main/docs/media/whatsnew-signature.png" alt="Signature" width="100%"></p>
-- 🧾 En bas des réglages : `ChouiTV 3.173 · 2026-10-27 · EMChouit`. Vous savez en un coup d'œil quelle version tourne.
-- 🔔 « Version plus récente disponible » n'apparaît que lorsqu'il y en a une.
-- 🧭 Navigation corrigée : on remonte et on descend sans à-coup dans « Principal et système ».
-
-### 📡 Et aussi depuis 3.165
-- 📺 Application **Channels** : **311 chaînes** arabes, installée avec le reste.
-- 🕰️ Réglage du **fuseau horaire** et de la **méthode de calcul** de la prière.
-- 🧹 Étape de **nettoyage** facultative avant l'installation : elle demande, puis agit.
-- 🆔 Paquets renommés `ma.chouitv.*`, avec un script qui reprend vos réglages depuis l'ancienne version.
-- 🔤 Police **Thmanyah** partout.
-
-**Installer / mettre à jour** : à partir de 3.166 la mise à jour arrive toute seule. Nouvelle TV : suivez le [guide d'installation](https://github.com/EMCHOUIT/ChouiTV#install).
-
-</details>
-
-<details>
-<summary><b>🇬🇧 English</b></summary>
-
-## ✨ What's new in ChouiTV 3.173
-
-This release gathers **everything added since 3.165**: an adhan you can set prayer by prayer, one-gesture backup of your settings, a tidy reciter grid, **311 channels**, and a signature that shows the version and its build date.
-
-### 💾 Back up and restore your settings
-<p align="center"><img src="https://raw.githubusercontent.com/EMCHOUIT/ChouiTV/main/docs/media/whatsnew-backup.png" alt="Export / import" width="100%"></p>
-- 📤 **Export**: a single `chouitv-settings.json` file in Downloads (screen, adhan, favourites).
-- 📥 **Import**: the screen shows you **what will change** before anything is applied.
-- ↩️ **Undo last import** puts the settings back as they were.
-- 🚚 Handy for moving from one TV to another, or setting up a new device.
-
-### 🕌 The adhan, your way
-<p align="center"><img src="https://raw.githubusercontent.com/EMCHOUIT/ChouiTV/main/docs/media/whatsnew-adhan.png" alt="Adhan" width="100%"></p>
-- 🔘 **Automatic adhan** switch at the top of the tab, today's times below it.
-- 🕋 **Turn each prayer on or off** on its own: Fajr, Dhuhr, Asr, Maghrib, Isha.
-- 🔕 **Any remote key stops the adhan**, even while the screensaver is on.
-- 🇲🇦 Times follow the **Moroccan Ministry of Awqaf** method, GMT time zone.
-
-### 🎙️ Reciters in a grid
-<p align="center"><img src="https://raw.githubusercontent.com/EMCHOUIT/ChouiTV/main/docs/media/whatsnew-reciters.png" alt="Reciters" width="100%"></p>
-- 🧱 **Four reciters per row**, one card each with the number of surahs.
-- ↔️ **Left/right** switches section: Reciters, Moroccan radios, Live Quran, Adhan.
-
-### 🏷️ A signature with the build date
-<p align="center"><img src="https://raw.githubusercontent.com/EMCHOUIT/ChouiTV/main/docs/media/whatsnew-signature.png" alt="Signature" width="100%"></p>
-- 🧾 Bottom of the settings: `ChouiTV 3.173 · 2026-10-27 · EMChouit`. See which version runs at a glance.
-- 🔔 «Newer version available» only shows when there is one.
-- 🧭 Navigation fixed: moving up and down in "Main and system" is smooth again.
-
-### 📡 Also since 3.165
-- 📺 **Channels** app: **311 Arabic channels**, installed with everything else.
-- 🕰️ **Time zone** and prayer **calculation method** settings.
-- 🧹 Optional **cleanup** step before installing: it asks first, then acts.
-- 🆔 Packages renamed `ma.chouitv.*`, with a script that carries your settings over from the old version.
-- 🔤 **Thmanyah** font throughout.
-
-**Install / update**: from 3.166 on, updates arrive by themselves. New TV: follow the [install guide](https://github.com/EMCHOUIT/ChouiTV#install).
-
-</details>
-
-<div dir="rtl" align="right">
+**📡 وأيضًا منذ 3.165:** تطبيق **القنوات** (**311** قناة عربية) · إعداد **المنطقة الزمنية** و**طريقة حساب الصلاة** · خطوة **تنظيف** اختيارية · أسماء الحزم `ma.chouitv.*` مع سكربت للنقل · خط **Thmanyah**.
 
 <a id="intro"></a>
 
@@ -196,6 +110,7 @@ This release gathers **everything added since 3.165**: an adhan you can set pray
 </tr>
 </table>
 
+> [!TIP]
 > ✅ **بلا إعلانات ولا حسابات** · ✅ **عربي من اليمين إلى اليسار** · ✅ **يتحدّث وحده** من إصدارات المشروع بضغطة OK واحدة.
 
 <p align="center"><a href="#install"><img src="docs/media/install-button.png" alt="ثبّت ChouiTV الآن" width="460"></a></p>
@@ -297,6 +212,7 @@ This release gathers **everything added since 3.165**: an adhan you can set pray
 | 11 | لا إله إلا الله وحده لا شريك له… | 10 | 8 ث | مائة حسنة ومحيت عنه مائة سيئة · البخاري ومسلم |
 | 12 | سبحان الله وبحمده عدد خلقه… | 3 | 9 ث | من حديث جويرية · مسلم |
 
+> [!WARNING]
 > ⚠️ الفضائل والمراجع للتذكير، وتُراجَع قبل الاعتماد عليها في الفتوى أو التعليم.
 
 🎛️ **تتحكم في كل شيء** (تبويب «الصلاة» ← «التسبيح»): النوع (**الكل** أو أذكار ما بعد الصلاة 33·33·34 أو صيغة واحدة) · العدد · الإيقاع (تلقائي بحسب طول العبارة، سريع، بطيء، أو ثابت من 1 إلى 10 ثوانٍ) · التوقيت (**دائمًا** أو **بعد الصلاة** أو **كل ساعة**) · مدة العرض · الاستراحة · إظهار الفضل · شكل العدّاد (خرز أو حلقة) · الحركة · المكان.
@@ -372,7 +288,7 @@ This release gathers **everything added since 3.165**: an adhan you can set pray
 <td><img src="docs/media/settings-4-prayer.png" alt="الصلاة"><br>🕌 <sub><b>الصلاة:</b> تنبيه قبل الأذان، تعديل وقت الصلاة، والتسبيح. و«الأساسيات» فيها <b>المنطقة الزمنية</b> و<b>طريقة حساب الصلاة</b> (تتبع المنطقة تلقائيًا: المغرب ← وزارة الأوقاف).</sub></td>
 </tr>
 <tr>
-<td colspan="2"><img src="docs/media/settings-5-home.png" alt="الرئيسية والنظام"><br>🏠 <sub><b>الرئيسية والنظام:</b> بطاقات الشاشة الرئيسية، التحية، ترتيب التطبيقات، التحديث التلقائي، ورقم الإصدار.</sub></td>
+<td colspan="2"><img src="docs/media/settings-5-home.png" alt="الرئيسية والنظام"><br>🏠 <sub><b>الرئيسية والنظام:</b> بطاقات الشاشة الرئيسية، التحية، ترتيب التطبيقات، التحديث التلقائي، ورقم الإصدار، ونسخ الإعدادات (تصدير واستيراد).</sub></td>
 </tr>
 </table>
 
@@ -384,6 +300,7 @@ This release gathers **everything added since 3.165**: an adhan you can set pray
 
 <p align="center"><img src="docs/media/guide-choose.png" alt="اختر طريقتك: تلقائيًا بالذكاء الاصطناعي أو يدويًا بـ ADB" width="100%"></p>
 
+> [!NOTE]
 > 📺 **يعمل على تلفزيونات Android TV و Google TV** (جُرّب على تلفزيون شاومي بأندرويد 11). التطبيقان يأتيان من [إصدارات ChouiTV](https://github.com/EMCHOUIT/ChouiTV/releases/latest)، وتصلك التحديثات تلقائيًا بضغطة **OK**.
 
 ### 🤖 الطريقة الأولى: تلقائيًا بالذكاء الاصطناعي ⭐ موصى بها
