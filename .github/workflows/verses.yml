@@ -1,0 +1,33 @@
+name: Fetch verse texts
+
+# The Quran API is unreachable from the dev container; CI fetches the verse texts
+# and pushes them to the data-verses branch for review. Per verse (.github/tools/fetch_verses.py):
+#   text     api.alquran.cloud, edition quran-simple (Tanzil)
+#   uthmani  the KFGQPC Uthmani Hafs 3.0 text, the one the font assets/fonts/UthmanicHafs-v30.woff2 is made for
+#            (npm package @quran.ws/text 0.1.0, checked by SHA-256)
+#   tafsir   «التفسير الميسر» (King Fahd Glorious Quran Printing Complex), api.alquran.cloud edition ar.muyassar;
+#            shown under the verse only with #tafsir=1. Copy the three fields into assets/shared/verses.json.
+on:
+  workflow_dispatch:
+  push:
+    branches: [master, content]
+    paths: ['.github/tools/fetch_verses.py']
+
+permissions:
+  contents: write
+
+jobs:
+  verses:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 .github/tools/fetch_verses.py
+      - name: Push to data-verses
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout --orphan data-verses
+          git rm -rfq --cached .
+          git add -f verses   # the folder is in .gitignore for local runs
+          git commit -qm "Verse texts, Uthmani text and tafsir (api.alquran.cloud, KFGQPC)"
+          git push -f origin data-verses

@@ -1,0 +1,214 @@
+{
+ "stations": [
+  {
+   "name": "إذاعة القرآن الكريم - السعودية",
+   "url": "https://stream.radiojar.com/0tpy1h0kxtzuv",
+   "live": true,
+   "group": "quran"
+  },
+  {
+   "name": "الشيخ أبو بكر الشاطري",
+   "url": "https://backup.qurango.net/radio/shaik_abu_bakr_al_shatri",
+   "live": true,
+   "group": "quran"
+  },
+  {
+   "name": "عبدالرحمن السديس",
+   "url": "https://backup.qurango.net/radio/abdulrahman_alsudaes",
+   "live": true,
+   "group": "quran"
+  },
+  {
+   "name": "سعود الشريم",
+   "url": "https://backup.qurango.net/radio/saud_alshuraim",
+   "live": true,
+   "group": "quran"
+  },
+  {
+   "name": "ماهر المعيقلي",
+   "url": "https://backup.qurango.net/radio/maher",
+   "live": true,
+   "group": "quran"
+  },
+  {
+   "name": "مشاري العفاسي",
+   "url": "https://backup.qurango.net/radio/mishary_alafasi",
+   "live": true,
+   "group": "quran"
+  },
+  {
+   "name": "سعد الغامدي",
+   "url": "https://backup.qurango.net/radio/saad_alghamdi",
+   "live": true,
+   "group": "quran"
+  },
+  {
+   "name": "ياسر الدوسري",
+   "url": "https://backup.qurango.net/radio/yasser_aldosari",
+   "live": true,
+   "group": "quran"
+  },
+  {
+   "name": "عبدالباسط عبدالصمد",
+   "url": "https://backup.qurango.net/radio/abdulbasit_abdulsamad",
+   "live": true,
+   "group": "quran"
+  },
+  {
+   "name": "محمد صديق المنشاوي",
+   "url": "https://backup.qurango.net/radio/mohammed_siddiq_alminshawi",
+   "live": true,
+   "group": "quran"
+  },
+  {
+   "name": "أحمد العجمي",
+   "url": "https://backup.qurango.net/radio/ahmad_alajmy",
+   "live": true,
+   "group": "quran"
+  },
+  {
+   "name": "هيت راديو",
+   "url": "https://hitradio-maroc.ice.infomaniak.ch/hitradio-maroc-128.mp3",
+   "live": true,
+   "group": "ma"
+  },
+  {
+   "name": "راديو مارس",
+   "url": "https://radiomars.ice.infomaniak.ch/radiomars-128.mp3",
+   "live": true,
+   "group": "ma"
+  },
+  {
+   "name": "مدينة FM",
+   "url": "https://medinafm.ice.infomaniak.ch/medinafm-128.mp3",
+   "live": true,
+   "group": "ma"
+  },
+  {
+   "name": "مدينة FM أمازيغ",
+   "url": "https://medinaamazigh.ice.infomaniak.ch/medinaamazigh-128.mp3",
+   "live": true,
+   "group": "ma"
+  },
+  {
+   "name": "مدينة FM أندلسي",
+   "url": "https://medinaandalou.ice.infomaniak.ch/medinaandalou-128.mp3",
+   "live": true,
+   "group": "ma"
+  },
+  {
+   "name": "مدينة FM طرب",
+   "url": "https://medinatarab.ice.infomaniak.ch/medinatarab-128.mp3",
+   "live": true,
+   "group": "ma"
+  },
+  {
+   "name": "مدينة FM نشاط",
+   "url": "https://medinanachat.ice.infomaniak.ch/medinanachat-128.mp3",
+   "live": true,
+   "group": "ma"
+  },
+  {
+   "name": "إم إف إم راديو",
+   "url": "https://a5.asurahosting.com:7980/radio.mp3",
+   "live": true,
+   "group": "ma"
+  },
+  {
+   "name": "يابلادي راديو",
+   "url": "https://radio.yabiladi.com:8002/;stream.mp3",
+   "live": true,
+   "group": "ma"
+  },
+  {
+   "name": "يابلادي شعبي",
+   "url": "https://radio.yabiladi.com:8102/;stream.mp3",
+   "live": true,
+   "group": "ma"
+  },
+  {
+   "name": "راديو أزوان",
+   "url": "https://az-maroc.ice.infomaniak.ch/az-maroc-128.mp3",
+   "live": true,
+   "group": "ma"
+  },
+  {
+   "name": "أتلانتيك راديو",
+   "url": "https://atlantic-sonic.nindohost.net:9300/stream",
+   "live": true,
+   "group": "ma"
+  },
+  {
+   "name": "مراكش بلس",
+   "url": "https://cast5.my-control-panel.com/proxy/marrakec/stream",
+   "live": true,
+   "group": "ma"
+  },
+  {
+   "name": "راديو بلس أكادير",
+   "url": "https://stream-158.zeno.fm/bqdbb6hd0neuv",
+   "live": true,
+   "group": "ma"
+  },
+  {
+   "name": "كاب راديو",
+   "url": "https://listen.radioking.com/radio/710810/stream/776366",
+   "live": true,
+   "group": "ma"
+  },
+  {
+   "name": "ناس راديو",
+   "url": "https://radio.nessradio.net:8212/nessradio-hd",
+   "live": true,
+   "group": "ma"
+  },
+  {
+   "name": "ميدي 1 هيتس",
+   "url": "https://cdn.live.easybroadcast.io/medi1radio/Hits",
+   "live": true,
+   "group": "ma"
+  },
+  {
+   "name": "طرب راديو",
+   "url": "https://stream.zeno.fm/fy8achbq97zuv",
+   "live": true,
+   "group": "ma"
+  },
+  {
+   "name": "أشكيد FM",
+   "url": "https://stream.zeno.fm/7nqu31p6xg0uv",
+   "live": true,
+   "group": "ma"
+  },
+  {
+   "name": "راديو صوت الأمل",
+   "url": "https://stream.zeno.fm/d4u7zbqh5qruv",
+   "live": true,
+   "group": "ma"
+  },
+  {
+   "name": "راديو أضواء FM",
+   "url": "https://stream.zeno.fm/tvxvud2kpm0uv",
+   "live": true,
+   "group": "ma"
+  },
+  {
+   "name": "راديو أزرو",
+   "url": "https://stream.zeno.fm/nzdw7gqc0s8uv",
+   "live": true,
+   "group": "ma"
+  },
+  {
+   "name": "ميد راديو",
+   "url": "https://medradio.ice.infomaniak.ch/medradio-128.mp3",
+   "live": true,
+   "group": "ma"
+  },
+  {
+   "name": "شدى إف إم",
+   "url": "https://chadafm.ice.infomaniak.ch/chadafm-128.aac",
+   "live": true,
+   "group": "ma"
+  }
+ ]
+}
