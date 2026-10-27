@@ -231,7 +231,7 @@ def hero():
     # the words
     R = W - 90
     d = ImageDraw.Draw(bg)
-    pill = "جديد · الإصدار 3.165"
+    pill = "جديد · الإصدار 3.173"
     pw = int(d.textlength(pill, font=font(28, 600), direction="rtl", language="ar")) + 120
     d.rounded_rectangle((R - pw, 92, R, 146), 27, fill=(28, 52, 38, 230), outline=GOLD + (220,), width=2)
     text(d, (R - 45, 119), pill, 28, GOLD, 600, anchor="rm")
