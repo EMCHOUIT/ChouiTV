@@ -122,6 +122,15 @@ final class Strings {
         k("star_text", "نجمة على GitHub تدعمنا وتشجّعنا على الاستمرار", "Une étoile sur GitHub nous soutient et nous encourage à continuer", "A star on GitHub supports us and keeps us going");
         k("star_btn", "ضع نجمة للمشروع", "Mettre une étoile au projet", "Star the project");
         k("z_Africa/Casablanca", "المغرب · GMT (Africa/Casablanca)", "Maroc · GMT (Africa/Casablanca)", "Morocco · GMT (Africa/Casablanca)");
+        k("sub_switch", "تعطيل الواجهة الأصلية مع شبكة أمان", "Accueil d'origine coupé, avec filet de sécurité", "Original home off, with a safety net");
+        k("home_ok", "الزر Home يفتح ChouiTV", "Le bouton Home ouvre ChouiTV", "The Home button opens ChouiTV");
+        k("home_warn", "تحقق من الزر Home", "Vérifiez le bouton Home", "Check the Home button");
+        k("home_kept", "هذا التلفزيون يحتفظ بواجهته الأصلية: افتح ChouiTV من قائمة التطبيقات.",
+            "Cette télé garde son accueil d'origine : ouvrez ChouiTV depuis ses applications.",
+            "This TV keeps its original home: open ChouiTV from its apps.");
+        k("home_unsure", "تعذّر التأكد من الزر Home. إن لم يفتح ChouiTV، فالتلفزيون يعيد واجهته الأصلية وحده خلال 5 دقائق.",
+            "Impossible de confirmer le bouton Home. S'il n'ouvre pas ChouiTV, la télé rétablit seule son accueil d'origine d'ici 5 minutes.",
+            "Could not confirm the Home button. If it does not open ChouiTV, the TV puts its original home back by itself within 5 minutes.");
         // time zones and prayer methods
         k("z_Africa/Abidjan", "المغرب · GMT (Africa/Abidjan)", "Maroc · GMT (Africa/Abidjan)", "Morocco · GMT (Africa/Abidjan)");
         k("z_city", "حسب المدينة", "Selon la ville", "By city");

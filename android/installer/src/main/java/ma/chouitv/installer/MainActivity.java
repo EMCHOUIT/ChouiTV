@@ -61,6 +61,7 @@ public class MainActivity extends Activity {
     private Flow flow;
     private String model = "";
     private volatile boolean busy;
+    private Flow.Home homeResult;
     private String chosen = "";
     private Runnable ticker;
 
@@ -419,13 +420,17 @@ public class MainActivity extends Activity {
 
                 cur = 6;
                 node(nodes, 6, Orn.Node.RUN);
+                sub(subV, 6, t("sub_switch"));
                 flow.setDefaults();
+                try { homeResult = flow.switchHome(); } catch (IOException lost) { homeResult = Flow.Home.UNSURE; }
+                sub(subV, 6, t("sub_defaults"));
                 node(nodes, 6, Orn.Node.DONE);
                 progress(6, 1f, bar, pctV, stepV, etaV, t0);
 
                 cur = 7;
                 node(nodes, 7, Orn.Node.RUN);
-                flow.verify();
+                try { flow.verify(); } catch (IOException lost) { if (homeResult != Flow.Home.UNSURE) throw lost; }
+                sub(subV, 7, homeResult == Flow.Home.OURS ? t("home_ok") : t("home_warn"));
                 node(nodes, 7, Orn.Node.DONE);
                 progress(7, 1f, bar, pctV, stepV, etaV, t0);
 
@@ -571,6 +576,12 @@ public class MainActivity extends Activity {
             try { startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/EMCHOUIT/ChouiTV"))); } catch (Exception ignored) { }
         });
         body.addView(star, new LinearLayout.LayoutParams(-1, dp(52)));
+        if (homeResult != null && homeResult != Flow.Home.OURS) {
+            LinearLayout hw = card(false);
+            hw.setBackground(cardBg(false, 0x33E8896B, 0xFFE8896B));
+            hw.addView(text(homeResult == Flow.Home.UNSURE || homeResult == Flow.Home.FAILED ? t("home_unsure") : t("home_kept"), regular, 14, SAND));
+            body.addView(hw, lp(0, 14, 0, 0));
+        }
         LinearLayout tip = card(false);
         tip.setBackground(cardBg(false, 0x333F7A5C, 0xFF3F7A5C));
         tip.addView(text(t("tip"), medium, 15, GOLD));
