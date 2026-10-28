@@ -1,6 +1,6 @@
 # Télés testées
 
-Résultats de l'installation sur de vraies télés. Si vous avez essayé ChouiTV sur la vôtre, partagez le résultat à la fin de l'[installateur ChouiTV](README.fr.md) ou avec un [rapport de télé](../../issues/new?template=tv-report.md) : cela nous aide à résoudre les problèmes et à proposer de nouvelles fonctionnalités.
+Résultats de l'installation sur de vraies télés. Si vous avez essayé ChouiTV sur la vôtre, partagez le résultat à la fin de l'[installateur ChouiTV](https://github.com/EMCHOUIT/ChouiTV-Installer) ou avec un [rapport de télé](../../issues/new?template=tv-report.md) : cela nous aide à résoudre les problèmes et à proposer de nouvelles fonctionnalités.
 
 | Marque et modèle | Android | Accueil d'origine | Résultat | Remarques |
 |---|---|---|---|---|

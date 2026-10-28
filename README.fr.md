@@ -300,6 +300,14 @@ L'application **Channels** accompagne ChouiTV dans le dock et diffuse **en direc
 > [!NOTE]
 > 📺 **Fonctionne sur les télés Android TV et Google TV** (testé sur une télé Xiaomi sous Android 11). Les deux applis viennent des [versions de ChouiTV](https://github.com/EMCHOUIT/ChouiTV/releases/latest) et les mises à jour arrivent d'une pression sur **OK**.
 
+### 📱 Le plus simple : depuis votre téléphone, sans ordinateur ⭐
+
+Téléchargez [**ChouiTV Installer**](https://github.com/EMCHOUIT/ChouiTV-Installer/releases/latest/download/ChouiTV-Installer.apk) sur un téléphone Android et ouvrez-le : il trouve votre télé, installe ChouiTV et le règle en environ deux minutes, en arabe, français ou anglais. [Détails et captures](https://github.com/EMCHOUIT/ChouiTV-Installer)
+
+<p align="center"><a href="https://github.com/EMCHOUIT/ChouiTV-Installer/releases/latest/download/ChouiTV-Installer.apk"><img src="https://img.shields.io/badge/%E2%AC%87%20ChouiTV%20Installer-D6AF6B?style=for-the-badge&labelColor=0A1D14" alt="ChouiTV Installer"></a></p>
+
+**Ou autrement :**
+
 ### 🤖 Méthode 1 : automatique avec une IA ⭐ recommandée
 
 <p align="center"><img src="docs/media/guide-auto.png" alt="Installation automatique en quatre étapes" width="100%"></p>

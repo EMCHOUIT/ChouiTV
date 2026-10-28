@@ -300,6 +300,14 @@ The **Channels** app sits beside ChouiTV in the dock and shows **live** Moroccan
 > [!NOTE]
 > 📺 **Works on Android TV and Google TV sets** (tested on a Xiaomi TV running Android 11). Both apps come from the [ChouiTV releases](https://github.com/EMCHOUIT/ChouiTV/releases/latest), and updates arrive with a press of **OK**.
 
+### 📱 The easiest: from your phone, no computer ⭐
+
+Download [**ChouiTV Installer**](https://github.com/EMCHOUIT/ChouiTV-Installer/releases/latest/download/ChouiTV-Installer.apk) on an Android phone and open it: it finds your TV and installs and sets up ChouiTV in about two minutes, in Arabic, French or English. [Details and screenshots](https://github.com/EMCHOUIT/ChouiTV-Installer)
+
+<p align="center"><a href="https://github.com/EMCHOUIT/ChouiTV-Installer/releases/latest/download/ChouiTV-Installer.apk"><img src="https://img.shields.io/badge/%E2%AC%87%20ChouiTV%20Installer-D6AF6B?style=for-the-badge&labelColor=0A1D14" alt="ChouiTV Installer"></a></p>
+
+**Or another way:**
+
 ### 🤖 Method 1: automatic with an AI ⭐ recommended
 
 <p align="center"><img src="docs/media/guide-auto.png" alt="Automatic install in four steps" width="100%"></p>

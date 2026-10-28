@@ -315,6 +315,14 @@
 
 <div dir="rtl" align="right">
 
+### 📱 الأسهل: من هاتفك، بلا كمبيوتر ⭐
+
+نزّل [**ChouiTV Installer**](https://github.com/EMCHOUIT/ChouiTV-Installer/releases/latest/download/ChouiTV-Installer.apk) على هاتف أندرويد وافتحه: يجد تلفزيونك، ويثبّت ChouiTV ويضبطه في نحو دقيقتين، بالعربية أو الفرنسية أو الإنجليزية. [التفاصيل واللقطات](https://github.com/EMCHOUIT/ChouiTV-Installer)
+
+<p align="center"><a href="https://github.com/EMCHOUIT/ChouiTV-Installer/releases/latest/download/ChouiTV-Installer.apk"><img src="https://img.shields.io/badge/%E2%AC%87%20ChouiTV%20Installer-D6AF6B?style=for-the-badge&labelColor=0A1D14" alt="ChouiTV Installer"></a></p>
+
+**أو بطرق أخرى:**
+
 ### 🤖 الطريقة الأولى: تلقائيًا بالذكاء الاصطناعي ⭐ موصى بها
 
 <p align="center"><img src="docs/media/guide-auto.png" alt="التثبيت التلقائي في أربع خطوات" width="100%"></p>
