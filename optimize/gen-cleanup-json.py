@@ -31,6 +31,22 @@ ADS = re.compile(r"(recommendation|autoinstalls|partnersetup|promo|messagebox|es
 OPTIONAL = re.compile(r"(netflix|amazon\.amazonvideo|youtube\.tvmusic|youtube\.tvkids|android\.videos|play\.games|gamebar|dashboard|channelplus|waterfall|hungama|airtel|freeview|tvbrowser|gamecenter|tcl\.guard|dreams\.basic)", re.I)
 
 
+# Brand names, the same in every language: shown in the installer's checklists instead of the package name.
+DISPLAY = {
+    "com.netflix.ninja": "Netflix", "com.netflix.mediaclient": "Netflix", "com.netflix.ninja.tv": "Netflix",
+    "com.amazon.amazonvideo.livingroom": "Prime Video", "com.amazon.avod.thirdpartyclient": "Prime Video",
+    "com.google.android.youtube.tvmusic": "YouTube Music", "com.google.android.youtube.tvkids": "YouTube Kids",
+    "com.google.android.videos": "Google Play Films", "com.google.android.play.games": "Google Play Games",
+    "com.disney.disneyplus": "Disney+", "com.spotify.tv.android": "Spotify", "tv.twitch.android.app": "Twitch",
+    "com.hbo.hbonow": "HBO Max", "com.apple.atve.androidtv.appletv": "Apple TV", "com.cbs.ott": "Paramount+",
+    "com.hulu.livingroomplus": "Hulu", "com.plexapp.android": "Plex", "org.xbmc.kodi": "Kodi", "org.videolan.vlc": "VLC",
+    "net.mbc.shahidTV": "Shahid", "org.schabi.newpipe": "NewPipe", "com.phlox.tvwebbrowser": "TV Bro",
+    "com.esaba.downloader": "Downloader", "org.localsend.localsend_app": "LocalSend", "com.ionitech.airscreen": "AirScreen",
+    "com.lagradost.cloudstream3.prerelease": "CloudStream", "io.privado.android": "Privado VPN", "com.alphainventor.filemanager": "File Manager",
+    "com.tcl.channelplus": "TCL Channel+", "com.tcl.guard": "TCL Guard", "com.tcl.gamebar": "TCL Game Bar",
+    "com.android.printspooler": "Print spooler", "com.xiaomi.mitv.tvmanager": "Mi TV Manager",
+}
+
 def pkgs_of(path):
     out = []
     with open(path, encoding="utf-8") as f:
@@ -106,6 +122,7 @@ def build():
         "packages": table,
         "groups": groups,
         "names": {"ar": {p: v for p, v in names.items() if p in used}},
+        "display": DISPLAY,
         "lists": lists,
     }
 
