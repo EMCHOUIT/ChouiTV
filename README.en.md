@@ -315,8 +315,9 @@ There are **three ways** to install ChouiTV. The simplest goes through your phon
 Go to the **[ChouiTV Installer](https://github.com/EMCHOUIT/ChouiTV-Installer)** repository and download the app on an Android phone. It:
 
 - finds your TV on the Wi-Fi, always downloads the **latest version** of ChouiTV, installs and sets it up in about two minutes;
-- speaks **Arabic, French and English**, with a progress bar and a safety net if the home screen does not open;
-- offers an optional **TV cleanup**: you see the plan first, you choose, and you can undo everything;
+- **guides you step by step** (or lets you choose yourself) and speaks **Arabic, French and English**, with a progress bar and a safety net if the home screen does not open;
+- offers an optional **TV cleanup** with one box per app: you see the list first, you choose, and you can put everything back;
+- **copies one TV's settings to another**, now or later;
 - asks for no account and shows no ads.
 
 <p align="center"><a href="https://github.com/EMCHOUIT/ChouiTV-Installer/releases/latest/download/ChouiTV-Installer.apk"><img src="https://img.shields.io/badge/%E2%AC%87%20ChouiTV%20Installer-D6AF6B?style=for-the-badge&labelColor=0A1D14" alt="ChouiTV Installer"></a></p>
