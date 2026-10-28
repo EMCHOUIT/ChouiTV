@@ -76,6 +76,7 @@ DISPLAY = {
     "android.autoinstalls.config.xiaomi.amelie": "Xiaomi auto-install config", "com.xiaomi.floatingframe": "Xiaomi floating frame",
     "com.mstar.android.tv.disclaimercustomization": "Legal notice customization", "com.mstar.netflixobserver": "Netflix observer", "co.sensara.tv.mitv.res": "Sensara remote helper",
     "fusion.android.tv.demo": "Store demo mode",
+    "com.mitv.tvhome.atv": "Xiaomi home (PatchWall)", "com.mitv.tvhome.mitvplus": "Mi TV+",
     # Sony
     "com.sony.dtv.da.service": "Sony usage analytics", "com.qterics.da.product": "Sony data analytics", "com.sony.dtv.sonyselect": "Sony Select",
     "com.sony.dtv.multiscreendemo": "Sony multi-screen demo", "com.sony.dtv.demosupport": "Sony demo support", "com.sony.dtv.smarthelp": "Sony Smart Help",
@@ -105,7 +106,7 @@ NAMES_FR = {
     "android.autoinstalls.config.google.gtvpai": "Installation auto d'applis suggérées", "fusion.android.tv.demo": "Mode démo de magasin",
     "com.xm.webcontent": "Contenu web Xiaomi", "com.android.ondevicepersonalization.services": "Personnalisation sur l'appareil",
     "com.android.federatedcompute.services": "Calcul fédéré Android", "com.miui.tv.analytics": "Analyses Xiaomi", "com.xiaomi.statistic": "Statistiques Xiaomi",
-    "com.tcl.bi": "Suivi d'usage TCL", "com.tcl.logkit": "Collecte de journaux TCL", "com.mstar.android.tv.disclaimercustomization": "Mentions légales du constructeur",
+    "com.tcl.bi": "Suivi d'usage TCL", "com.mitv.tvhome.atv": "Accueil Xiaomi (PatchWall)", "com.mitv.tvhome.mitvplus": "Mi TV+", "com.tcl.logkit": "Collecte de journaux TCL", "com.mstar.android.tv.disclaimercustomization": "Mentions légales du constructeur",
     "com.android.dreams.basic": "Écran de veille de base", "com.xiaomi.mitv.tvmanager": "Gestionnaire TV Xiaomi", "com.tcl.messagebox": "Messages TCL",
     "com.tcl.esticker": "Autocollants promotionnels TCL", "com.tcl.exhibit": "Mode démo de magasin TCL", "com.tcl.hotelmenu": "Mode hôtel TCL",
     "com.google.android.youtube.tvmusic": "YouTube Music", "com.android.healthconnect.controller": "Santé Connect", "com.google.android.tts": "Synthèse vocale Google",
