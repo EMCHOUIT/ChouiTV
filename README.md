@@ -306,7 +306,7 @@
 
 ## 🚀 التثبيت
 
-<p align="center"><img src="docs/media/guide-choose.png" alt="اختر طريقتك: تلقائيًا بالذكاء الاصطناعي أو يدويًا بـ ADB" width="100%"></p>
+<p align="center"><img src="docs/media/guide-choose-ar.png" alt="ثلاث طرق لتثبيت ChouiTV: من هاتفك، بالذكاء الاصطناعي، يدويًا بـ ADB" width="100%"></p>
 
 </div>
 
@@ -315,15 +315,32 @@
 
 <div dir="rtl" align="right">
 
-### 📱 الأسهل: من هاتفك، بلا كمبيوتر ⭐
+هناك **ثلاث طرق** لتثبيت ChouiTV، وأسهلها من هاتفك، ولها مستودعها الخاص: [**ChouiTV Installer**](https://github.com/EMCHOUIT/ChouiTV-Installer).
 
-نزّل [**ChouiTV Installer**](https://github.com/EMCHOUIT/ChouiTV-Installer/releases/latest/download/ChouiTV-Installer.apk) على هاتف أندرويد وافتحه: يجد تلفزيونك، ويثبّت ChouiTV ويضبطه في نحو دقيقتين، بالعربية أو الفرنسية أو الإنجليزية. [التفاصيل واللقطات](https://github.com/EMCHOUIT/ChouiTV-Installer)
+| | الخيار | لمن | المدة |
+|---|---|---|---|
+| 📱 | [**الخيار 1: من هاتفك**](#install-phone) ⭐ | للجميع، بلا كمبيوتر | نحو دقيقتين |
+| 🤖 | [**الخيار 2: بالذكاء الاصطناعي**](#install-ai) | لديك حاسوب ومساعد ذكي | نحو 40 دقيقة دون أوامر |
+| 🛠️ | [**الخيار 3: يدويًا بـ ADB**](#install-adb) | تريد التحكم الكامل | خمس دقائق وبضعة أوامر |
+
+<a id="install-phone"></a>
+
+### 📱 الخيار 1: من هاتفك، بلا كمبيوتر ⭐ موصى به
+
+افتح مستودع **[ChouiTV Installer](https://github.com/EMCHOUIT/ChouiTV-Installer)** ونزّل التطبيق على هاتف أندرويد. فهو:
+
+- يجد تلفزيونك على الواي فاي، وينزّل دائمًا **أحدث إصدار** من ChouiTV، ويثبّته ويضبطه في نحو دقيقتين؛
+- يعمل بـ **العربية والفرنسية والإنجليزية**، مع شريط تقدّم وشبكة أمان إن لم تفتح الواجهة؛
+- يقترح اختياريًا **تنظيف التلفزيون**: ترى الخطة أولًا، وتختار، ويمكنك التراجع عن كل شيء؛
+- لا يطلب حسابًا ولا يعرض إعلانات.
 
 <p align="center"><a href="https://github.com/EMCHOUIT/ChouiTV-Installer/releases/latest/download/ChouiTV-Installer.apk"><img src="https://img.shields.io/badge/%E2%AC%87%20ChouiTV%20Installer-D6AF6B?style=for-the-badge&labelColor=0A1D14" alt="ChouiTV Installer"></a></p>
 
-**أو بطرق أخرى:**
+[التفاصيل واللقطات والأسئلة](https://github.com/EMCHOUIT/ChouiTV-Installer)
 
-### 🤖 الطريقة الأولى: تلقائيًا بالذكاء الاصطناعي ⭐ موصى بها
+<a id="install-ai"></a>
+
+### 🤖 الخيار 2: من حاسوب، بالذكاء الاصطناعي
 
 <p align="center"><img src="docs/media/guide-auto.png" alt="التثبيت التلقائي في أربع خطوات" width="100%"></p>
 
@@ -359,14 +376,16 @@ irm https://claude.ai/install.ps1 | iex
 
 <img src="docs/media/divider.png" alt="" width="100%">
 
-### 🛠️ الطريقة الثانية: يدويًا بـ ADB
+<a id="install-adb"></a>
+
+### 🛠️ الخيار 3: يدويًا بـ ADB
 
 <p align="center"><img src="docs/media/guide-manual.png" alt="التثبيت اليدوي في خمس خطوات" width="100%"></p>
 
 <details>
 <summary>🔌 <b>1. اتصل بالتلفزيون</b></summary>
 
-فعّل **USB debugging** كما في الطريقة الأولى، وثبّت [أدوات ADB](https://developer.android.com/tools/releases/platform-tools)، ثم:
+فعّل **USB debugging** كما في الخيار 2، وثبّت [أدوات ADB](https://developer.android.com/tools/releases/platform-tools)، ثم:
 
 ```bash
 adb connect <عنوان-التلفزيون>:5555
@@ -405,7 +424,7 @@ adb shell settings put secure screensaver_components ma.chouitv.screensaver/.Scr
 adb shell settings put secure screensaver_default_component ma.chouitv.screensaver/.ScreenDream
 ```
 
-ثم اضغط زر **Home** واختر الواجهة الجديدة إن سألك التلفزيون. (بعض التلفزيونات تُبقي واجهة الشركة: الطريقة الأولى، أو سكربتات المشروع أدناه، تتكفّل بذلك بأمان.)
+ثم اضغط زر **Home** واختر الواجهة الجديدة إن سألك التلفزيون. (بعض التلفزيونات تُبقي واجهة الشركة: الخيار 2، أو سكربتات المشروع أدناه، تتكفّل بذلك بأمان.)
 </details>
 
 <details>
@@ -425,7 +444,7 @@ optimize/find-tv.sh        # يجد التلفزيون على الشبكة
 optimize/install.sh all    # ينزّل أحدث إصدار، يثبّت الواجهة وشاشة التوقف ويضبطهما
 ```
 
-ملاحظة: **تنظيف التلفزيون** (حذف التتبّع والإعلانات والتطبيقات التجريبية) خطوة مهمة لأداء أفضل، فهو يحرّر من 85 إلى 215 ميغابايت من الذاكرة. المساعد يسألك قبل أن يبدأ: إن وافقت نظّف، وإن رفضت ثبّت ما تحتاجه تطبيقاتنا فقط (`SKIP_CLEANUP=1`)، ويمكنك طلب التنظيف لاحقًا.
+ملاحظة: **تنظيف التلفزيون** (حذف التتبّع والإعلانات والتطبيقات التجريبية) خطوة مهمة لأداء أفضل، فهو يحرّر من 85 إلى 215 ميغابايت من الذاكرة. المساعد يسألك قبل أن يبدأ: إن وافقت نظّف، وإن رفضت ثبّت ما تحتاجه تطبيقاتنا فقط (`SKIP_CLEANUP=1`)، ويمكنك طلب التنظيف لاحقًا. ومن الهاتف يقترح [ChouiTV Installer](https://github.com/EMCHOUIT/ChouiTV-Installer) التنظيف نفسه اختياريًا: يعرض الخطة أولًا، ولا يوقف إلا ما تختاره، ويتيح لك التراجع عن كل شيء.
 
 وللرجوع كما كان التلفزيون: `optimize/reset.sh`. وكل التفاصيل في [`docs/SETUP-PROMPT.md`](docs/SETUP-PROMPT.md).
 </details>

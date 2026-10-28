@@ -295,20 +295,37 @@ The **Channels** app sits beside ChouiTV in the dock and shows **live** Moroccan
 
 ## 🚀 Install
 
-<p align="center"><img src="docs/media/guide-choose.png" alt="Choose: automatic with an AI, or by hand with ADB" width="100%"></p>
+<p align="center"><img src="docs/media/guide-choose-en.png" alt="Three ways to install ChouiTV: from your phone, with an AI, by hand with ADB" width="100%"></p>
 
 > [!NOTE]
 > 📺 **Works on Android TV and Google TV sets** (tested on a Xiaomi TV running Android 11). Both apps come from the [ChouiTV releases](https://github.com/EMCHOUIT/ChouiTV/releases/latest), and updates arrive with a press of **OK**.
 
-### 📱 The easiest: from your phone, no computer ⭐
+There are **three ways** to install ChouiTV. The simplest goes through your phone, and it has its own repository: [**ChouiTV Installer**](https://github.com/EMCHOUIT/ChouiTV-Installer).
 
-Download [**ChouiTV Installer**](https://github.com/EMCHOUIT/ChouiTV-Installer/releases/latest/download/ChouiTV-Installer.apk) on an Android phone and open it: it finds your TV and installs and sets up ChouiTV in about two minutes, in Arabic, French or English. [Details and screenshots](https://github.com/EMCHOUIT/ChouiTV-Installer)
+| | Option | For whom | Time |
+|---|---|---|---|
+| 📱 | [**Option 1: from your phone**](#install-phone) ⭐ | everyone, no computer | about 2 minutes |
+| 🤖 | [**Option 2: with an AI**](#install-ai) | you have a computer and an assistant | about 40 minutes, no commands |
+| 🛠️ | [**Option 3: by hand with ADB**](#install-adb) | you want full control | five minutes and a few commands |
+
+<a id="install-phone"></a>
+
+### 📱 Option 1: from your phone, no computer ⭐ recommended
+
+Go to the **[ChouiTV Installer](https://github.com/EMCHOUIT/ChouiTV-Installer)** repository and download the app on an Android phone. It:
+
+- finds your TV on the Wi-Fi, always downloads the **latest version** of ChouiTV, installs and sets it up in about two minutes;
+- speaks **Arabic, French and English**, with a progress bar and a safety net if the home screen does not open;
+- offers an optional **TV cleanup**: you see the plan first, you choose, and you can undo everything;
+- asks for no account and shows no ads.
 
 <p align="center"><a href="https://github.com/EMCHOUIT/ChouiTV-Installer/releases/latest/download/ChouiTV-Installer.apk"><img src="https://img.shields.io/badge/%E2%AC%87%20ChouiTV%20Installer-D6AF6B?style=for-the-badge&labelColor=0A1D14" alt="ChouiTV Installer"></a></p>
 
-**Or another way:**
+[Details, screenshots and FAQ](https://github.com/EMCHOUIT/ChouiTV-Installer)
 
-### 🤖 Method 1: automatic with an AI ⭐ recommended
+<a id="install-ai"></a>
+
+### 🤖 Option 2: from a computer, with an AI
 
 <p align="center"><img src="docs/media/guide-auto.png" alt="Automatic install in four steps" width="100%"></p>
 
@@ -347,14 +364,16 @@ Then close PowerShell and open a new window.
 
 <img src="docs/media/divider.png" alt="" width="100%">
 
-### 🛠️ Method 2: by hand with ADB
+<a id="install-adb"></a>
+
+### 🛠️ Option 3: by hand with ADB
 
 <p align="center"><img src="docs/media/guide-manual.png" alt="Manual install in five steps" width="100%"></p>
 
 <details>
 <summary>🔌 <b>1. Connect to the TV</b></summary>
 
-Turn on **USB debugging** as in method 1, install the [ADB tools](https://developer.android.com/tools/releases/platform-tools), then:
+Turn on **USB debugging** as in option 2, install the [ADB tools](https://developer.android.com/tools/releases/platform-tools), then:
 
 ```bash
 adb connect <tv-address>:5555
@@ -393,7 +412,7 @@ adb shell settings put secure screensaver_components ma.chouitv.screensaver/.Scr
 adb shell settings put secure screensaver_default_component ma.chouitv.screensaver/.ScreenDream
 ```
 
-Then press **Home** and choose the new launcher if the TV asks. (Some TVs keep the manufacturer's launcher: method 1, or the project scripts below, handle that safely.)
+Then press **Home** and choose the new launcher if the TV asks. (Some TVs keep the manufacturer's launcher: option 2, or the project scripts below, handle that safely.)
 </details>
 
 <details>
@@ -413,7 +432,7 @@ optimize/find-tv.sh        # finds the TV on the network
 optimize/install.sh all    # downloads the latest release, installs and sets up the launcher and screensaver
 ```
 
-Note: **cleaning the TV** (removing tracking, ads and trial apps) is an important step for better performance: it frees 85 to 215 MB of memory. The assistant asks before starting: if you agree it cleans, if you decline it installs only what our apps need (`SKIP_CLEANUP=1`), and you can ask for the cleanup later.
+Note: **cleaning the TV** (removing tracking, ads and trial apps) is an important step for better performance: it frees 85 to 215 MB of memory. The assistant asks before starting: if you agree it cleans, if you decline it installs only what our apps need (`SKIP_CLEANUP=1`), and you can ask for the cleanup later. From your phone, [ChouiTV Installer](https://github.com/EMCHOUIT/ChouiTV-Installer) offers the same cleanup as an option: it shows the plan first, turns off only what you choose and lets you undo everything.
 
 To go back to how the TV was: `optimize/reset.sh`. All the details are in [`docs/SETUP-PROMPT.md`](docs/SETUP-PROMPT.md).
 </details>

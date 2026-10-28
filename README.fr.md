@@ -295,20 +295,37 @@ L'application **Channels** accompagne ChouiTV dans le dock et diffuse **en direc
 
 ## 🚀 Installation
 
-<p align="center"><img src="docs/media/guide-choose.png" alt="Choisissez : automatique avec une IA, ou à la main avec ADB" width="100%"></p>
+<p align="center"><img src="docs/media/guide-choose-fr.png" alt="Trois façons d'installer ChouiTV : depuis votre téléphone, avec une IA, à la main avec ADB" width="100%"></p>
 
 > [!NOTE]
 > 📺 **Fonctionne sur les télés Android TV et Google TV** (testé sur une télé Xiaomi sous Android 11). Les deux applis viennent des [versions de ChouiTV](https://github.com/EMCHOUIT/ChouiTV/releases/latest) et les mises à jour arrivent d'une pression sur **OK**.
 
-### 📱 Le plus simple : depuis votre téléphone, sans ordinateur ⭐
+Il y a **trois façons** d'installer ChouiTV. La plus simple passe par votre téléphone, et elle a son propre dépôt : [**ChouiTV Installer**](https://github.com/EMCHOUIT/ChouiTV-Installer).
 
-Téléchargez [**ChouiTV Installer**](https://github.com/EMCHOUIT/ChouiTV-Installer/releases/latest/download/ChouiTV-Installer.apk) sur un téléphone Android et ouvrez-le : il trouve votre télé, installe ChouiTV et le règle en environ deux minutes, en arabe, français ou anglais. [Détails et captures](https://github.com/EMCHOUIT/ChouiTV-Installer)
+| | Option | Pour qui | Durée |
+|---|---|---|---|
+| 📱 | [**Option 1 : depuis votre téléphone**](#install-phone) ⭐ | tout le monde, sans ordinateur | environ 2 minutes |
+| 🤖 | [**Option 2 : avec une IA**](#install-ai) | vous avez un ordinateur et un assistant | environ 40 minutes, sans commande |
+| 🛠️ | [**Option 3 : à la main avec ADB**](#install-adb) | vous voulez garder le contrôle | cinq minutes et quelques commandes |
+
+<a id="install-phone"></a>
+
+### 📱 Option 1 : depuis votre téléphone, sans ordinateur ⭐ recommandée
+
+Rendez-vous sur le dépôt **[ChouiTV Installer](https://github.com/EMCHOUIT/ChouiTV-Installer)** et téléchargez l'appli sur un téléphone Android. Elle :
+
+- trouve votre télé sur le Wi-Fi, télécharge toujours la **dernière version** de ChouiTV, l'installe et la règle en environ deux minutes ;
+- parle **arabe, français et anglais**, avec une barre de progression et un filet de sécurité si l'accueil ne s'ouvre pas ;
+- propose, en option, un **nettoyage de la télé** : vous voyez le plan avant, vous choisissez, et vous pouvez tout annuler ;
+- ne demande ni compte, ni publicité.
 
 <p align="center"><a href="https://github.com/EMCHOUIT/ChouiTV-Installer/releases/latest/download/ChouiTV-Installer.apk"><img src="https://img.shields.io/badge/%E2%AC%87%20ChouiTV%20Installer-D6AF6B?style=for-the-badge&labelColor=0A1D14" alt="ChouiTV Installer"></a></p>
 
-**Ou autrement :**
+[Détails, captures et FAQ](https://github.com/EMCHOUIT/ChouiTV-Installer)
 
-### 🤖 Méthode 1 : automatique avec une IA ⭐ recommandée
+<a id="install-ai"></a>
+
+### 🤖 Option 2 : depuis un ordinateur, avec une IA
 
 <p align="center"><img src="docs/media/guide-auto.png" alt="Installation automatique en quatre étapes" width="100%"></p>
 
@@ -347,14 +364,16 @@ Puis fermez PowerShell et ouvrez une nouvelle fenêtre.
 
 <img src="docs/media/divider.png" alt="" width="100%">
 
-### 🛠️ Méthode 2 : à la main avec ADB
+<a id="install-adb"></a>
+
+### 🛠️ Option 3 : à la main avec ADB
 
 <p align="center"><img src="docs/media/guide-manual.png" alt="Installation manuelle en cinq étapes" width="100%"></p>
 
 <details>
 <summary>🔌 <b>1. Connectez-vous à la télé</b></summary>
 
-Activez **USB debugging** comme dans la méthode 1, installez les [outils ADB](https://developer.android.com/tools/releases/platform-tools), puis :
+Activez **USB debugging** comme dans l'option 2, installez les [outils ADB](https://developer.android.com/tools/releases/platform-tools), puis :
 
 ```bash
 adb connect <adresse-de-la-télé>:5555
@@ -393,7 +412,7 @@ adb shell settings put secure screensaver_components ma.chouitv.screensaver/.Scr
 adb shell settings put secure screensaver_default_component ma.chouitv.screensaver/.ScreenDream
 ```
 
-Puis appuyez sur **Home** et choisissez le nouvel écran d'accueil si la télé le demande. (Certaines télés gardent l'accueil du constructeur : la méthode 1, ou les scripts du projet ci-dessous, s'en chargent en toute sécurité.)
+Puis appuyez sur **Home** et choisissez le nouvel écran d'accueil si la télé le demande. (Certaines télés gardent l'accueil du constructeur : la l'option 2, ou les scripts du projet ci-dessous, s'en chargent en toute sécurité.)
 </details>
 
 <details>
@@ -413,7 +432,7 @@ optimize/find-tv.sh        # trouve la télé sur le réseau
 optimize/install.sh all    # télécharge la dernière version, installe l'accueil et l'écran de veille, et les règle
 ```
 
-Remarque : le **nettoyage de la télé** (suppression du pistage, des publicités et des applis d'essai) est une étape importante pour de meilleures performances : il libère de 85 à 215 Mo de mémoire. L'assistant vous demande avant de commencer : si vous acceptez, il nettoie ; sinon, il installe seulement ce dont nos applis ont besoin (`SKIP_CLEANUP=1`), et vous pouvez demander le nettoyage plus tard.
+Remarque : le **nettoyage de la télé** (suppression du pistage, des publicités et des applis d'essai) est une étape importante pour de meilleures performances : il libère de 85 à 215 Mo de mémoire. L'assistant vous demande avant de commencer : si vous acceptez, il nettoie ; sinon, il installe seulement ce dont nos applis ont besoin (`SKIP_CLEANUP=1`), et vous pouvez demander le nettoyage plus tard. Depuis le téléphone, [ChouiTV Installer](https://github.com/EMCHOUIT/ChouiTV-Installer) propose le même nettoyage en option : il montre d'abord le plan, ne coupe que ce que vous choisissez et permet de tout annuler.
 
 Pour revenir à l'état d'origine : `optimize/reset.sh`. Tous les détails dans [`docs/SETUP-PROMPT.md`](docs/SETUP-PROMPT.md).
 </details>
