@@ -1,7 +1,6 @@
 package ma.chouitv.installer;
 
 import android.util.Base64;
-import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -45,7 +44,7 @@ final class Adb implements AutoCloseable {
     /** What the TV says about itself in its CNXN banner, e.g. device::ro.product.model=...; */
     String banner = "";
 
-    private static void log(String m) { Log.d("ChouiAdb", m); }
+    private static void log(String m) { }
 
     private Adb(Socket s) throws IOException {
         socket = s;
