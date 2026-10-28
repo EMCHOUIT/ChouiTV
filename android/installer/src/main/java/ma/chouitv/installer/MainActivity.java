@@ -50,7 +50,7 @@ import static ma.chouitv.installer.Strings.t;
  */
 public class MainActivity extends Activity {
     private static final int GOLD = 0xFFD6AF6B, SAND = 0xFFF6EFE0, MUTED = 0xFFC6BBA4, DARK = 0xFF040E09;
-    private static final int PICK_SETTINGS = 7, AUTH_SECONDS = 70;
+    private static final int PICK_SETTINGS = 7, AUTH_SECONDS = 120;
 
     private final ExecutorService bg = Executors.newSingleThreadExecutor();
     private final Handler ui = new Handler(Looper.getMainLooper());
@@ -667,6 +667,7 @@ public class MainActivity extends Activity {
         LinearLayout c = card(false);
         c.addView(text(label, regular, 13, MUTED));
         TextView v = text(value, medium, 19, SAND);
+        v.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);   // an Arabic city name in a French page still starts on the reading side
         c.addView(v);
         c.setOnClickListener(click);
         body.addView(c, lp(0, 0, 0, 10));
