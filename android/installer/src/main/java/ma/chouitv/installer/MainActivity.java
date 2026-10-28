@@ -62,6 +62,10 @@ public class MainActivity extends Activity {
     private String model = "";
     private volatile boolean busy;
     private Flow.Home homeResult;
+    // for the TV report
+    private String tvBrand = "", tvModel = "", tvAndroid = "", tvSdk = "", installError = "";
+    private int stepsDone;
+    private long installMs;
     private String chosen = "";
     private Runnable ticker;
 
@@ -107,7 +111,7 @@ public class MainActivity extends Activity {
     @Override
     public void onBackPressed() {
         if (busy) return;
-        if (step > 0 && step < 3) show(step - 1); else super.onBackPressed();
+        if (step == 6) show(5); else if (step > 0 && step < 3) show(step - 1); else super.onBackPressed();
     }
 
     // ---------- the six screens ----------
@@ -146,6 +150,7 @@ public class MainActivity extends Activity {
             case 2: connect(body, button); break;
             case 3: install(body, button); break;
             case 4: personalise(body, button); break;
+            case 6: report(body, button); break;
             default: done(body, button); break;
         }
     }
@@ -372,6 +377,9 @@ public class MainActivity extends Activity {
                 node(nodes, 0, Orn.Node.RUN);
                 progress(0, 0f, bar, pctV, stepV, etaV, t0);
                 String m = flow.model(), av = flow.androidVersion();
+                tvModel = m; tvAndroid = av;
+                try { tvBrand = flow.prop("ro.product.manufacturer"); tvSdk = flow.prop("ro.build.version.sdk"); } catch (IOException ignored) { }
+                stepsDone = 0;
                 sub(subV, 0, m + " · Android " + av);
                 node(nodes, 0, Orn.Node.DONE);
                 progress(0, 1f, bar, pctV, stepV, etaV, t0);
@@ -434,6 +442,8 @@ public class MainActivity extends Activity {
                 node(nodes, 7, Orn.Node.DONE);
                 progress(7, 1f, bar, pctV, stepV, etaV, t0);
 
+                installMs = System.currentTimeMillis() - t0;
+                installError = "";
                 try { cityList = flow.cities(); } catch (Exception ignored) { }
                 Thread.sleep(700);
                 runOnUiThread(() -> { busy = false; show(4); });
@@ -443,6 +453,15 @@ public class MainActivity extends Activity {
                     busy = false;
                     nodes[failed].set(Orn.Node.FAIL);
                     err.setText(t("err_install", friendly(e, "", false)));
+                    installMs = System.currentTimeMillis() - t0;
+                    installError = friendly(e, "", false);
+                    TextView share = text("★  " + t("rc_problem"), medium, 16, GOLD);
+                    share.setGravity(Gravity.CENTER);
+                    GradientDrawable sg = new GradientDrawable();
+                    sg.setCornerRadius(dp(26)); sg.setColor(0xFF142C1F); sg.setStroke(dp(2), 0xFF3F7A5C);
+                    share.setBackground(sg);
+                    share.setOnClickListener(v -> show(6));
+                    body.addView(share, lp(0, 14, 0, 0));
                     button.setText(t("retry"));
                     button.setAlpha(1f);
                     button.setOnClickListener(v -> show(3));
@@ -451,7 +470,10 @@ public class MainActivity extends Activity {
         });
     }
 
-    private void node(final Orn.Node[] nodes, final int i, final int state) { runOnUiThread(() -> nodes[i].set(state)); }
+    private void node(final Orn.Node[] nodes, final int i, final int state) {
+        if (state == Orn.Node.DONE) stepsDone++;
+        runOnUiThread(() -> nodes[i].set(state));
+    }
 
     private void sub(final TextView[] subs, final int i, final String text) { runOnUiThread(() -> subs[i].setText(text)); }
 
@@ -576,6 +598,18 @@ public class MainActivity extends Activity {
             try { startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/EMCHOUIT/ChouiTV"))); } catch (Exception ignored) { }
         });
         body.addView(star, new LinearLayout.LayoutParams(-1, dp(52)));
+        LinearLayout rc = card(false);
+        rc.setBackground(cardBg(false, 0x333F7A5C, 0xFF3F7A5C));
+        rc.addView(text(t("rc_title"), medium, 17, SAND));
+        rc.addView(text(t("rc_why"), regular, 13, MUTED), lp(0, 6, 0, 10));
+        TextView rb = text(t("rc_btn"), medium, 16, SAND);
+        rb.setGravity(Gravity.CENTER);
+        GradientDrawable rg = new GradientDrawable();
+        rg.setCornerRadius(dp(26)); rg.setColor(0); rg.setStroke(dp(2), 0xFF3F7A5C);
+        rb.setBackground(rg);
+        rb.setOnClickListener(v -> show(6));
+        rc.addView(rb, new LinearLayout.LayoutParams(-1, dp(48)));
+        body.addView(rc, lp(0, 14, 0, 0));
         if (homeResult != null && homeResult != Flow.Home.OURS) {
             LinearLayout hw = card(false);
             hw.setBackground(cardBg(false, 0x33E8896B, 0xFFE8896B));
@@ -589,6 +623,74 @@ public class MainActivity extends Activity {
         body.addView(tip, lp(0, 14, 0, 0));
         button.setText(t("open_tv"));
         button.setOnClickListener(v -> bg.execute(() -> { try { flow.openOnTv(); } catch (Exception ignored) { } }));
+    }
+
+    // ---------- the TV report: what would be sent, shown in full, then opened as a GitHub issue the person sends ----------
+
+    private String[][] reportRows() {
+        String home = homeResult == Flow.Home.OURS ? t("rp_home_off") : homeResult == Flow.Home.KEPT_STOCK ? t("rp_home_kept") : t("rp_home_unsure");
+        java.util.List<String[]> r = new ArrayList<>();
+        r.add(new String[] {t("rp_brand"), (tvBrand.isEmpty() ? "" : cap(tvBrand) + " · ") + tvModel});
+        r.add(new String[] {t("rp_android"), tvAndroid + (tvSdk.isEmpty() ? "" : " (API " + tvSdk + ")")});
+        r.add(new String[] {t("rp_version"), BuildInfo.VERSION});
+        if (installError.isEmpty()) r.add(new String[] {t("rp_home"), home});
+        r.add(new String[] {t("rp_pp"), flow != null && flow.playProtect ? t("rp_pp_yes") : t("rp_pp_no")});
+        r.add(new String[] {t("rp_steps"), t("rp_steps_val", stepsDone, Orn.Bar.STEPS)});
+        r.add(new String[] {t("rp_time"), t("rp_time_val", Math.max(1, Math.round(installMs / 60000f)))});
+        if (!installError.isEmpty()) r.add(new String[] {t("rp_error"), scrub(installError)});
+        return r.toArray(new String[0][]);
+    }
+
+    private static String cap(String s) { return s.isEmpty() ? s : Character.toUpperCase(s.charAt(0)) + s.substring(1); }
+
+    /** An error text may carry an address: it never leaves the phone. */
+    private static String scrub(String s) { return s.replaceAll("\\d{1,3}(\\.\\d{1,3}){3}(:\\d+)?", "x.x.x.x"); }
+
+    private String reportBody() {
+        boolean ok = installError.isEmpty();
+        String home = homeResult == Flow.Home.OURS ? "turned off, Home opens ChouiTV" : homeResult == Flow.Home.KEPT_STOCK ? "kept by the TV (it refuses to turn it off)" : "not confirmed";
+        StringBuilder b = new StringBuilder("### TV report\n\n| | |\n|---|---|\n");
+        b.append("| Brand / model | ").append((tvBrand.isEmpty() ? "" : cap(tvBrand) + " ")).append(tvModel).append(" |\n");
+        b.append("| Android | ").append(tvAndroid).append(tvSdk.isEmpty() ? "" : " (API " + tvSdk + ")").append(" |\n");
+        b.append("| ChouiTV | ").append(BuildInfo.VERSION).append(" |\n");
+        if (ok) b.append("| Original home | ").append(home).append(" |\n");
+        b.append("| Play Protect | ").append(flow != null && flow.playProtect ? "asked to confirm" : "no prompt").append(" |\n");
+        b.append("| Steps | ").append(stepsDone).append(" of ").append(Orn.Bar.STEPS).append(" passed |\n");
+        b.append("| Duration | ~").append(Math.max(1, Math.round(installMs / 60000f))).append(" min |\n");
+        if (!ok) b.append("| Error | ").append(scrub(installError).replace("|", "/")).append(" |\n");
+        b.append("| Installer language | ").append(Strings.lang).append(" |\n\n");
+        b.append(ok ? "Everything worked on this TV.\n\n" : "Something went wrong on this TV: what happened?\n\n");
+        b.append("*Sent from ChouiTV Installer. No personal data.*\n");
+        return b.toString();
+    }
+
+    private void report(LinearLayout body, TextView button) {
+        body.addView(text(t("rp_title"), display, 30, SAND), lp(0, 8, 0, 0));
+        body.addView(text(t("rp_sub"), regular, 15, MUTED), lp(0, 4, 0, 6));
+        body.addView(new Orn.Rule(this), new LinearLayout.LayoutParams(-1, dp(22)));
+        LinearLayout why = card(false);
+        why.setBackground(cardBg(false, 0x1FD6AF6B, 0xCCD6AF6B));
+        why.addView(text(t("rc_why"), regular, 14, SAND));
+        body.addView(why, lp(0, 10, 0, 10));
+        LinearLayout tbl = card(false);
+        for (String[] r : reportRows()) {
+            tbl.addView(text(r[0], regular, 12, MUTED), lp(0, 8, 0, 0));
+            tbl.addView(text(r[1], medium, 16, SAND));
+        }
+        body.addView(tbl, lp(0, 0, 0, 10));
+        LinearLayout never = card(false);
+        never.setBackground(cardBg(false, 0x333F7A5C, 0xFF3F7A5C));
+        never.addView(text(t("rp_never"), medium, 15, GOLD));
+        for (String k : new String[] {"rp_never1", "rp_never2", "rp_never3"}) never.addView(text("✕  " + t(k), regular, 14, SAND), lp(0, 4, 0, 0));
+        body.addView(never, lp(0, 0, 0, 10));
+        body.addView(text(t("rp_note"), regular, 12, MUTED), lp(4, 0, 4, 8));
+        button.setText(t("rp_open"));
+        button.setOnClickListener(v -> {
+            String title = "TV report: " + (tvBrand.isEmpty() ? "" : cap(tvBrand) + " ") + tvModel + " · Android " + tvAndroid + (installError.isEmpty() ? "" : " · problem");
+            Uri u = Uri.parse("https://github.com/EMCHOUIT/ChouiTV/issues/new").buildUpon()
+                .appendQueryParameter("labels", "tv-report").appendQueryParameter("title", title).appendQueryParameter("body", reportBody()).build();
+            try { startActivity(new Intent(Intent.ACTION_VIEW, u)); } catch (Exception ignored) { }
+        });
     }
 
     // ---------- choosers ----------

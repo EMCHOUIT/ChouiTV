@@ -12,6 +12,8 @@ final class Flow {
 
     private final Adb tv;
     private final File cache;
+    /** true when Play Protect refused an install over ADB at least once (for the TV report) */
+    boolean playProtect;
 
     Flow(Adb tv, File cache) { this.tv = tv; this.cache = cache; }
 
@@ -20,6 +22,8 @@ final class Flow {
     String model() throws IOException { return tv.shell("getprop ro.product.model").trim(); }
 
     String androidVersion() throws IOException { return tv.shell("getprop ro.build.version.release").trim(); }
+
+    String prop(String name) throws IOException { return tv.shell("getprop " + name).trim(); }
 
     File download(String pkg, String url, String sha, Adb.Progress p) throws Exception {
         return Net.download(url, new File(cache, pkg + ".apk"), sha, p);
@@ -30,6 +34,7 @@ final class Flow {
         try {
             String out = tv.install(f, up);
             if (out.contains("INSTALL_FAILED_VERIFICATION_FAILURE")) {
+                playProtect = true;
                 // Play Protect refused an install over ADB: its check is off for this install only and put back after
                 String was = tv.shell("settings get global " + VERIFIER).trim();
                 tv.shell("settings put global " + VERIFIER + " 0");

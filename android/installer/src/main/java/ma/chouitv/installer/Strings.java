@@ -131,6 +131,35 @@ final class Strings {
         k("home_unsure", "تعذّر التأكد من الزر Home. إن لم يفتح ChouiTV، فالتلفزيون يعيد واجهته الأصلية وحده خلال 5 دقائق.",
             "Impossible de confirmer le bouton Home. S'il n'ouvre pas ChouiTV, la télé rétablit seule son accueil d'origine d'ici 5 minutes.",
             "Could not confirm the Home button. If it does not open ChouiTV, the TV puts its original home back by itself within 5 minutes.");
+        k("rc_title", "شارك نتيجة تلفزيونك", "Partagez le résultat de votre télé", "Share your TV's result");
+        k("rc_why", "إن واجهتك مشكلة فتقريرك يساعدنا على إيجاد حل لها. وإن سار كل شيء على ما يرام فيساعدنا على اقتراح ميزات جديدة لتلفزيونك في الإصدارات القادمة.",
+            "Si vous avez rencontré un problème, votre rapport nous aide à trouver une solution. Si tout s'est bien passé, il nous aide à proposer de nouvelles fonctionnalités pour votre télé dans les prochaines versions.",
+            "If you ran into a problem, your report helps us find a fix. If everything went well, it helps us suggest new features for your TV in the next versions.");
+        k("rc_btn", "اطّلع وأرسل", "Voir et envoyer", "Review and send");
+        k("rc_problem", "شارك المشكلة", "Partager le problème", "Share the problem");
+        k("rp_title", "نتيجة تلفزيونك", "Le résultat de votre télé", "Your TV's result");
+        k("rp_sub", "هذا بالضبط ما سيُرسل، لا غير", "Voici exactement ce qui sera envoyé, rien d'autre", "This is exactly what will be sent, nothing else");
+        k("rp_brand", "العلامة والطراز", "Marque et modèle", "Brand and model");
+        k("rp_android", "أندرويد", "Android", "Android");
+        k("rp_version", "إصدار ChouiTV", "Version de ChouiTV", "ChouiTV version");
+        k("rp_home", "الواجهة الأصلية", "Accueil d'origine", "Original home");
+        k("rp_pp", "Play Protect", "Play Protect", "Play Protect");
+        k("rp_steps", "خطوات التثبيت", "Étapes de l'installation", "Install steps");
+        k("rp_time", "المدة", "Durée", "Duration");
+        k("rp_error", "الخطأ", "Erreur", "Error");
+        k("rp_home_off", "عُطّلت · Home يفتح ChouiTV", "coupé · Home ouvre ChouiTV", "turned off · Home opens ChouiTV");
+        k("rp_home_kept", "بقيت (التلفزيون يرفض تعطيلها)", "conservé (la télé refuse de le couper)", "kept (the TV refuses to turn it off)");
+        k("rp_home_unsure", "لم يتأكد", "non confirmé", "not confirmed");
+        k("rp_pp_no", "لم يطلب تأكيدًا", "n'a rien demandé", "no prompt");
+        k("rp_pp_yes", "طلب تأكيدًا", "a demandé une confirmation", "asked to confirm");
+        k("rp_steps_val", "%d من %d نجحت", "%d sur %d réussies", "%d of %d passed");
+        k("rp_time_val", "نحو %d د", "environ %d min", "about %d min");
+        k("rp_never", "لا يُرسل أبدًا", "N'est jamais envoyé", "Never sent");
+        k("rp_never1", "عنوان IP أو اسم الواي فاي", "L'adresse IP ou le nom du Wi-Fi", "The IP address or the Wi-Fi name");
+        k("rp_never2", "الرقم التسلسلي أو معرّف الجهاز", "Le numéro de série ou l'identifiant de l'appareil", "The serial number or device ID");
+        k("rp_never3", "مدينتك أو موقعك أو إعداداتك", "Votre ville, votre position ou vos réglages", "Your city, your location or your settings");
+        k("rp_open", "افتح في GitHub", "Ouvrir sur GitHub", "Open on GitHub");
+        k("rp_note", "تراجعها أنت ثم تضغط «Submit» بنفسك. ويلزم حساب GitHub.", "Vous la relisez, puis appuyez vous-même sur « Submit ». Un compte GitHub est nécessaire.", "You read it, then press \"Submit\" yourself. A GitHub account is needed.");
         // time zones and prayer methods
         k("z_Africa/Abidjan", "المغرب · GMT (Africa/Abidjan)", "Maroc · GMT (Africa/Abidjan)", "Morocco · GMT (Africa/Abidjan)");
         k("z_city", "حسب المدينة", "Selon la ville", "By city");
