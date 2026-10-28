@@ -320,7 +320,7 @@ Rendez-vous sur le dépôt **[ChouiTV Installer](https://github.com/EMCHOUIT/Cho
 - **copie les réglages d'une télé sur une autre**, maintenant ou plus tard ;
 - ne demande ni compte, ni publicité.
 
-<p align="center"><a href="https://github.com/EMCHOUIT/ChouiTV-Installer/releases/latest/download/ChouiTV-Installer.apk"><img src="https://img.shields.io/badge/%E2%AC%87%20ChouiTV%20Installer-D6AF6B?style=for-the-badge&labelColor=0A1D14" alt="ChouiTV Installer"></a></p>
+<p align="center"><a href="https://github.com/EMCHOUIT/ChouiTV-Installer/releases/download/v1.3/ChouiTV-Installer-1.3.apk"><img src="https://img.shields.io/badge/%E2%AC%87%20ChouiTV%20Installer-D6AF6B?style=for-the-badge&labelColor=0A1D14" alt="ChouiTV Installer"></a></p>
 
 [Détails, captures et FAQ](https://github.com/EMCHOUIT/ChouiTV-Installer)
 

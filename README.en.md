@@ -320,7 +320,7 @@ Go to the **[ChouiTV Installer](https://github.com/EMCHOUIT/ChouiTV-Installer)**
 - **copies one TV's settings to another**, now or later;
 - asks for no account and shows no ads.
 
-<p align="center"><a href="https://github.com/EMCHOUIT/ChouiTV-Installer/releases/latest/download/ChouiTV-Installer.apk"><img src="https://img.shields.io/badge/%E2%AC%87%20ChouiTV%20Installer-D6AF6B?style=for-the-badge&labelColor=0A1D14" alt="ChouiTV Installer"></a></p>
+<p align="center"><a href="https://github.com/EMCHOUIT/ChouiTV-Installer/releases/download/v1.3/ChouiTV-Installer-1.3.apk"><img src="https://img.shields.io/badge/%E2%AC%87%20ChouiTV%20Installer-D6AF6B?style=for-the-badge&labelColor=0A1D14" alt="ChouiTV Installer"></a></p>
 
 [Details, screenshots and FAQ](https://github.com/EMCHOUIT/ChouiTV-Installer)
 
