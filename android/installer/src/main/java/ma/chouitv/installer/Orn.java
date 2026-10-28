@@ -151,4 +151,83 @@ final class Orn {
             cv.drawPath(s, outer);
         }
     }
+
+    /** The global progress: a wide gold bar that fills from the reading side, a tick per step, a star at the tip. */
+    static final class Bar extends View {
+        private final Paint track, fill, tick, ring, dot;
+        private float p;
+        static final int STEPS = 8;
+
+        Bar(Context c) {
+            super(c);
+            track = new Paint(Paint.ANTI_ALIAS_FLAG); track.setColor(0xFF343F38);
+            fill = new Paint(Paint.ANTI_ALIAS_FLAG);
+            tick = new Paint(Paint.ANTI_ALIAS_FLAG); tick.setColor(0xFF0A1811); tick.setStrokeWidth(dp(c, 2));
+            ring = line(0xFFD6AF6B, dp(c, 1.6f));
+            dot = new Paint(Paint.ANTI_ALIAS_FLAG); dot.setColor(0xFF142C1F);
+        }
+
+        void set(float v) { p = Math.max(0f, Math.min(1f, v)); invalidate(); }
+
+        @Override protected void onDraw(Canvas cv) {
+            boolean rtl = getLayoutDirection() == LAYOUT_DIRECTION_RTL;
+            float h = dp(getContext(), 14), pad = dp(getContext(), 12), w = getWidth() - 2 * pad, cy = getHeight() / 2f, top = cy - h / 2, bot = cy + h / 2;
+            RectF tr = new RectF(pad, top, pad + w, bot);
+            cv.drawRoundRect(tr, h / 2, h / 2, track);
+            float fw = Math.max(h, w * p);
+            RectF fr = rtl ? new RectF(pad + w - fw, top, pad + w, bot) : new RectF(pad, top, pad + fw, bot);
+            fill.setShader(new android.graphics.LinearGradient(0, top, 0, bot, 0xFFFFE296, 0xFFC48E3A, android.graphics.Shader.TileMode.CLAMP));
+            cv.drawRoundRect(fr, h / 2, h / 2, fill);
+            for (int i = 1; i < STEPS; i++) {
+                float x = rtl ? pad + w - w * i / STEPS : pad + w * i / STEPS;
+                cv.drawLine(x, top - dp(getContext(), 3), x, bot + dp(getContext(), 3), tick);
+            }
+            float tip = rtl ? fr.left : fr.right;
+            Path s = star(tip, cy, dp(getContext(), 11));
+            cv.drawPath(s, dot);
+            cv.drawPath(s, ring);
+        }
+    }
+
+    /** One node of the timeline: the rail through it, and a dot that is empty, running, done or failed. */
+    static final class Node extends View {
+        static final int WAIT = 0, RUN = 1, DONE = 2, FAIL = 3;
+        private int state = WAIT;
+        private final boolean first, last;
+        private final Paint rail, fill, ring, mark;
+
+        Node(Context c, boolean first, boolean last) {
+            super(c);
+            this.first = first; this.last = last;
+            rail = line(0xFF50645A, dp(c, 2));
+            fill = new Paint(Paint.ANTI_ALIAS_FLAG);
+            ring = line(0xFF50645A, dp(c, 2));
+            mark = line(0xFFF6EFE0, dp(c, 2.4f));
+            mark.setStrokeCap(Paint.Cap.ROUND);
+        }
+
+        void set(int s) { state = s; invalidate(); }
+
+        @Override protected void onDraw(Canvas cv) {
+            float cx = getWidth() / 2f, cy = Math.min(getHeight() / 2f, dp(getContext(), 20)), r = dp(getContext(), 10);
+            if (!first) cv.drawLine(cx, 0, cx, cy - r, rail);
+            if (!last) cv.drawLine(cx, cy + r, cx, getHeight(), rail);
+            fill.setColor(state == DONE ? 0xFF3F7A5C : state == FAIL ? 0xFF7A3F3F : state == RUN ? 0xFF142C1F : 0xFF0A1811);
+            cv.drawCircle(cx, cy, r, fill);
+            ring.setColor(state == RUN ? GOLD : state == DONE ? 0xFF3F7A5C : state == FAIL ? 0xFF7A3F3F : 0xFF50645A);
+            ring.setStrokeWidth(dp(getContext(), state == RUN ? 2.6f : 2));
+            cv.drawCircle(cx, cy, r, ring);
+            if (state == DONE) {
+                Path c = new Path();
+                c.moveTo(cx - r * 0.45f, cy + r * 0.05f); c.lineTo(cx - r * 0.1f, cy + r * 0.4f); c.lineTo(cx + r * 0.5f, cy - r * 0.35f);
+                cv.drawPath(c, mark);
+            } else if (state == RUN) {
+                Paint d = new Paint(Paint.ANTI_ALIAS_FLAG); d.setColor(GOLD);
+                cv.drawCircle(cx, cy, r * 0.32f, d);
+            } else if (state == FAIL) {
+                cv.drawLine(cx, cy - r * 0.45f, cx, cy + r * 0.1f, mark);
+                cv.drawPoint(cx, cy + r * 0.45f, mark);
+            }
+        }
+    }
 }

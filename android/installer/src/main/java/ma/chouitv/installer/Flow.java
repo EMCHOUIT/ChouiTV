@@ -10,16 +10,23 @@ final class Flow {
     static final String SAVER = "ma.chouitv.screensaver", HOME = "ma.chouitv.home", CHANNELS = "com.majnioui.tv.channels";
     static final String VERIFIER = "verifier_verify_adb_installs";
 
-    interface Say { void step(int index, String state, int percent); }
-
     private final Adb tv;
     private final File cache;
 
     Flow(Adb tv, File cache) { this.tv = tv; this.cache = cache; }
 
-    /** Downloads one APK and installs it; the same recovery as optimize/install.sh (Play Protect, another signing key). */
-    void installApk(String pkg, String url, String sha, final Adb.Progress down, final Adb.Progress up) throws Exception {
-        File f = Net.download(url, new File(cache, pkg + ".apk"), sha, down);
+    // ---------- the steps of the installation ----------
+
+    String model() throws IOException { return tv.shell("getprop ro.product.model").trim(); }
+
+    String androidVersion() throws IOException { return tv.shell("getprop ro.build.version.release").trim(); }
+
+    File download(String pkg, String url, String sha, Adb.Progress p) throws Exception {
+        return Net.download(url, new File(cache, pkg + ".apk"), sha, p);
+    }
+
+    /** Sends a downloaded APK and installs it; the same recovery as optimize/install.sh (Play Protect, another signing key). */
+    void installFile(String pkg, File f, Adb.Progress up) throws Exception {
         try {
             String out = tv.install(f, up);
             if (out.contains("INSTALL_FAILED_VERIFICATION_FAILURE")) {
@@ -45,23 +52,27 @@ final class Flow {
         } finally { f.delete(); }
     }
 
-    /** The screensaver and the TV's permissions for the home app, then the home role. */
-    void configure() throws IOException {
+    /** The permissions the home app needs. */
+    void grantPermissions() throws IOException {
+        tv.shell("pm grant " + HOME + " android.permission.ACCESS_FINE_LOCATION");
+        tv.shell("appops set " + HOME + " SCHEDULE_EXACT_ALARM allow");
+    }
+
+    /** The screensaver, then the home role. */
+    void setDefaults() throws IOException {
         tv.shell("settings put secure screensaver_enabled 1");
         tv.shell("settings put secure screensaver_components " + SAVER + "/.ScreenDream");
         tv.shell("settings put secure screensaver_default_component " + SAVER + "/.ScreenDream");
-        tv.shell("pm grant " + HOME + " android.permission.ACCESS_FINE_LOCATION");
-        tv.shell("appops set " + HOME + " SCHEDULE_EXACT_ALARM allow");
         tv.shell("cmd role add-role-holder --user 0 android.app.role.HOME " + HOME);
         tv.shell("cmd package set-home-activity --user 0 " + HOME + "/.MainActivity");
     }
 
-    boolean installed(String pkg) throws IOException {
-        return tv.shell("pm list packages " + pkg).contains("package:" + pkg);
-    }
-
-    String model() throws IOException {
-        return tv.shell("getprop ro.product.model").trim();
+    /** Everything is there: the three apps are installed. Returns true when the home key opens our home. */
+    boolean verify() throws IOException {
+        for (String p : new String[] {SAVER, CHANNELS, HOME}) {
+            if (!tv.shell("pm list packages " + p).contains("package:" + p)) throw new IOException(p + " is not installed");
+        }
+        return tv.shell("cmd package resolve-activity --brief -a android.intent.action.MAIN -c android.intent.category.HOME").contains(HOME);
     }
 
     // ---------- the screensaver's own receiver (the same one optimize/saver.sh talks to) ----------

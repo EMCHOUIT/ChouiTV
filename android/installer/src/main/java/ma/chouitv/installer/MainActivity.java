@@ -30,6 +30,7 @@ import android.widget.Toast;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
+import java.io.IOException;
 import java.net.ConnectException;
 import java.net.NoRouteToHostException;
 import java.net.SocketTimeoutException;
@@ -64,13 +65,13 @@ public class MainActivity extends Activity {
     private Runnable ticker;
 
     // personalisation
-    private String city = "الدار البيضاء", tz = "Africa/Abidjan", method = "21";
+    private String city = "الدار البيضاء", tz = "Africa/Casablanca", method = "21";
     private boolean adhanOn = true;
     private List<String[]> cityList = new ArrayList<>();
     private String importedB64;
     private TextView cityV, tzV, methodV, adhanV, importV;
 
-    private static final String[] ZONES = {"Africa/Abidjan", "city", "Africa/Algiers", "Africa/Tunis", "Africa/Cairo", "Asia/Riyadh", "Asia/Dubai", "Europe/Paris"};
+    private static final String[] ZONES = {"Africa/Casablanca", "city", "Africa/Algiers", "Africa/Tunis", "Africa/Cairo", "Asia/Riyadh", "Asia/Dubai", "Europe/Paris"};
     private static final String[] METHODS = {"21", "auto", "19", "18", "5", "4", "3"};
 
     @Override
@@ -316,74 +317,127 @@ public class MainActivity extends Activity {
         });
     }
 
+    /** The weight of each of the eight steps in the global percentage (they add up to 100). */
+    private static final int[] W = {3, 25, 15, 12, 15, 6, 12, 12};
+
     private void install(final LinearLayout body, final TextView button) {
-        final String[][] rows = {{t("row_home"), "chouitv-home.apk"}, {t("row_saver"), "chouitv-screensaver.apk"}, {t("row_channels"), t("ch_sub")}, {t("row_config"), ""}};
-        final TextView[] marks = new TextView[4];
-        final LinearLayout[] cards = new LinearLayout[4];
-        for (int i = 0; i < 4; i++) {
-            LinearLayout c = card(false);
-            c.setOrientation(LinearLayout.HORIZONTAL);
-            c.setGravity(Gravity.CENTER_VERTICAL);
-            TextView m = text("", medium, 16, SAND);
-            m.setGravity(Gravity.CENTER);
-            LinearLayout.LayoutParams mp = new LinearLayout.LayoutParams(dp(34), dp(34));
-            mp.setMarginEnd(dp(14));
-            c.addView(m, mp);
+        final int n = W.length;
+        final TextView pctV = text("0%", display, 58, SAND);
+        pctV.setGravity(Gravity.CENTER);
+        pctV.setTextDirection(View.TEXT_DIRECTION_LTR);
+        body.addView(pctV, lp(0, 0, 0, 4));
+        final Orn.Bar bar = new Orn.Bar(this);
+        body.addView(bar, new LinearLayout.LayoutParams(-1, dp(32)));
+        LinearLayout meta = new LinearLayout(this);
+        meta.setOrientation(LinearLayout.HORIZONTAL);
+        final TextView stepV = text(t("step_of", 1, n), medium, 14, SAND);
+        final TextView etaV = text("", regular, 14, GOLD);
+        etaV.setGravity(Gravity.END);
+        meta.addView(stepV, new LinearLayout.LayoutParams(0, -2, 1f));
+        meta.addView(etaV, new LinearLayout.LayoutParams(0, -2, 1f));
+        body.addView(meta, lp(6, 6, 6, 14));
+        final String[] titles = {t("s_check"), t("s_download", ""), t("s_saver"), t("s_channels"), t("s_home"), t("s_perms"), t("s_defaults"), t("s_verify")};
+        final String[] subs0 = {"", "", "", t("ch_sub"), "", t("sub_perms"), t("sub_defaults"), t("sub_verify")};
+        final Orn.Node[] nodes = new Orn.Node[n];
+        final TextView[] titleV = new TextView[n], subV = new TextView[n];
+        for (int i = 0; i < n; i++) {
+            LinearLayout row = new LinearLayout(this);
+            row.setOrientation(LinearLayout.HORIZONTAL);
+            nodes[i] = new Orn.Node(this, i == 0, i == n - 1);
+            row.addView(nodes[i], new LinearLayout.LayoutParams(dp(30), -1));
             LinearLayout tt = new LinearLayout(this);
             tt.setOrientation(LinearLayout.VERTICAL);
-            tt.addView(text(rows[i][0], medium, 17, SAND));
-            TextView sub = text(rows[i][1], regular, 13, MUTED);
-            if (i < 2) sub.setTextDirection(View.TEXT_DIRECTION_LTR);
-            tt.addView(sub);
-            c.addView(tt, new LinearLayout.LayoutParams(0, -2, 1f));
-            body.addView(c, lp(0, 0, 0, 10));
-            marks[i] = m; cards[i] = c;
-            mark(m, c, "wait");
+            tt.setPadding(0, dp(8), 0, dp(10));
+            titleV[i] = text(titles[i], medium, 16, SAND);
+            subV[i] = text(subs0[i], regular, 13, MUTED);
+            subV[i].setTextDirection(View.TEXT_DIRECTION_FIRST_STRONG);
+            tt.addView(titleV[i]);
+            tt.addView(subV[i]);
+            LinearLayout.LayoutParams tp = new LinearLayout.LayoutParams(0, -2, 1f);
+            tp.setMarginStart(dp(10));
+            row.addView(tt, tp);
+            body.addView(row, new LinearLayout.LayoutParams(-1, -2));
         }
-        final ProgressBar bar = new ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal);
-        bar.setMax(1000);
-        bar.getProgressDrawable().setColorFilter(GOLD, android.graphics.PorterDuff.Mode.SRC_IN);
-        body.addView(bar, lp(0, 10, 0, 0));
-        final TextView info = text("", regular, 14, MUTED);
-        body.addView(info, lp(0, 8, 0, 0));
+        final TextView err = text("", regular, 14, 0xFFE8896B);
+        body.addView(err, lp(0, 10, 0, 0));
         button.setText(t("installing"));
         button.setAlpha(0.6f);
         busy = true;
-        // order on the TV: screensaver, channels, home (the new home only after the other two work), then the settings
-        final int[] order = {1, 2, 0, 3};
+        final long t0 = System.currentTimeMillis();
         bg.execute(() -> {
-            int doing = -1;
+            int cur = 0;
             try {
+                cur = 0;
+                node(nodes, 0, Orn.Node.RUN);
+                progress(0, 0f, bar, pctV, stepV, etaV, t0);
+                String m = flow.model(), av = flow.androidVersion();
+                sub(subV, 0, m + " · Android " + av);
+                node(nodes, 0, Orn.Node.DONE);
+                progress(0, 1f, bar, pctV, stepV, etaV, t0);
+
+                cur = 1;
+                node(nodes, 1, Orn.Node.RUN);
                 final Net.Release rel = Net.latest();
-                for (int k = 0; k < 4; k++) {
-                    final int i = order[k];
-                    doing = i;
-                    final int base = k * 250;
-                    runOnUiThread(() -> { mark(marks[i], cards[i], "run"); info.setText(t("version") + " " + rel.version); });
-                    if (i == 3) {
-                        flow.configure();
-                    } else {
-                        String pkg = i == 0 ? Flow.HOME : i == 1 ? Flow.SAVER : Flow.CHANNELS;
-                        String url = null, sha = "";
-                        for (Net.Apk a : rel.apks) if (a.pkg.equals(pkg)) { url = a.url; sha = a.sha; }
-                        if (i == 2) url = Net.CHANNELS;
-                        if (url == null) throw new java.io.IOException("no link for " + pkg);
-                        flow.installApk(pkg, url, sha,
-                            (d, tt) -> setBar(bar, base + (tt > 0 ? (int) (125 * d / tt) : 0)),
-                            (d, tt) -> setBar(bar, base + 125 + (tt > 0 ? (int) (125 * d / tt) : 0)));
-                    }
-                    runOnUiThread(() -> mark(marks[i], cards[i], "done"));
-                    setBar(bar, base + 250);
+                final String ver = rel.version;
+                runOnUiThread(() -> titleV[1].setText(t("s_download", ver)));
+                final String[] pk = {Flow.SAVER, Flow.CHANNELS, Flow.HOME};
+                final java.io.File[] files = new java.io.File[3];
+                for (int j = 0; j < 3; j++) {
+                    String url = null, sha = "";
+                    for (Net.Apk a : rel.apks) if (a.pkg.equals(pk[j])) { url = a.url; sha = a.sha; }
+                    if (j == 1) { url = Net.CHANNELS; sha = ""; }
+                    if (url == null) throw new IOException("no link for " + pk[j]);
+                    final int jj = j;
+                    files[j] = flow.download(pk[j], url, sha, (d, tt) -> {
+                        progress(1, (jj + (tt > 0 ? (float) d / tt : 0f)) / 3f, bar, pctV, stepV, etaV, t0);
+                        sub(subV, 1, (jj + 1) + "/3 · " + mb(d) + (tt > 0 ? " / " + mb(tt) : ""));
+                    });
                 }
+                node(nodes, 1, Orn.Node.DONE);
+                progress(1, 1f, bar, pctV, stepV, etaV, t0);
+
+                for (int k = 0; k < 3; k++) {
+                    cur = 2 + k;
+                    final int s = cur;
+                    node(nodes, s, Orn.Node.RUN);
+                    flow.installFile(pk[k], files[k], (d, tt) -> {
+                        float f = tt > 0 ? (float) d / tt : 0f;
+                        progress(s, f * 0.85f, bar, pctV, stepV, etaV, t0);
+                        sub(subV, s, f >= 1f ? t("sub_install") : t("sub_send", (int) (f * 100)));
+                    });
+                    if (s != 3) sub(subV, s, ver);
+                    else sub(subV, s, t("ch_sub"));
+                    node(nodes, s, Orn.Node.DONE);
+                    progress(s, 1f, bar, pctV, stepV, etaV, t0);
+                }
+
+                cur = 5;
+                node(nodes, 5, Orn.Node.RUN);
+                flow.grantPermissions();
+                node(nodes, 5, Orn.Node.DONE);
+                progress(5, 1f, bar, pctV, stepV, etaV, t0);
+
+                cur = 6;
+                node(nodes, 6, Orn.Node.RUN);
+                flow.setDefaults();
+                node(nodes, 6, Orn.Node.DONE);
+                progress(6, 1f, bar, pctV, stepV, etaV, t0);
+
+                cur = 7;
+                node(nodes, 7, Orn.Node.RUN);
+                flow.verify();
+                node(nodes, 7, Orn.Node.DONE);
+                progress(7, 1f, bar, pctV, stepV, etaV, t0);
+
                 try { cityList = flow.cities(); } catch (Exception ignored) { }
+                Thread.sleep(700);
                 runOnUiThread(() -> { busy = false; show(4); });
             } catch (final Exception e) {
-                final int failed = doing;
+                final int failed = cur;
                 runOnUiThread(() -> {
                     busy = false;
-                    if (failed >= 0) mark(marks[failed], cards[failed], "fail");
-                    info.setTextColor(0xFFE8896B);
-                    info.setText(t("err_install", friendly(e, "", false)));
+                    nodes[failed].set(Orn.Node.FAIL);
+                    err.setText(t("err_install", friendly(e, "", false)));
                     button.setText(t("retry"));
                     button.setAlpha(1f);
                     button.setOnClickListener(v -> show(3));
@@ -392,9 +446,28 @@ public class MainActivity extends Activity {
         });
     }
 
-    private void setBar(final ProgressBar bar, final int v) {
-        runOnUiThread(() -> bar.setProgress(Math.min(1000, v)));
+    private void node(final Orn.Node[] nodes, final int i, final int state) { runOnUiThread(() -> nodes[i].set(state)); }
+
+    private void sub(final TextView[] subs, final int i, final String text) { runOnUiThread(() -> subs[i].setText(text)); }
+
+    private String mb(long bytes) { return String.format(Locale.ENGLISH, "%.1f %s", bytes / 1048576.0, t("mb")); }
+
+    /** The global percentage: the weights of the finished steps plus the share of the running one. */
+    private void progress(final int step, float frac, final Orn.Bar bar, final TextView pctV, final TextView stepV, final TextView etaV, final long t0) {
+        float done = 0;
+        for (int i = 0; i < step; i++) done += W[i];
+        final float pct = Math.min(100f, done + W[step] * Math.max(0f, Math.min(1f, frac)));
+        final long el = (System.currentTimeMillis() - t0) / 1000;
+        final String eta = pct < 6f || pct >= 100f ? "" : eta(Math.round(el * (100 - pct) / pct));
+        runOnUiThread(() -> {
+            pctV.setText(Math.round(pct) + "%");
+            bar.set(pct / 100f);
+            stepV.setText(t("step_of", step + 1, W.length));
+            etaV.setText(eta);
+        });
     }
+
+    private String eta(long sec) { return sec < 45 ? t("eta_lt1") : t("eta_min", Math.max(1, Math.round(sec / 60f))); }
 
     private void personalise(LinearLayout body, final TextView button) {
         cityV = addChoice(body, t("city"), city, v -> pickCity());
@@ -449,35 +522,60 @@ public class MainActivity extends Activity {
         LinearLayout in = new LinearLayout(this);
         in.setOrientation(LinearLayout.VERTICAL);
         in.setGravity(Gravity.CENTER);
-        in.setPadding(dp(18), dp(40), dp(18), dp(18));
-        TextView check = text("✓", medium, 46, GOLD);
+        in.setPadding(dp(18), dp(36), dp(18), dp(16));
+        TextView check = text("✓", medium, 40, GOLD);
         check.setGravity(Gravity.CENTER);
         GradientDrawable ring = new GradientDrawable();
         ring.setShape(GradientDrawable.OVAL);
         ring.setColor(0xFF142C1F);
         ring.setStroke(dp(3), GOLD);
         check.setBackground(ring);
-        in.addView(check, new LinearLayout.LayoutParams(dp(96), dp(96)));
-        TextView logo = text("ChouiTV", script, 40, SAND);
+        in.addView(check, new LinearLayout.LayoutParams(dp(84), dp(84)));
+        TextView logo = text("ChouiTV", script, 38, SAND);
         logo.setGravity(Gravity.CENTER);
         gold(logo);
-        in.addView(logo, lp(0, 14, 0, 0));
+        in.addView(logo, lp(0, 10, 0, 0));
         arch.addView(in, new FrameLayout.LayoutParams(-1, -1));
-        LinearLayout.LayoutParams ap = new LinearLayout.LayoutParams(dp(270), dp(290));
+        LinearLayout.LayoutParams ap = new LinearLayout.LayoutParams(dp(230), dp(230));
         ap.gravity = Gravity.CENTER_HORIZONTAL;
-        ap.topMargin = dp(20);
+        ap.topMargin = dp(10);
         body.addView(arch, ap);
-        TextView title = text(t("done_ready"), display, 26, SAND);
+        TextView title = text(t("thanks_title"), display, 24, SAND);
         title.setGravity(Gravity.CENTER);
-        body.addView(title, lp(0, 20, 0, 4));
-        TextView s = text(t("done_sub"), regular, 15, MUTED);
+        body.addView(title, lp(0, 16, 0, 4));
+        TextView s = text(t("thanks_sub"), regular, 15, MUTED);
         s.setGravity(Gravity.CENTER);
         body.addView(s);
+        // the ask: a star on GitHub
+        LinearLayout ask = card(false);
+        ask.setBackground(cardBg(false, 0x1FD6AF6B, 0xCCD6AF6B));
+        ask.setGravity(Gravity.CENTER_HORIZONTAL);
+        TextView st = text("★", medium, 26, GOLD);
+        st.setGravity(Gravity.CENTER);
+        ask.addView(st, new LinearLayout.LayoutParams(-1, -2));
+        TextView q = text(t("star_title"), medium, 18, GOLD);
+        q.setGravity(Gravity.CENTER);
+        ask.addView(q);
+        TextView qt = text(t("star_text"), regular, 14, SAND);
+        qt.setGravity(Gravity.CENTER);
+        ask.addView(qt, lp(0, 4, 0, 0));
+        body.addView(ask, lp(0, 18, 0, 10));
+        TextView star = text("★  " + t("star_btn"), medium, 17, GOLD);
+        star.setGravity(Gravity.CENTER);
+        GradientDrawable sb = new GradientDrawable();
+        sb.setCornerRadius(dp(28));
+        sb.setColor(0xFF142C1F);
+        sb.setStroke(dp(2), GOLD);
+        star.setBackground(sb);
+        star.setOnClickListener(v -> {
+            try { startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/EMCHOUIT/ChouiTV"))); } catch (Exception ignored) { }
+        });
+        body.addView(star, new LinearLayout.LayoutParams(-1, dp(52)));
         LinearLayout tip = card(false);
         tip.setBackground(cardBg(false, 0x333F7A5C, 0xFF3F7A5C));
         tip.addView(text(t("tip"), medium, 15, GOLD));
         tip.addView(text(t("tip_text"), regular, 14, SAND));
-        body.addView(tip, lp(0, 22, 0, 0));
+        body.addView(tip, lp(0, 14, 0, 0));
         button.setText(t("open_tv"));
         button.setOnClickListener(v -> bg.execute(() -> { try { flow.openOnTv(); } catch (Exception ignored) { } }));
     }

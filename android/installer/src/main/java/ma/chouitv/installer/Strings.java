@@ -1,6 +1,7 @@
 package ma.chouitv.installer;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /** Every text of the installer in Arabic, French and English. The language is chosen on the first screen. */
@@ -16,7 +17,7 @@ final class Strings {
         return v[lang.equals("fr") ? 1 : lang.equals("en") ? 2 : 0];
     }
 
-    static String t(String key, Object... args) { return String.format(t(key), args); }
+    static String t(String key, Object... args) { return String.format(Locale.ENGLISH, t(key), args); }
 
     static boolean rtl() { return lang.equals("ar"); }
 
@@ -98,6 +99,29 @@ final class Strings {
         k("tip", "نصيحة", "Conseil", "Tip");
         k("tip_text", "أغلق «تصحيح الشبكة» على التلفزيون عند الانتهاء", "Désactivez le « Débogage réseau » sur la télé une fois fini", "Turn \"Network debugging\" off on the TV when you are done");
         k("open_tv", "افتح على التلفزيون", "Ouvrir sur la télé", "Open on the TV");
+        k("step_of", "الخطوة %d من %d", "Étape %d sur %d", "Step %d of %d");
+        k("eta_lt1", "أقل من دقيقة", "moins d'une minute", "under a minute");
+        k("eta_min", "نحو %d د", "environ %d min", "about %d min");
+        k("mb", "م.ب", "Mo", "MB");
+        k("s_check", "فحص التلفزيون", "Vérification de la télé", "Checking the TV");
+        k("s_download", "تنزيل الإصدار %s", "Téléchargement de la version %s", "Downloading version %s");
+        k("s_saver", "شاشة التوقف والإعدادات", "Écran de veille et réglages", "Screensaver and settings");
+        k("s_channels", "تطبيق القنوات", "Application Chaînes", "Channels app");
+        k("s_home", "الواجهة الرئيسية", "Écran d'accueil", "Home screen");
+        k("s_perms", "الصلاحيات", "Permissions", "Permissions");
+        k("s_defaults", "الواجهة الافتراضية", "Accueil par défaut", "Default home");
+        k("s_verify", "التحقق من التثبيت", "Vérification de l'installation", "Checking the install");
+        k("sub_send", "إرسال %d%%", "Envoi %d%%", "Sending %d%%");
+        k("sub_install", "تثبيت…", "Installation…", "Installing…");
+        k("sub_perms", "الموقع · المنبّهات", "Position · alarmes", "Location · alarms");
+        k("sub_defaults", "مع شاشة التوقف", "et écran de veille", "and screensaver");
+        k("sub_verify", "الإصدارات والواجهة", "Versions et accueil", "Versions and home");
+        k("thanks_title", "شكرًا لاختيارك ChouiTV", "Merci d'avoir choisi ChouiTV", "Thank you for choosing ChouiTV");
+        k("thanks_sub", "تلفزيونك جاهز، والتحديثات تصلك وحدها", "Votre télé est prête, les mises à jour arrivent seules", "Your TV is ready and updates arrive by themselves");
+        k("star_title", "أعجبك التطبيق؟", "ChouiTV vous plaît ?", "Enjoying ChouiTV?");
+        k("star_text", "نجمة على GitHub تدعمنا وتشجّعنا على الاستمرار", "Une étoile sur GitHub nous soutient et nous encourage à continuer", "A star on GitHub supports us and keeps us going");
+        k("star_btn", "ضع نجمة للمشروع", "Mettre une étoile au projet", "Star the project");
+        k("z_Africa/Casablanca", "المغرب · GMT (Africa/Casablanca)", "Maroc · GMT (Africa/Casablanca)", "Morocco · GMT (Africa/Casablanca)");
         // time zones and prayer methods
         k("z_Africa/Abidjan", "المغرب · GMT (Africa/Abidjan)", "Maroc · GMT (Africa/Abidjan)", "Morocco · GMT (Africa/Abidjan)");
         k("z_city", "حسب المدينة", "Selon la ville", "By city");
