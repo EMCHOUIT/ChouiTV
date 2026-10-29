@@ -433,7 +433,7 @@ public class MainActivity extends Activity {
         right.setClipChildren(false);
         Pill saver = pill("شاشة التوقف", R.drawable.ic_screensaver);
         saver.setOnClickListener(v -> startScreensaver());
-        saver.setOnLongClickListener(v -> { openPackage(SAVER_PKG); return true; });   // the settings of the screensaver: the city, the cards, the photos
+        saver.setOnLongClickListener(v -> { openSaverSettings(); return true; });   // the settings of the screensaver: the city, the cards, the photos
         Pill inputs = pill("المصادر", R.drawable.ic_input);
         inputs.setOnClickListener(v -> showInputs(v));
         wifiPill = pill("واي فاي", R.drawable.ic_wifi);
@@ -446,7 +446,7 @@ public class MainActivity extends Activity {
         sleepPill = pill("مؤقت النوم", R.drawable.ic_sleep);
         sleepPill.setOnClickListener(v -> showSleep(v));
         List<Pill> row = new ArrayList<>(Arrays.asList(inputs, wifiPill, settings, sleepPill));
-        if (isInstalled(SAVER_PKG)) row.add(saver);   // (no «المهام» pill any more)
+        row.add(saver);   // (no «المهام» pill any more)
         if (getResources().getBoolean(R.bool.show_listening)) row.add(tilawah);
         for (Pill p : row) {
             right.addView(p, llp(-2, dp(Pill.HEIGHT), dp(10), 0, 0, 0));
@@ -1396,12 +1396,17 @@ public class MainActivity extends Activity {
             startActivity(new Intent().setClassName("com.android.systemui", "com.android.systemui.Somnambulator").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         } catch (RuntimeException e) {
             try { startActivity(new Intent(Intent.ACTION_MAIN).setClassName(getPackageName(), "ma.chouitv.screensaver.MainActivity").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); }
-            catch (RuntimeException ignored) { openPackage(SAVER_PKG); }
+            catch (RuntimeException ignored) { openSaverSettings(); }
         }
         if (!prefs().getBoolean("saverHint", false)) {   // once: where the settings went
             prefs().edit().putBoolean("saverHint", true).apply();
             android.widget.Toast.makeText(this, "للإعدادات (المدينة…): اضغط مطولاً على «شاشة التوقف»", android.widget.Toast.LENGTH_LONG).show();
         }
+    }
+
+    /** The settings of the screensaver and of this home screen: an activity of this app (a separate app until 4.0). */
+    private void openSaverSettings() {
+        launch(new Intent(Intent.ACTION_MAIN).setClassName(getPackageName(), Dock.SETTINGS_ACTIVITY));
     }
 
     private void openPackage(String pkg) {
@@ -1411,7 +1416,6 @@ public class MainActivity extends Activity {
     }
 
     static final int GOLD = 0xFFD6AF6B;
-    static final String SAVER_PKG = "ma.chouitv.screensaver";
     private final Map<String, Typeface> fonts = new HashMap<>();
 
     /** Thmanyah from assets/fonts; any old family name maps to the nearest weight. */

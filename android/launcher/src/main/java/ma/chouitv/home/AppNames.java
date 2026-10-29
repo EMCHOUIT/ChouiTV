@@ -41,7 +41,7 @@ final class AppNames {
         Map<String, String> m = new HashMap<>();
         for (String row : Dock.prefs(c).getString("names", "").split("\n")) {
             int bar = row.indexOf('|');
-            if (bar > 0) m.put(row.substring(0, bar), row.substring(bar + 1));
+            if (bar > 0) m.put(Dock.current(c, row.substring(0, bar)), row.substring(bar + 1));
         }
         return m;
     }

@@ -28,11 +28,21 @@ final class Dock {
         return c.getSharedPreferences("MainActivity", Context.MODE_PRIVATE);
     }
 
+    /** The settings of the screensaver, an activity of this app since 4.0 (they were the app ma.chouitv.screensaver). */
+    static final String SETTINGS_ACTIVITY = "ma.chouitv.screensaver.SettingsActivity";
+    /** The package the settings had before 4.0: a favourite, a hidden or a renamed entry that names it now means this app. */
+    static final String OLD_SETTINGS_PACKAGE = "ma.chouitv.screensaver";
+
+    static String current(Context c, String pkg) { return OLD_SETTINGS_PACKAGE.equals(pkg) ? c.getPackageName() : pkg; }
+
     /** Saved order, or the defaults from config.xml; may name apps that are no longer installed. */
     static List<String> saved(Context c) {
         String s = prefs(c).getString("dock", null);
-        return s != null ? Arrays.asList(s.isEmpty() ? new String[0] : s.split(","))
-                         : Arrays.asList(c.getResources().getStringArray(R.array.dock_apps));
+        List<String> raw = s != null ? Arrays.asList(s.isEmpty() ? new String[0] : s.split(","))
+                                     : Arrays.asList(c.getResources().getStringArray(R.array.dock_apps));
+        List<String> out = new ArrayList<>();
+        for (String p : raw) { String q = current(c, p); if (!out.contains(q)) out.add(q); }
+        return out;
     }
 
     /** The stock home screens of Google TV and Android TV: they list only TV (leanback) apps. */
@@ -87,7 +97,9 @@ final class Dock {
             Intent q = new Intent(Intent.ACTION_MAIN).addCategory(category);
             for (ResolveInfo ri : pm.queryIntentActivities(q, PackageManager.GET_RESOLVED_FILTER)) {
                 String p = ri.activityInfo.packageName;
-                if (p.equals(c.getPackageName()) || out.containsKey(p) || (why != null && why.containsKey(p))) continue;
+                // this app's own entry is its settings (the screensaver's, since 4.0); its other activities are not apps to open from here
+                if (p.equals(c.getPackageName()) && !SETTINGS_ACTIVITY.equals(ri.activityInfo.name)) continue;
+                if (out.containsKey(p) || (why != null && why.containsKey(p))) continue;
                 String reason = hidden.contains(p) ? "hidden with dock.sh hide"
                         : shown.contains(p) ? null
                         : config.contains(p) ? "hidden in config.xml"
@@ -104,7 +116,9 @@ final class Dock {
     /** Packages hidden ("hidden") or shown against the rule ("shown") from ADB. */
     static Set<String> prefSet(Context c, String key) {
         String s = prefs(c).getString(key, "");
-        return s.isEmpty() ? new HashSet<>() : new HashSet<>(Arrays.asList(s.split(",")));
+        Set<String> out = new HashSet<>();
+        if (!s.isEmpty()) for (String p : s.split(",")) out.add(current(c, p));
+        return out;
     }
 
     /** Hide or show these packages: one list gains them, the other loses them; the home screen redraws. */
