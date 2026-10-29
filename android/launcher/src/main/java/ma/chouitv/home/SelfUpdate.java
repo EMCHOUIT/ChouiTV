@@ -123,7 +123,11 @@ final class SelfUpdate {
         // the file and its signature are asked for with the same minute; the TV believes the file only if the owner signed exactly these bytes
         byte[] file = download(MANIFEST + "?t=" + (now / 60_000L));   // the minute: a cached copy is not kept for long
         String signature = new String(download(MANIFEST + ".sig?t=" + (now / 60_000L)), "UTF-8");
-        if (!ManifestTrust.verify(file, signature)) return "error: the version file is not signed by ChouiTV";
+        if (!ManifestTrust.verify(file, signature)) {
+            // right after a release the file and its signature can come from two different moments (GitHub's copies update one after the other): ask again in 30 minutes, not in 6 hours
+            p.edit().putLong("updCheck", now - CHECK_EVERY_MS + 30 * 60_000L).apply();
+            return "error: the version file is not signed by ChouiTV (" + file.length + " + " + signature.trim().length() + " bytes" + (ManifestTrust.lastError != null ? ", " + ManifestTrust.lastError : ", no match") + ")";
+        }
         JSONObject m = new JSONObject(new String(file, "UTF-8"));
         int latest = m.getInt("versionCode");
         JSONArray apks = m.getJSONArray("apks");

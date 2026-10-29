@@ -22,7 +22,11 @@ final class ManifestTrust {
     /** True only when `signature` (base64 of the DER ECDSA signature) is the owner's signature of exactly these bytes. */
     static boolean verify(byte[] manifest, String signature) { return verify(manifest, signature, PUBLIC_KEY); }
 
+    /** Why the last check could not run at all (null when it ran and the signature simply did not match); shown by saver.sh update. */
+    static volatile String lastError;
+
     static boolean verify(byte[] manifest, String signature, String publicKey) {
+        lastError = null;
         if (manifest == null || signature == null || publicKey == null) return false;
         try {
             PublicKey key = KeyFactory.getInstance("EC").generatePublic(new X509EncodedKeySpec(Base64.getDecoder().decode(publicKey.trim())));
@@ -31,6 +35,7 @@ final class ManifestTrust {
             s.update(manifest);
             return s.verify(Base64.getMimeDecoder().decode(signature.trim().getBytes(StandardCharsets.US_ASCII)));
         } catch (Exception anythingWrong) {
+            lastError = anythingWrong.toString();
             return false;   // a signature that cannot even be read is not a signature
         }
     }
