@@ -6,7 +6,13 @@ import make_media as m
 from make_media import *
 
 def shot(name):
-    return Image.open(os.path.join(m.RAW, name + ".png")).convert("RGB")
+    im = Image.open(os.path.join(m.RAW, name + ".png")).convert("RGB")
+    if name == "set5":   # an older capture, with the TV's mute icon in its corner: cleaned with the mask taken from the capture that has it too
+        keep = m.RAW
+        m.RAW, m._MASK = os.path.expanduser("~/media_raw_old"), None
+        im = m.clean(im)
+        m.RAW, m._MASK = keep, None
+    return im
 
 def banner(version, pill_txt, title_lines, chips, out):
     W, H = 1800, 640
@@ -69,7 +75,7 @@ def card(kind, title, sub, bullets, shotname, out):
         y += 76
     im.save(os.path.join(m.OUT, out), optimize=True)
 
-if __name__ == "__main__":
+def v3173():
     banner("3.173", "جديد · الإصدار 3.173", "أذان على مقاسك، وإعداداتك في جيبك",
            [("down", "نسخ الإعدادات"), ("moon", "أذان لكل صلاة"), ("waves", "القرّاء في شبكة"), ("star", "قنوات 311")], "whatsnew-banner.png")
     card("down", "انسخ إعداداتك واستعدها", "تصدير واستيراد بضغطة واحدة، تنقلها بين تلفزيوناتك",
@@ -80,4 +86,18 @@ if __name__ == "__main__":
          ["بطاقات واضحة بعدد السور", "الأسهم تغيّر القسم دون الدخول في الخيارات", "إذاعات مغربية، القرآن مباشر، والأذان"], "t0", "whatsnew-reciters.png")
     card("star", "توقيع بتاريخ البناء", "تعرف أي نسخة عندك بنظرة واحدة",
          ["ChouiTV 3.173 · 2026-10-27 · EMChouit", "تنقّل أسهل صعودًا ونزولًا في الإعدادات", "إشارة تظهر فقط حين يتوفر إصدار أحدث"], "set_system_end", "whatsnew-signature.png")
+    print("done")
+
+def v3175():
+    card("waves", "إذاعات من بلدان كثيرة", "حتى ثلاثة بلدان، و4 محطات في كل صف",
+         ["37 إذاعة مغربية مضمّنة، 13 منها جديدة", "فرنسا والجزائر والسعودية و20 بلدًا آخر", "المفضلة بضغطة مطوّلة على الاختيار"], "l_ma", "whatsnew-radios.png")
+    card("check", "اختر بلدانك وحدّث القوائم", "شبكة من أربعة بمربعات اختيار، وثلاثة بلدان على الأكثر",
+         ["زر «تحديث الإذاعات» بشريط تقدّم", "حالة كل بلد أثناء التحميل", "تاريخ آخر تحديث تحت الزر"], "l_radio_countries", "whatsnew-radio-countries.png")
+    card("moon", "الإذاعة تتوقف", "لا إيقاف مؤقت، ولا شيء يبقى في الذاكرة",
+         ["OK على الإذاعة يوقفها ويحرّر الذاكرة", "القرآن يحتفظ بالإيقاف المؤقت ويزداد زر إيقاف", "ضغط مطوّل على «تستمع الآن» لفتح الخيارات"], "now_options", "whatsnew-radio-stop.png")
+    card("down", "الإعدادات تشمل الإذاعات", "البلدان والمفضلة والمُلغاة تنتقل معك",
+         ["القوائم تُحمَّل تلقائيًا على التلفزيون الآخر", "معاينة لما سيتغيّر قبل التطبيق", "يعمل أيضًا من تطبيق ChouiTV Installer"], "set5", "whatsnew-radio-backup.png")
+
+if __name__ == "__main__":
+    (v3175 if os.environ.get("WHATSNEW") == "3.175" else v3173)()
     print("done")

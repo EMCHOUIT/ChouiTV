@@ -34,58 +34,61 @@
 
 <a id="new"></a>
 
-## 🆕 What's new in 3.173
+## 🆕 What's new in 3.175
 
-> This release gathers **everything added since 3.165**.
+> This release gathers **everything added since 3.173**.
 
 <table>
 <tr>
 <td width="50%" valign="top">
 
-### 💾 Settings backup
-<img src="docs/media/whatsnew-backup.png" alt="Export and import">
+### 📻 Radios from several countries
+<img src="docs/media/whatsnew-radios.png" alt="Radios">
 
-- 📤 **Export**: one `chouitv-settings.json` file in Downloads
-- 📥 **Import**: the screen shows **what will change** before applying
-- ↩️ **Undo** the last import
-- 🚚 Ideal for moving from one TV to another
-- 📻 Includes the **radios**: the chosen countries, hidden stations and favourites (the lists download again by themselves on the other TV)
+- 🌍 **Up to 3 countries**, shown as chips, **4 stations a row**
+- 🇲🇦 **37 Moroccan radios** built in (13 new)
+- 🛰️ France, Algeria, Saudi Arabia and 20 other countries, downloaded on request
+- ⭐ **Favourites** with a long press on OK
 
 </td>
 <td width="50%" valign="top">
 
-### 🕌 The adhan, your way
-<img src="docs/media/whatsnew-adhan.png" alt="Adhan">
+### ✅ Choose your countries, update
+<img src="docs/media/whatsnew-radio-countries.png" alt="Choose the countries">
 
-- 🔘 **Automatic adhan** switch at the top of the tab
-- 🕋 **Each prayer** can be turned on or off on its own
-- 🔕 **Any remote key** stops it, even during the screensaver
-- 🇲🇦 **Ministry of Awqaf** method, GMT time zone
+- 🔲 A grid of **four** with tick boxes
+- 🔄 **«تحديث الإذاعات»** button with a **progress bar**
+- 🧭 The state of **each country** while it loads
+- 🗓️ The **date of the last update** under it
 
 </td>
 </tr>
 <tr>
 <td valign="top">
 
-### 🎙️ Reciters in a grid
-<img src="docs/media/whatsnew-reciters.png" alt="Reciters">
+### ⏹️ A radio stops
+<img src="docs/media/whatsnew-radio-stop.png" alt="Stop">
 
-- 🧱 **Four reciters per row**, with their number of surahs
-- ↔️ **Left/right** switches section: Reciters, Radios, Live Quran, Adhan
+- 🛑 OK **stops** the radio and frees the memory (no pause)
+- ⏸️ A recitation keeps its **pause** and gains a **stop**
+- 🎛️ Long press on the **«Now playing»** card: pause, stop, the player
+- 🧹 The **«المهام»** button is no longer on the home screen
 
 </td>
 <td valign="top">
 
-### 🏷️ Signature with build date
-<img src="docs/media/whatsnew-signature.png" alt="Signature">
+### 💾 Settings include the radios
+<img src="docs/media/whatsnew-radio-backup.png" alt="Backup">
 
-- 🧾 `ChouiTV 3.173 · 2026-10-27 · EMChouit` at the bottom of the settings
-- 🔔 «Newer version» only shows when there is one
-- 🧭 Up/down navigation fixed in "Main and system"
+- 📤 Countries, stations left out and favourites in the file
+- 📥 The lists **download again by themselves** on the other TV
+- 📱 Works with **ChouiTV Installer** too
 
 </td>
 </tr>
 </table>
+
+**🧾 Also since 3.173:** settings backup · adhan per prayer · reciters in a grid · signature with build date.
 
 **📡 Also since 3.165:** **Channels** app (**311** Arabic channels) · **time zone** and prayer **calculation method** settings · optional **cleanup** step · packages renamed `ma.chouitv.*` with a migration script · **Thmanyah** font.
 

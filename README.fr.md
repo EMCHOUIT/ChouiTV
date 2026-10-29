@@ -34,58 +34,61 @@
 
 <a id="new"></a>
 
-## 🆕 Nouveautés de la 3.173
+## 🆕 Nouveautés de la 3.175
 
-> Cette version réunit **tout ce qui a été ajouté depuis la 3.165**.
+> Cette version réunit **tout ce qui a été ajouté depuis la 3.173**.
 
 <table>
 <tr>
 <td width="50%" valign="top">
 
-### 💾 Sauvegarde des réglages
-<img src="docs/media/whatsnew-backup.png" alt="Export et import">
+### 📻 Des radios de plusieurs pays
+<img src="docs/media/whatsnew-radios.png" alt="Radios">
 
-- 📤 **Exporter** : un fichier `chouitv-settings.json` dans Téléchargements
-- 📥 **Importer** : l'écran montre **ce qui va changer** avant d'appliquer
-- ↩️ **Annuler** le dernier import
-- 🚚 Idéal pour passer d'une TV à l'autre
-- 📻 Inclut les **radios** : pays choisis, stations masquées et favoris (les listes se retéléchargent seules sur l'autre télé)
+- 🌍 **Jusqu'à 3 pays**, les pays en puces et **4 stations par ligne**
+- 🇲🇦 **37 radios marocaines** intégrées (13 nouvelles)
+- 🛰️ France, Algérie, Arabie saoudite et 20 autres pays, téléchargés à la demande
+- ⭐ **Favoris** par un appui long sur OK
 
 </td>
 <td width="50%" valign="top">
 
-### 🕌 L'adhan comme vous le voulez
-<img src="docs/media/whatsnew-adhan.png" alt="Adhan">
+### ✅ Choisir ses pays, mettre à jour
+<img src="docs/media/whatsnew-radio-countries.png" alt="Choisir les pays">
 
-- 🔘 Interrupteur de l'**adhan automatique** en haut de l'onglet
-- 🕋 **Chaque prière** s'active ou se coupe séparément
-- 🔕 **N'importe quelle touche** de la télécommande l'arrête, même en veille
-- 🇲🇦 Méthode du **ministère des Habous**, fuseau GMT
+- 🔲 Une grille de **quatre** avec cases à cocher
+- 🔄 Bouton **« تحديث الإذاعات »** avec **barre de progression**
+- 🧭 L'état de **chaque pays** pendant le chargement
+- 🗓️ La **date de la dernière mise à jour** dessous
 
 </td>
 </tr>
 <tr>
 <td valign="top">
 
-### 🎙️ Récitants en grille
-<img src="docs/media/whatsnew-reciters.png" alt="Récitants">
+### ⏹️ Une radio s'arrête
+<img src="docs/media/whatsnew-radio-stop.png" alt="Arrêt">
 
-- 🧱 **Quatre récitants par ligne**, avec le nombre de sourates
-- ↔️ **Gauche/droite** change de section : Récitants, Radios, Coran en direct, Adhan
+- 🛑 OK **arrête** la radio et libère la mémoire (pas de pause)
+- ⏸️ Un Coran garde sa **pause** et gagne un **arrêt**
+- 🎛️ Appui long sur la carte **« En écoute »** : pause, arrêt, lecteur
+- 🧹 Le bouton **« المهام »** n'est plus sur l'accueil
 
 </td>
 <td valign="top">
 
-### 🏷️ Signature avec date de build
-<img src="docs/media/whatsnew-signature.png" alt="Signature">
+### 💾 Les réglages incluent les radios
+<img src="docs/media/whatsnew-radio-backup.png" alt="Sauvegarde">
 
-- 🧾 `ChouiTV 3.173 · 2026-10-27 · EMChouit` en bas des réglages
-- 🔔 « Version plus récente » n'apparaît que s'il y en a une
-- 🧭 Navigation haut/bas corrigée dans « Principal et système »
+- 📤 Pays, stations écartées et favoris dans le fichier
+- 📥 Les listes se **retéléchargent seules** sur l'autre télé
+- 📱 Fonctionne aussi avec **ChouiTV Installer**
 
 </td>
 </tr>
 </table>
+
+**🧾 Et aussi depuis la 3.173 :** sauvegarde des réglages · adhan par prière · récitants en grille · signature avec date de build.
 
 **📡 Et aussi depuis la 3.165 :** application **Channels** (**311 chaînes** arabes) · réglage du **fuseau horaire** et de la **méthode de calcul** · étape de **nettoyage** facultative · paquets renommés `ma.chouitv.*` avec script de migration · police **Thmanyah**.
 
