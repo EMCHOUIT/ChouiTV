@@ -223,6 +223,18 @@ signing with another one, ends the updates for good (the only way out is uninsta
 - **Keep two offline copies of the `.p12` and of its password, in two places** (a USB stick and a password manager, for example). If the file is lost
   there is no recovery: Android would not accept an update signed with a new key.
 
+## The signed version file (3.180)
+
+`latest.json` is read from GitHub, so anyone who got into the repository could point the TVs at other files. Since 3.180 the TVs, and ChouiTV
+Installer 1.5, believe a `latest.json` only if `latest.json.sig` (next to it on `main`) is the owner's ECDSA P-256 signature of exactly its bytes.
+
+- The private key is `~/chouitv-signing/manifest-key.pem` (mode 600, **not** in the repository). The public half is `optimize/manifest-pub.b64`
+  and is compiled into the apps (`ManifestTrust.PUBLIC_KEY`, in the launcher and in the Installer). **Keep two offline copies of the `.pem`** like the APK key:
+  without it no new version can be announced, and changing the key means shipping an update signed with the old one that carries the new one.
+- Release order: build and make the release assets, write the new `latest.json`, run `optimize/sign-manifest.sh` (it signs and checks against
+  the public key), then commit `latest.json` **and** `latest.json.sig` in the same push.
+- A TV on 3.179 or older does not check the signature; from 3.180 on, a missing or wrong `.sig` means «no update» (the cause shows in `saver.sh update`).
+
 ## Known limits
 
 - Live streams depend on third parties; a station can be down, move, or be blocked on some networks.

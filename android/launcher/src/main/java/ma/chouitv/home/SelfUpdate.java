@@ -119,8 +119,12 @@ final class SelfUpdate {
         }
         if (!dry) deleteAll(dir(c));
         if (!force && now - p.getLong("updCheck", 0) < CHECK_EVERY_MS) return "checked recently";
-        JSONObject m = new JSONObject(new String(download(MANIFEST + "?t=" + (now / 60_000L)), "UTF-8"));   // the minute: a cached copy is not kept for long
         p.edit().putLong("updCheck", now).apply();
+        // the file and its signature are asked for with the same minute; the TV believes the file only if the owner signed exactly these bytes
+        byte[] file = download(MANIFEST + "?t=" + (now / 60_000L));   // the minute: a cached copy is not kept for long
+        String signature = new String(download(MANIFEST + ".sig?t=" + (now / 60_000L)), "UTF-8");
+        if (!ManifestTrust.verify(file, signature)) return "error: the version file is not signed by ChouiTV";
+        JSONObject m = new JSONObject(new String(file, "UTF-8"));
         int latest = m.getInt("versionCode");
         JSONArray apks = m.getJSONArray("apks");
         List<String> listed = new ArrayList<>();
