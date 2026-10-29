@@ -9,7 +9,7 @@ public class UpdateReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context c, Intent i) {
         final PendingResult pending = goAsync();
-        SelfUpdate.maybeStart(c, i.getBooleanExtra("force", false), message -> {
+        SelfUpdate.maybeStart(c, i.getBooleanExtra("force", false), i.getBooleanExtra("dry", false), message -> {
             pending.setResultData("update: " + message);
             pending.finish();
         });

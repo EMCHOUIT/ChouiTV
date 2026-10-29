@@ -341,20 +341,20 @@ public class SettingsActivity extends Activity {
         row("ترتيب التطبيقات المفضلة", "قائمة ترتّب فيها المفضلة بالأسهم", R.drawable.ic_star,
             new Runnable() { public void run() { openDockSettings(); } });
 
-        header("التطبيق");
-        row("التحديث التلقائي للصفحة", prefs.autoUpdate() ? "يعمل · عند بدء الشاشة، كل ٦ ساعات" : "متوقف", R.drawable.ic_sync, new Runnable() { public void run() { pickOnOff("التحديث التلقائي للصفحة", prefs.autoUpdate(), v -> prefs.setAutoUpdate(v)); } });
-        row("تحديث الشاشة الآن", "ينزّل أحدث نسخة من الشاشة", R.drawable.ic_sync, new Runnable() { public void run() { updateNow(); } });
-
         header("نسخ الإعدادات");
         row("تصدير الإعدادات", "يحفظ إعداداتك كلها في ملف chouitv-settings.json بمجلد التنزيلات", R.drawable.ic_sync,
             new Runnable() { public void run() { exportSettings(); } });
         row("استيراد الإعدادات", "يقرأ الملف من التنزيلات ويعرض ما سيتغيّر قبل التطبيق", R.drawable.ic_sync,
             new Runnable() { public void run() { importSettings(); } });
-        View last = list.getChildAt(list.getChildCount() - 1);
         if (SettingsBackup.hasUndo(this)) {
-            last = row("التراجع عن آخر استيراد", "يعيد الإعدادات كما كانت قبله", R.drawable.ic_sync,
+            row("التراجع عن آخر استيراد", "يعيد الإعدادات كما كانت قبله", R.drawable.ic_sync,
                 new Runnable() { public void run() { undoImport(); } });
         }
+
+        // the updates come last in the tab, just above the version line
+        header("التحديث");
+        row("التحديث التلقائي للصفحة", prefs.autoUpdate() ? "يعمل · عند بدء الشاشة، كل ٦ ساعات" : "متوقف", R.drawable.ic_sync, new Runnable() { public void run() { pickOnOff("التحديث التلقائي للصفحة", prefs.autoUpdate(), v -> prefs.setAutoUpdate(v)); } });
+        View last = row("تحديث التطبيق والشاشة الآن", "ينزّل أحدث إصدار من التطبيقين ومن الشاشة", R.drawable.ic_sync, new Runnable() { public void run() { updateNow(); } });
         noConv = true;   // a version number stays in Latin digits
         note(last, Updater.versionLines(this));   // at the very end: only the last row jumps to the bottom, not one in the middle
         noConv = false;
@@ -1343,12 +1343,63 @@ public class SettingsActivity extends Activity {
         return arabicNum(n) + (n <= 10 ? " دقائق" : " دقيقة");
     }
 
+    /**
+     * «تحديث التطبيق والشاشة الآن»: the page of the screen first (as before), then the two apps: the home app is asked to check the
+     * newest version now (it downloads both APKs, checks them and asks for one OK each). Before, this only refreshed the page, so a TV
+     * that said «يتوفر 3.175» answered that everything was up to date.
+     */
     private void updateNow() {
         toast("جارٍ التحقق…");
         new Thread(() -> {
-            final String msg = Updater.check(getApplicationContext(), true);
-            runOnUiThread(() -> { toast(msg); if (!isFinishing()) render(); });
+            final String page = Updater.check(getApplicationContext(), true);
+            runOnUiThread(() -> {
+                if (isFinishing()) return;
+                render();
+                askAppsUpdate(page);
+            });
         }).start();
+    }
+
+    /**
+     * Two steps. First the home app only says whether a newer version exists (dry). If there is one, the home screen is brought to the front and
+     * only then is the install started: Android refuses to show its «install?» screen to an app that is in the background, and the settings of
+     * this app are what is in front now.
+     */
+    private void askAppsUpdate(final String page) { askAppsUpdate(page, true); }
+
+    private void askAppsUpdate(final String page, final boolean dry) {
+        android.content.BroadcastReceiver answer = new android.content.BroadcastReceiver() {
+            @Override public void onReceive(android.content.Context c, Intent i) {
+                String data = getResultData();
+                if (isFinishing()) return;
+                if (data == null) toast("تعذّر الوصول إلى التطبيق الرئيسي: " + page);
+                else if (data.startsWith("update: available")) {
+                    toast("يتوفر إصدار جديد: جارٍ فتح الشاشة الرئيسية للتثبيت · اضغط OK عند السؤال");
+                    try {
+                        startActivity(new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                    } catch (RuntimeException ignored) { }
+                    new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> askAppsUpdate(page, false), 2500);
+                }
+                else if (data.startsWith("update: installing")) toast("جارٍ تنزيل الإصدار الجديد… اضغط OK على الشاشة لتثبيته");
+                else if (data.startsWith("update: up to date")) toast("التطبيقان على أحدث إصدار · " + page);
+                else if (data.startsWith("update: needs permission")) {   // Android needs the person's «allow» once for the home app
+                    toast("فعّل «السماح بهذا المصدر» لتلفزيونك ثم عُد واضغط التحديث من جديد");
+                    try {
+                        startActivity(new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, android.net.Uri.parse("package:ma.chouitv.home")));
+                    } catch (RuntimeException e) {
+                        toast("الأمر عبر ADB: appops set ma.chouitv.home REQUEST_INSTALL_PACKAGES allow");
+                    }
+                }
+                else if (data.contains("busy") || data.contains("in progress")) toast("التحديث جارٍ بالفعل");
+                else toast("تعذّر تحديث التطبيق: " + data.replace("update: ", ""));
+            }
+        };
+        Intent ask = new Intent("ma.chouitv.home.UPDATE_NOW").setPackage("ma.chouitv.home").putExtra("dry", dry);
+        try {
+            sendOrderedBroadcast(ask, null, answer, null, 0, null, null);
+        } catch (RuntimeException e) {
+            toast("التطبيق الرئيسي غير مثبّت · " + page);
+        }
     }
 
     private void openDreamSettings() {

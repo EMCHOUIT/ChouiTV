@@ -65,22 +65,30 @@ final class SelfUpdate {
     }
 
     /** In the background: check, and if there is a newer version, download it, verify it and start the installer. Safe to call often. */
-    static void maybeStart(final Context ctx, final boolean force, final Done done) {
+    static void maybeStart(final Context ctx, final boolean force, final Done done) { maybeStart(ctx, force, false, done); }
+
+    /** dry: only says whether a newer version exists ("available N"), downloads and installs nothing. */
+    static void maybeStart(final Context ctx, final boolean force, final boolean dry, final Done done) {
         final Context c = ctx.getApplicationContext();
         if (!BUSY.compareAndSet(false, true)) { if (done != null) done.say("busy"); return; }
         new Thread(() -> {
             String message;
-            try { message = run(c, force); }
+            try { message = run(c, force, dry); }
             catch (Exception e) { message = "error: " + e; }
             finally { BUSY.set(false); }
             if (done != null) done.say(message);
         }).start();
     }
 
-    private static String run(Context c, boolean force) throws Exception {
+    private static String run(Context c, boolean force, boolean dry) throws Exception {
         long now = System.currentTimeMillis();
         SharedPreferences p = prefs(c);
-        if (!p.getString("updQueue", "").isEmpty()) return "an install is in progress";
+        if (!p.getString("updQueue", "").isEmpty()) {
+            // an install that never ended (the screen asking «install?» was closed, or Android never answered) must not block the updates for ever:
+            // after ten minutes, or when the person asks again, it is forgotten
+            if (!force && now - p.getLong("updStartedAt", 0) < 10 * 60_000L) return "an install is in progress";
+            p.edit().putString("updQueue", "").apply();
+        }
         deleteAll(dir(c));
         if (!force && now - p.getLong("updCheck", 0) < CHECK_EVERY_MS) return "checked recently";
         JSONObject m = new JSONObject(new String(download(MANIFEST), "UTF-8"));
@@ -90,6 +98,10 @@ final class SelfUpdate {
         if (latest <= mine) return "up to date (installed " + mine + ", latest " + latest + ")";
         if (!force && p.getInt("updDeclined", 0) == latest && now - p.getLong("updDeclinedAt", 0) < RETRY_AFTER_DECLINE_MS)
             return "version " + latest + " was declined lately";
+        // Android installs for an app only when the person allowed «install unknown apps» for it; without that the installer refuses at the last
+        // step, after the download. The settings screen that asks the person is opened by whoever is in front (the screensaver's settings).
+        if (Build.VERSION.SDK_INT >= 26 && !c.getPackageManager().canRequestPackageInstalls()) return "needs permission: install unknown apps";
+        if (dry) return "available " + latest;
         JSONArray apks = m.getJSONArray("apks");
         List<String> paths = new ArrayList<>();
         File d = dir(c);
@@ -106,7 +118,7 @@ final class SelfUpdate {
             paths.add(f.getAbsolutePath());
         }
         if (paths.isEmpty()) return "error: no apk listed";
-        p.edit().putString("updQueue", android.text.TextUtils.join("|", paths)).putInt("updTarget", latest).apply();
+        p.edit().putString("updQueue", android.text.TextUtils.join("|", paths)).putInt("updTarget", latest).putLong("updStartedAt", now).apply();
         toast(c, "تحديث تلفزيونك " + latest + ": اضغط OK لتثبيته");
         installNext(c);
         return "installing version " + latest;
