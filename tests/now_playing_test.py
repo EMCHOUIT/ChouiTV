@@ -53,19 +53,17 @@ check("MainActivity: it goes with the playback, and the focus goes back to the f
       "nowCard.hasFocus() && !pills.isEmpty()) pills.get(0).requestFocus()" in main)
 check("MainActivity: it takes the focus like a pill (D-pad order: ▶ from the first pill reaches it; down goes to the cards or the dock)",
       "nowCard.setNextFocusDownId(card != null ? card.getId()" in main and "nowCard.setNextFocusLeftId(pills.get(0).getId())" in main)
-# the screensaver's own «يُتلى الآن» card (item 6): the launcher answers a signed-only provider, the app gives the page one read-only call
+# the screensaver's own «يُتلى الآن» card (item 6): the home side answers a provider, the screensaver side gives the page one read-only call (one app since 4.0)
 manifest_h = (ROOT / "android/launcher/src/main/AndroidManifest.xml").read_text(encoding="utf-8")
-manifest_s = (ROOT / "android/app/src/main/AndroidManifest.xml").read_text(encoding="utf-8")
 provider = (TIL / "NowPlayingProvider.java").read_text(encoding="utf-8")
-bridge = (ROOT / "android/app/src/main/java/ma/chouitv/screensaver/NowPlayingBridge.java").read_text(encoding="utf-8")
-screenview = (ROOT / "android/app/src/main/java/ma/chouitv/screensaver/ScreenView.java").read_text(encoding="utf-8")
+bridge = (ROOT / "android/launcher/src/main/java/ma/chouitv/screensaver/NowPlayingBridge.java").read_text(encoding="utf-8")
+screenview = (ROOT / "android/launcher/src/main/java/ma/chouitv/screensaver/ScreenView.java").read_text(encoding="utf-8")
 check("screen card: the launcher's provider is read-only, one row only while a surah or a station PLAYS (not paused, not the adhan)",
       "if (s.show && s.playing) out.addRow" in provider and "return null;" in provider.split("getType")[1].split("}")[0]
       and "insert(Uri uri, ContentValues v) { return null; }" in provider)
-check("screen card: the provider needs a signature permission only the screensaver (same key) holds",
+check("screen card: the provider needs a signature permission only our own code (same key, now the same app) holds",
       'android:name="ma.chouitv.home.READ_NOW_PLAYING"' in manifest_h and 'android:protectionLevel="signature"' in manifest_h
-      and 'android:authorities="ma.chouitv.home.nowplaying"' in manifest_h and 'android:readPermission="ma.chouitv.home.READ_NOW_PLAYING"' in manifest_h
-      and 'uses-permission android:name="ma.chouitv.home.READ_NOW_PLAYING"' in manifest_s)
+      and 'android:authorities="ma.chouitv.home.nowplaying"' in manifest_h and 'android:readPermission="ma.chouitv.home.READ_NOW_PLAYING"' in manifest_h)
 check("screen card: the page gets one call, window.UrtvNative.nowPlaying(), on the screen only (not on the settings' previews); errors give an empty answer",
       '@JavascriptInterface' in bridge and bridge.count("@JavascriptInterface") == 1 and "catch (Exception ignored)" in bridge
       and 'if (screen) w.addJavascriptInterface(new NowPlayingBridge(c), "UrtvNative")' in screenview)

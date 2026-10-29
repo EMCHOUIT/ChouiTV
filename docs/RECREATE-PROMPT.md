@@ -106,10 +106,10 @@ All three are built identically — small gold label, big value, small sub-line 
 
 ## The Android app (what we actually shipped)
 
-- A `DreamService` screensaver (`ma.chouitv.screensaver/.ScreenDream`) started by the TV's own idle timer, plus a full-screen preview activity; any remote key closes it.
+- A `DreamService` screensaver (`ma.chouitv.home/ma.chouitv.screensaver.ScreenDream`: since 4.0 the screensaver lives inside the home app, one package and one APK) started by the TV's own idle timer, plus a full-screen preview activity; any remote key closes it.
 - The WebView loads a light build of the page (`dist/tv.html`, 0.3 MB); the app answers its font and photo requests from the APK and a photo cache on disk (`shouldInterceptRequest`), so nothing waits on the network.
 - Settings: 194 Saudi cities and towns in the 13 regions plus an online place search; up to 20 teams (browse leagues or search TheSportsDB; Arabic names from a table, then Wikidata, then transliteration); the card beside the clock; episode filters. They reach the page as a URL fragment (`#city=..&lat=..&lon=..&teams=id,id&panel=..`) — a `?query` on `file://` fails in WebView.
 - Agents set everything over ADB through shell-only broadcast receivers (`optimize/saver.sh`, `optimize/dock.sh`).
 - Auto-update: when the screensaver starts, and at most every 6 hours, the app downloads the page from the repo (background thread, one at a time) and uses it if it is newer than the APK.
 - TCL quirk: after a power cut the app may stay frozen until opened once; a boot receiver plus a persisted job (which only starts the process, no network) bring it back on most sets.
-- Built by Gradle and published by hand as a numbered release `v3.N` (both APKs), with `latest.json` on `main` naming the newest one (see docs/TILAWAH.md, Build and test).
+- Built by Gradle and published by hand as a numbered release `v3.N` (one APK, `chouitv-home.apk`), with `latest.json` on `main` naming the newest one (see docs/TILAWAH.md, Build and test).

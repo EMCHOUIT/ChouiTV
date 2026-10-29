@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Moves a TV that still runs the apps under their old names (sa.urtv.screensaver, sa.urtv.home) to ChouiTV (ma.chouitv.screensaver, ma.chouitv.home).
-# They are other apps for Android, so they cannot update into each other: the new ones are installed next to the old ones, the settings are carried over,
+# Moves a TV that still runs the apps under their old names (sa.urtv.screensaver, sa.urtv.home) to ChouiTV 4.0 (one app, ma.chouitv.home).
+# They are other apps for Android, so they cannot update into each other: the new one is installed next to the old ones, the settings are carried over,
 # the new home screen becomes Home, and only then the old apps are removed.
 #   optimize/migrate-to-chouitv.sh                   the settings come from the old screensaver's own export (its build 3.170 or newer)
 #   optimize/migrate-to-chouitv.sh settings.json     the settings come from this file (an `optimize/saver.sh export` of this TV or of another one)
-#   APK_DIR=/folder optimize/migrate-to-chouitv.sh   the new APKs (chouitv-home.apk, chouitv-screensaver.apk, channels-release.apk) from a folder, not downloaded
+#   APK_DIR=/folder optimize/migrate-to-chouitv.sh   the new APKs (chouitv-home.apk, channels-release.apk) from a folder, not downloaded
 # What is not carried over: the person's photos and tasks (they belong to the old app's storage). The TV's own settings (Wi-Fi, accounts, other apps) are not touched.
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -37,10 +37,10 @@ if [ -z "$SETTINGS" ]; then
 fi
 [ -f "$SETTINGS" ] || { echo "!! No such file: $SETTINGS"; exit 1; }
 
-# 2. the new apps, next to the old ones (the new home screen takes Home behind the safety switch of install.sh)
+# 2. the new app, next to the old ones (the new home screen takes Home behind the safety switch of install.sh)
 bash optimize/install.sh all
 
-# 3. the settings in the new apps
+# 3. the settings in the new app
 echo "Carrying the settings over:"
 bash optimize/saver.sh import "$SETTINGS" --yes
 
@@ -53,4 +53,4 @@ fi
 for p in "$OLD_H" "$OLD_S"; do
   if installed "$p"; then tv "pm uninstall $p" | tr -d '\r' | tail -1; fi
 done
-echo "Done: the TV runs ChouiTV (ma.chouitv.*). Press Home to check, then optimize/saver.sh show."
+echo "Done: the TV runs ChouiTV (ma.chouitv.home). Press Home to check, then optimize/saver.sh show."

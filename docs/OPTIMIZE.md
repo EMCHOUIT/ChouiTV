@@ -31,7 +31,7 @@ Field readings put the screensaver at 120–250 MB of free RAM while it runs, mo
 - The home screen's card (if turned on) is paused, its timers too, when an app is in front, and destroyed with the
   activity.
   App tiles are kept at the size they are shown, in a cache of 6 MB at most.
-- `optimize/measure.sh` prints the two apps' memory (TOTAL PSS) under its table, to compare releases.
+- `optimize/measure.sh` prints the app's memory (TOTAL PSS) under its table, to compare releases.
 
 ## Running it
 

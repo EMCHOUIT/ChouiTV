@@ -23,7 +23,7 @@ sleep "${SAVER_WAIT_S:-6}"
 if dreaming; then echo dream; exit 0; fi
 if [ "${1:-}" = --preview ]; then
   # a fresh preview each time (one already open would come back as it was, with the settings it opened with)
-  tv "am start --activity-clear-task -n ma.chouitv.screensaver/.MainActivity" > /dev/null
+  tv "am start --activity-clear-task -n ma.chouitv.home/ma.chouitv.screensaver.MainActivity" > /dev/null
   echo preview
   exit 0
 fi

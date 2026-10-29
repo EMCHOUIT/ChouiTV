@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Checks that APKs are signed with THE ChouiTV key (the one the TVs already trust): its SHA-256 is pinned in .github/signer-sha256.txt.
-#   optimize/check-signer.sh chouitv-home.apk chouitv-screensaver.apk      (run it before every release; exit 1 on any mismatch)
+#   optimize/check-signer.sh chouitv-home.apk      (run it before every release; exit 1 on any mismatch)
+# Since 4.0 a release has ONE APK (chouitv-home.apk); the script still takes any number of them and pins the same key.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 want=$(tr -d '[:space:]:' < .github/signer-sha256.txt | tr 'A-F' 'a-f')

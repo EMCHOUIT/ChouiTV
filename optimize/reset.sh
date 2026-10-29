@@ -40,7 +40,7 @@ if [ -f optimize/run/backup.txt ]; then
   vals=$(tr -d '\r' < optimize/run/backup.txt | awk '/^== /{s=($2=="screensaver")} s&&!/^==/{print}')
   { read -r comps; read -r enabled; read -r timeout; } <<< "$vals"
   { # the screensaver the TV had (a component list; none then, or ours from an earlier setup: left deleted, the TV picks its own)
-    if [[ "${comps:-}" =~ ^[A-Za-z0-9_.]+/[A-Za-z0-9_.\$]+(,[A-Za-z0-9_.]+/[A-Za-z0-9_.\$]+)*$ ]] && [[ "$comps" != *ma.chouitv.screensaver/* ]]; then
+    if [[ "${comps:-}" =~ ^[A-Za-z0-9_.]+/[A-Za-z0-9_.\$]+(,[A-Za-z0-9_.]+/[A-Za-z0-9_.\$]+)*$ ]] && [[ "$comps" != *ma.chouitv.home/* ]] && [[ "$comps" != *ma.chouitv.screensaver/* ]]; then
       echo "settings put secure screensaver_components '$comps'"
     fi
     for kv in "secure screensaver_enabled ${enabled:-}" "system screen_off_timeout ${timeout:-}"; do
@@ -54,6 +54,7 @@ else
 fi
 
 echo "3/4 Removing our apps (old and new names; missing ones are skipped)…"
+# (ma.chouitv.screensaver is the 3.x second app; removed here if an old TV still has it)
 # the appop the launcher was given for the adhan (it vanishes with the app anyway)
 tv "appops set ma.chouitv.home SCHEDULE_EXACT_ALARM default" > /dev/null 2>&1 || true
 for p in ma.chouitv.home ma.chouitv.screensaver ma.chouitv.listening sa.yourtv.home sa.yourtv.screensaver com.abdullah.tvhome com.abdullah.tvsaver; do

@@ -175,7 +175,7 @@ by_id = {c["id"]: c for c in clubs}
 check("clubs: the known ids are the clubs the app uses",
       all(team_key(by_id.get(i, {}).get("en", "")) == team_key(n) for i, n in KNOWN.items()),
       {i: by_id.get(i, {}).get("en") for i, n in KNOWN.items() if team_key(by_id.get(i, {}).get("en", "")) != team_key(n)})
-prefs_leagues = re.findall(r'\{"([^"]+)", "[^"]+"\}', (ROOT / "android/app/src/main/java/ma/chouitv/screensaver/Prefs.java")
+prefs_leagues = re.findall(r'\{"([^"]+)", "[^"]+"\}', (ROOT / "android/launcher/src/main/java/ma/chouitv/screensaver/Prefs.java")
                            .read_text(encoding="utf-8").split("LEAGUES = {")[1].split("};")[0])
 count = {l: sum(l in c["leagues"] for c in clubs) for l in prefs_leagues}
 PENDING = set()
@@ -233,7 +233,7 @@ check("java: no digit conversion by hand outside DigitsText (Digits.of / DigitsT
 # the one asked for (a TV test read the preview as the settings screen, and as the settings not working)
 starts = [f"{f.name}: {l.strip()}" for f in sorted((ROOT / "optimize").glob("*.sh"))
           for l in f.read_text(encoding="utf-8").splitlines()
-          if re.search(r"ma\.chouitv\.screensaver/\.(MainActivity|SettingsActivity)", l) and "am start" in l
+          if re.search(r"ma\.chouitv\.home/ma\.chouitv\.screensaver\.(MainActivity|SettingsActivity)", l) and "am start" in l
           and "--activity-clear-task" not in l]
 check("optimize: the screensaver preview and settings always open fresh (--activity-clear-task)", not starts, starts)
 
@@ -264,12 +264,12 @@ check("docs/FEATURES.md: every saver.sh / photos.sh command and every card and s
 # the app's list of cards (Prefs.PANELS: what settings and saver.sh accept) and the page's must be the same words
 page_panels = re.search(CARD_RE["panel"], tpl_src)
 page_panels = re.findall(r"'([a-z]+)'", page_panels.group(1) if page_panels else "") + ["none"]   # «none»: no card, not a kind
-app_panels = re.findall(r'\{"([a-z]+)", "[^"]+"\}', re.search(r"PANELS = \{(.*?)\n    \};", (ROOT / "android/app/src/main/java/ma/chouitv/screensaver/Prefs.java").read_text(encoding="utf-8"), re.S).group(1))
+app_panels = re.findall(r'\{"([a-z]+)", "[^"]+"\}', re.search(r"PANELS = \{(.*?)\n    \};", (ROOT / "android/launcher/src/main/java/ma/chouitv/screensaver/Prefs.java").read_text(encoding="utf-8"), re.S).group(1))
 check("cards: Prefs.PANELS and the page's #panel= list name the same cards", sorted(page_panels) == sorted(app_panels),
       f"page only {sorted(set(page_panels) - set(app_panels))}, app only {sorted(set(app_panels) - set(page_panels))}")
 
 # the settings' pickers say in one plain line what each card and each card style is, in the words of docs/FEATURES.md
-prefs_src = (ROOT / "android/app/src/main/java/ma/chouitv/screensaver/Prefs.java").read_text(encoding="utf-8")
+prefs_src = (ROOT / "android/launcher/src/main/java/ma/chouitv/screensaver/Prefs.java").read_text(encoding="utf-8")
 def table(name):
     body = re.search(rf"{name} = \{{(.*?)\}};", prefs_src, re.S).group(1)
     return dict(re.findall(r'\{"([a-z0-9]+)", "([^"]+)"\}', body))
@@ -285,7 +285,7 @@ for tbl, src in (("PANEL_ABOUT", "PANELS"), ("CARD_STYLE_ABOUT", "CARD_STYLES"))
 cfg = ET.parse(ROOT / "android/launcher/src/main/res/values/config.xml").getroot()
 arr = {a.get("name"): [i.text for i in a] for a in cfg.findall("string-array")}
 check("launcher: no dock app is also hidden", not set(arr["dock_apps"]) & set(arr["hidden_apps"]))
-check("launcher: screensaver app not hidden", "ma.chouitv.screensaver" not in arr["hidden_apps"])
+check("launcher: our own app (home, screensaver, settings: one app since 4.0) is not hidden", "ma.chouitv.home" not in arr["hidden_apps"] and "ma.chouitv.screensaver" not in arr["hidden_apps"])
 
 # Arabic app names: package|name rows; the names are drawn with Thmanyah, so it needs a glyph for each character
 app_rows = [(i.text or "").split("|", 1) for i in ET.parse(ROOT / "android/launcher/src/main/res/values/app_names.xml")

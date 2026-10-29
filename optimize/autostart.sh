@@ -5,13 +5,13 @@
 # AUTO_START setting so key helpers and Sleep Timer survive reboot», #1143, and the install scripts of their add-ons): the op
 # is AUTO_START on G08 builds and APP_AUTO_START on G10, other TVs do not know it, and without `appops write-settings` the
 # grant does not reach the disk before the next restart.
-#   optimize/autostart.sh           allow it for ma.chouitv.home and ma.chouitv.screensaver on a TCL, then say what the TV answers
+#   optimize/autostart.sh           allow it for ma.chouitv.home (the one app since 4.0) on a TCL, then say what the TV answers
 #   optimize/autostart.sh check     only say it (the lines report.md gets): «Auto-start: …», or a !! line when a TCL refuses
 set -euo pipefail
 cd "$(dirname "$0")/.."
 PY="${PY:-optimize/venv/bin/python}"
 tv() { "$PY" -I optimize/tv.py "$@"; }
-PKGS=(ma.chouitv.home ma.chouitv.screensaver)
+PKGS=(ma.chouitv.home)
 
 is_tcl() {
   local who
@@ -44,7 +44,7 @@ for p in "${PKGS[@]}"; do
   line="$line${line:+, }$p $st"
   case "$st" in allow|none) ;; *) bad="$bad $p($st)" ;; esac   # none: this TCL build has no such op
 done
-if [ -z "$line" ]; then echo "Auto-start (TCL): our apps are not installed"
+if [ -z "$line" ]; then echo "Auto-start (TCL): our app is not installed"
 elif [ -n "$bad" ]; then
   echo "!! Auto-start (TCL): not allowed for$bad: after a restart the adhan alarms and the sleep service may not start. Run optimize/autostart.sh again"
 else echo "Auto-start (TCL): $line"; fi

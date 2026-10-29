@@ -71,7 +71,7 @@ Those defaults, unless I change them:
 - nothing from `optimize/lists/tcl-optional.txt` is disabled (`optimize/lists/mine.txt` stays empty);
 - if I pick the episodes card: all genres and languages.
 
-My city is checked later against `android/app/src/main/java/ma/chouitv/screensaver/Cities.java`; if it isn't there,
+My city is checked later against `android/launcher/src/main/java/ma/chouitv/screensaver/Cities.java`; if it isn't there,
 step 4 sets it with its coordinates (`city <name> <lat> <lon>`) without asking me again.
 
 ## 0. Can you reach my TV? (check this first, 1 minute)
@@ -245,6 +245,7 @@ Lines starting with `!!` are the scripts telling you to stop and act. These are 
 | `The setup wizard of this TV owns its saved Wi-Fi network: left on` or `!! The setup wizard of this TV answers Home and owns its saved Wi-Fi network` | disabling `com.google.android.tungsten.setupwraith` can delete the Wi-Fi network saved during the first-run wizard (two TCL sets lost their password; CleanYourTV documents it). `install.sh` turns the wizard off only when it really answers Home and the network is not its own | the first line: nothing to do. The `!!` line: nothing was changed; tell me what it says in Arabic (forget the network in Settings → Network and join it again), then the same command. `optimize/restore.sh` and the safety switch always turn the wizard back on |
 | `!! Auto-start (TCL): not allowed for ma.chouitv.home(ignore)` | TCL firmware starts apps at boot only if they hold its auto-start op; ours need it (adhan alarms after a restart, the sleep service) | `optimize/autostart.sh` again; the report shows `Auto-start (TCL): … allow` after the restart. Not a TCL: «Auto-start: not a TCL», nothing to do |
 | `!! Home did not open the new launcher` | slow ADB, or firmware that pins its own home (a Fire TV often refuses another home) | leave the TV 5 minutes; `optimize/run.sh` once more; if again, `SKIP_LAUNCHER=1 optimize/run.sh` |
+| the TV has two ChouiTV apps (`ma.chouitv.screensaver` beside `ma.chouitv.home`, a 3.x setup) | before 4.0 the screensaver was a second app | `optimize/migrate-to-v4.sh` (carries the settings over, removes the old app at the end after asking; a plain `install.sh all` would leave it) |
 | the TV has no home at all (black screen, Home does nothing) | our home app is gone while the stock home is off | `optimize/restore.sh` (no list: only the home screen), then `optimize/install.sh launcher`; more in `docs/OPTIMIZE.md`, «Home screen problems» |
 | `!! The stock home is not on screen` (reset) | the stock home was slow to start | ask me to press Home, then `optimize/reset.sh` again |
 | `!! still off` (keep.sh) | a protected feature would not turn back on | **stop**, show me; don't continue |
@@ -294,7 +295,7 @@ out, tell me again and run it once more.
 
 Before you start step 3, tell me in plain Arabic how to undo everything, so I know it is safe: one command,
 `optimize/reset.sh`, run from this folder (say the folder's full path), puts the TV back as it came (the
-disabled apps back on, the TV's own home screen and screensaver back, our two apps removed, TV Bro and
+disabled apps back on, the TV's own home screen and screensaver back, our app removed, TV Bro and
 SmartTube removed if the setup installed them, the speed tweaks back to Android's defaults); my photos, accounts and other apps are not touched. Any agent on this computer can
 run it for me later.
 
@@ -406,7 +407,7 @@ optimize/run.sh status                            # every step ✓, and «report
 ```
 (One `!!` line is allowed there: «the screensaver may slow this TV». It is advice for me, not a failure: see step 7.)
 - `report.md` shows Home as `ma.chouitv.home` (or the stock home if we used `SKIP_LAUNCHER=1`) and the screensaver
-  as `ma.chouitv.screensaver`.
+  as `ma.chouitv.home/ma.chouitv.screensaver.ScreenDream` (since 4.0 home and screensaver are one app).
 - You looked at the step 5 screenshots yourself and they show my city, my card and my favourites.
 
 ## 7. Tell me

@@ -27,7 +27,7 @@ def check(name, ok, detail=""):
     print(("PASS " if ok else "FAIL ") + name + ("" if ok else "  -> " + detail))
     failed += not ok
 
-A = "am broadcast -n ma.chouitv.screensaver/.SaverReceiver -a ma.chouitv.screensaver.SET "
+A = "am broadcast -n ma.chouitv.home/ma.chouitv.screensaver.SaverReceiver -a ma.chouitv.screensaver.SET "
 bad = "it's"
 for words in (["city", bad], ["city", "x", bad, "46.7"], ["city", "x", "24.7", bad], ["city", "x", "24.7", "46.7", bad], ["teams", bad], ["card", bad],
               ["home-card", bad], ["greeting", bad], ["adhanbar", bad], ["genres", bad], ["leagues", bad], ["events", bad], ["langs", bad],

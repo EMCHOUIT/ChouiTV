@@ -51,16 +51,16 @@ wins = [(("Windows", "10.0.22631", "10"), "11"), (("Windows", "10.0.22000", "10"
 bad_win = [(a, share.windows_release(*a), want) for a, want in wins if share.windows_release(*a) != want]
 print("share: " + ("Windows 11 told from 10 by the build number" if not bad_win else f"WRONG windows {bad_win}"))
 # the Versions line: live from the TV when it answers, else the report's
-(share.RUN / "report.md").write_text("Home: h\nVersions: screensaver 3.89, home 3.89\n", encoding="utf-8")
-share.live_versions = lambda: "Versions: screensaver 3.124, home 3.124"
+(share.RUN / "report.md").write_text("Home: h\nVersions: ChouiTV 3.89\n", encoding="utf-8")
+share.live_versions = lambda: "Versions: ChouiTV 3.124"
 live = [l for l in share.report_checks() if l.startswith("Versions:")]
 share.live_versions = lambda: None
 old = [l for l in share.report_checks() if l.startswith("Versions:")]
 (share.RUN / "report.md").write_text("Home: h\n", encoding="utf-8")
-share.live_versions = lambda: "Versions: screensaver 3.124, home 3.124"
+share.live_versions = lambda: "Versions: ChouiTV 3.124"
 added = [l for l in share.report_checks() if l.startswith("Versions:")]
 share.live_versions = lambda: None
-versions_ok = live == ["Versions: screensaver 3.124, home 3.124"] and old == ["Versions: screensaver 3.89, home 3.89"] and len(added) == 1
+versions_ok = live == ["Versions: ChouiTV 3.124"] and old == ["Versions: ChouiTV 3.89"] and len(added) == 1
 print("share: " + ("Versions read live, the report's line as the fallback" if versions_ok else f"WRONG versions {live} {old} {added}"))
 # --preview writes and prints the text and sends nothing; --send sends that file, or says there is none
 import contextlib, io

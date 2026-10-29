@@ -21,7 +21,7 @@ ua = (H / "UpdateActivity.java").read_text(encoding="utf-8")
 ir = (H / "InstallResultReceiver.java").read_text(encoding="utf-8")
 un = (H / "UpdateNowReceiver.java").read_text(encoding="utf-8")
 man = (ROOT / "android/launcher/src/main/AndroidManifest.xml").read_text(encoding="utf-8")
-saver = (ROOT / "android/app/src/main/java/ma/chouitv/screensaver/Updater.java").read_text(encoding="utf-8")
+saver = (ROOT / "android/launcher/src/main/java/ma/chouitv/screensaver/Updater.java").read_text(encoding="utf-8")
 
 check("the installs are driven by UpdateActivity, started and waited for before anything is installed", "launchUi(c)" in su and "UpdateActivity.live" in su)
 check("the result receiver shows nothing itself (a background app cannot start Android's install screen)", "startActivity" not in ir and "live" in ir)

@@ -34,7 +34,7 @@ else:
 
 data = (ROOT / "android/launcher/src/main/java/ma/chouitv/home/BackupData.java").read_text(encoding="utf-8")
 backup = (TIL / "RadioBackup.java").read_text(encoding="utf-8")
-saver = (ROOT / "android/app/src/main/java/ma/chouitv/screensaver/SettingsBackup.java").read_text(encoding="utf-8")
+saver = (ROOT / "android/launcher/src/main/java/ma/chouitv/screensaver/SettingsBackup.java").read_text(encoding="utf-8")
 check("the home export carries the radios", 'o.put("radio", ma.chouitv.home.tilawah.RadioBackup.export(c))' in data)
 check("an import checks the radios whole before it writes anything", data.index("RadioBackup.check(radio)") < data.index("int n = write(adhanPrefs(c)"))
 check("the radios are written with the adhan and the dock", "RadioBackup.apply(c, radio)" in data)

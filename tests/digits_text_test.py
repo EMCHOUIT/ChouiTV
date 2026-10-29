@@ -10,7 +10,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 HOME = ROOT / "android/launcher/src/main/java/ma/chouitv/home"
-APP = ROOT / "android/app/src/main/java/ma/chouitv/screensaver"
+APP = ROOT / "android/launcher/src/main/java/ma/chouitv/screensaver"
 failed = 0
 def check(name, ok, detail=""):
     global failed

@@ -14,8 +14,8 @@ An Arabic home screen and screensaver for Android TV, made for a Moroccan family
 - Moroccan cities by the 12 regions, Moroccan teams (national team and Botola clubs), darija greetings, proverbs and family words in the wisdom card, verse/dua card from public APIs every 2 minutes.
 - **Settings export/import** (settings tab «الرئيسية والنظام» ← «نسخ الإعدادات», and `optimize/saver.sh export` / `import`): everything the person set in one JSON file, with a preview and an undo.
 - **Time zone and prayer calculation** settings (the calculation follows the zone: Morocco uses the Awqaf ministry's), a prayer's own options in «الاستماع», any key stops a ringing adhan.
-- **Own names (3.171):** the apps are `ma.chouitv.screensaver` and `ma.chouitv.home` (earlier builds used other names). They are other apps for Android: `optimize/migrate-to-chouitv.sh` moves a TV from the old ones (settings carried over, old apps removed).
-- **Self-update:** both apps check the releases of `EMCHOUIT/ChouiTV` and ask for one OK press per APK.
+- **One app (4.0):** the home screen, the screensaver شاشة تلفزيونك, its settings and «الاستماع» are ONE app, `ma.chouitv.home` (`chouitv-home.apk`). Until 3.x there were two (`ma.chouitv.home` and `ma.chouitv.screensaver`): `optimize/migrate-to-v4.sh` moves such a TV (settings carried over, the second app removed at the end). Earlier builds used other names (`sa.urtv.*`): `optimize/migrate-to-chouitv.sh` moves a TV from those straight to 4.0.
+- **Self-update:** the app checks the releases of `EMCHOUIT/ChouiTV` and asks for one OK press for its APK.
 
 ## Build
 
@@ -23,13 +23,13 @@ JDK 17, Android SDK (build-tools, platform 34), Gradle 8.9, Python 3.12.
 
 ```bash
 python src/build.py            # builds dist/tv.html from src/template.html (commit first: the page's build stamp is the last commit time of src/)
-GITHUB_RUN_NUMBER=165 gradle -p android :app:assembleRelease :launcher:assembleRelease
+GITHUB_RUN_NUMBER=165 gradle -p android :launcher:assembleRelease
 ```
 
-- Both APKs (`ma.chouitv.screensaver`, `ma.chouitv.home`) **must be signed with the same key** (a read permission between them is signature-level). The key is not in this repository.
+- The APK (`ma.chouitv.home`, module `android/launcher`; the screensaver's Java sources are in `android/launcher/src/main/java/ma/chouitv/screensaver/`) **must be signed with THE key the TVs already trust** (`.github/signer-sha256.txt`; `optimize/check-signer.sh chouitv-home.apk` checks it). The key is not in this repository.
 - **Fonts:** the interface uses the **Thmanyah** font (`assets/fonts/Thmanyah-*.woff2` for the page, `android/launcher/src/main/assets/fonts/Thmanyah-*.otf` for the apps); the Quran text uses the unmodified KFGQPC Uthmanic Hafs (see `assets/fonts/UthmanicHafs-NOTICE.txt`).
 - `GITHUB_RUN_NUMBER` becomes the version code: it must be higher than the installed one.
-- The APKs are published as releases of `EMCHOUIT/ChouiTV`.
+- The APK is published as a release of `EMCHOUIT/ChouiTV`.
 
 ## Credits and licence
 

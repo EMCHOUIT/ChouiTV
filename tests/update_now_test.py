@@ -16,7 +16,7 @@ def check(name, ok, detail=""):
     failed += not ok
 
 
-settings = (ROOT / "android/app/src/main/java/ma/chouitv/screensaver/SettingsActivity.java").read_text(encoding="utf-8")
+settings = (ROOT / "android/launcher/src/main/java/ma/chouitv/screensaver/SettingsActivity.java").read_text(encoding="utf-8")
 home = ROOT / "android/launcher/src/main"
 selfu = (home / "java/ma/chouitv/home/SelfUpdate.java").read_text(encoding="utf-8")
 manifest = (home / "AndroidManifest.xml").read_text(encoding="utf-8")

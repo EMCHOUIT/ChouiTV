@@ -14,7 +14,7 @@ if not shutil.which("javac"):
     sys.exit(0)
 failed = False
 for run_class, sources in (
-        ("ma.chouitv.screensaver.PrayerAdjRun", ["android/app/src/main/java/ma/chouitv/screensaver/PrayerAdj.java", "android/app/src/main/java/ma/chouitv/screensaver/DigitsText.java", "tests/PrayerAdjRun.java"]),
+        ("ma.chouitv.screensaver.PrayerAdjRun", ["android/launcher/src/main/java/ma/chouitv/screensaver/PrayerAdj.java", "android/launcher/src/main/java/ma/chouitv/screensaver/DigitsText.java", "tests/PrayerAdjRun.java"]),
         ("ma.chouitv.home.tilawah.PrayerAdjustRun", ["android/launcher/src/main/java/ma/chouitv/home/tilawah/PrayerAdjust.java",
                                                   "android/launcher/src/main/java/ma/chouitv/home/tilawah/PrayerMath.java", "tests/PrayerAdjustRun.java"])):
     with tempfile.TemporaryDirectory() as tmp:

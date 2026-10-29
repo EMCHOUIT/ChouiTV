@@ -10,7 +10,7 @@ import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SRC = ROOT / "android/app/src/main/java/ma/chouitv/screensaver"
+SRC = ROOT / "android/launcher/src/main/java/ma/chouitv/screensaver"
 NAMES = re.findall(r'\{"([^"]+)", "[\d.-]+", "[\d.-]+"\}', (SRC / "Cities.java").read_text(encoding="utf-8"))
 
 # typed -> the names it must find (all of them, in the list's order)
