@@ -374,7 +374,7 @@
     font-weight:700;
     font-size:clamp(120px,min(17vw,31vh),345px);line-height:.92;letter-spacing:.022em;
     color:#FFFDF6;font-variant-numeric:tabular-nums;
-    text-shadow:0 4px 70px rgba(0,0,0,.65), 0 0 130px rgba(255,236,190,.12);
+    text-shadow:0 4px 24px rgba(0,0,0,.65);   /* 70px and 130px blurs on a 345px clock made a huge texture the TV rebuilt all the time: the dream's GL memory swung 55-155 MB, now a steady ~55 */
   }
   .clock .d{unicode-bidi:isolate}
   .clock .d i{font-style:normal}
