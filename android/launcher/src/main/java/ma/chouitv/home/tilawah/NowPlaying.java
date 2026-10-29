@@ -49,7 +49,11 @@ public final class NowPlaying {
                 NowPlayingText.who(radio, reciterName));
     }
 
+    /** OK on the card: a recording pauses or plays; a live station stops (it has no pause) */
     public static void toggle(Context c) { MusicService.toggle(c); }
+
+    /** stop for good: the background playback ends and the player lets go of what it loaded */
+    public static void stop(Context c) { MusicService.stopAction(c); }
 
     public static void next(Context c) { MusicService.nextAction(c); }
 

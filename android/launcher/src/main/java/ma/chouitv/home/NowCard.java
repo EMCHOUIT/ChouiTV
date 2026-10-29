@@ -23,13 +23,13 @@ final class NowCard extends LinearLayout {
     private static final int ON = 0xE6FFFFFF, FOCUSED = 0xFF111111, GOLD = 0xFFD4AF6A, DIM = 0xFFC6BBA4;
 
     private final GradientDrawable bg = new GradientDrawable();
-    private final Drawable play, pause;
+    private final Drawable play, pause, stop;
     private final ImageView mark;
     private final TextView title, sub;
     private String subText = "", hintText = "";
-    private boolean playing;
+    private boolean playing, radio;
 
-    NowCard(Context c, Typeface strong, Typeface plain, Drawable playIcon, Drawable pauseIcon) {
+    NowCard(Context c, Typeface strong, Typeface plain, Drawable playIcon, Drawable pauseIcon, Drawable stopIcon) {
         super(c);
         float d = c.getResources().getDisplayMetrics().density;
         setOrientation(HORIZONTAL);
@@ -43,6 +43,7 @@ final class NowCard extends LinearLayout {
 
         play = playIcon.mutate();
         pause = pauseIcon.mutate();
+        stop = stopIcon.mutate();
         mark = new ImageView(c);
         addView(mark, new LayoutParams(Math.round(14 * d), Math.round(14 * d)));
 
@@ -73,6 +74,7 @@ final class NowCard extends LinearLayout {
     /** what the card says now (MainActivity, on a change and once a minute for the sleep timer) */
     void bind(NowPlaying.State s) {
         playing = s.playing;
+        radio = s.radio;
         title.setText(Digits.of(s.title));
         subText = Digits.of(s.sub);
         hintText = Digits.of(s.hint);
@@ -90,7 +92,8 @@ final class NowCard extends LinearLayout {
         title.setTextColor(focused ? FOCUSED : ON);
         sub.setTextColor(focused ? FOCUSED : DIM);
         sub.setText(focused ? hintText : subText);   // the keys, while it has the focus
-        Drawable icon = playing ? pause : play;   // the mark says what OK does: pause while it plays, play while it is paused
+        // the mark says what OK does: stop for a live station (it has no pause), pause while a recording plays, play while it is paused
+        Drawable icon = radio ? stop : playing ? pause : play;
         icon.setTint(focused ? FOCUSED : GOLD);
         mark.setImageDrawable(icon);
     }

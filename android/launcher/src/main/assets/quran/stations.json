@@ -209,6 +209,84 @@
    "url": "https://chadafm.ice.infomaniak.ch/chadafm-128.aac",
    "live": true,
    "group": "ma"
+  },
+  {
+   "name": "راديو فيروز",
+   "url": "https://stream.zeno.fm/zv3e5wykprhvv.mp3",
+   "live": true,
+   "group": "ma"
+  },
+  {
+   "name": "راديو منارات",
+   "url": "https://listen.radioking.com/radio/252934/stream/297385",
+   "live": true,
+   "group": "ma"
+  },
+  {
+   "name": "سكايروك الدار البيضاء",
+   "url": "https://icecast.skyrock.net/s/casa_aac_64k",
+   "live": true,
+   "group": "ma"
+  },
+  {
+   "name": "راديو أصوات",
+   "url": "https://broadcast.ice.infomaniak.ch/aswat-high.mp3",
+   "live": true,
+   "group": "ma"
+  },
+  {
+   "name": "أضواء FM 2",
+   "url": "https://stream.zeno.fm/5bxh2nh0x1zuv",
+   "live": true,
+   "group": "ma"
+  },
+  {
+   "name": "أضواء ميوزيك 3",
+   "url": "https://stream.zeno.fm/x4451xh0x1zuv",
+   "live": true,
+   "group": "ma"
+  },
+  {
+   "name": "أضواء أطفال 4",
+   "url": "https://stream.zeno.fm/8wrs2bh0x1zuv",
+   "live": true,
+   "group": "ma"
+  },
+  {
+   "name": "يابلادي أمازيغي",
+   "url": "https://radio.yabiladi.com:9002/;stream.mp3",
+   "live": true,
+   "group": "ma"
+  },
+  {
+   "name": "ميدي 1 راديو",
+   "url": "https://cdn.live.easybroadcast.io/live/83_medi1radio-maghreb_8s9i4bn/playlist.m3u8",
+   "live": true,
+   "group": "ma"
+  },
+  {
+   "name": "ستار المغرب FM",
+   "url": "https://a2.asurahosting.com:6100/radio.mp3",
+   "live": true,
+   "group": "ma"
+  },
+  {
+   "name": "زين بلادي",
+   "url": "https://asmaki.ma:8000/radio.mp3",
+   "live": true,
+   "group": "ma"
+  },
+  {
+   "name": "يو راديو",
+   "url": "https://uradio-aac.ice.infomaniak.ch/uradio.aac",
+   "live": true,
+   "group": "ma"
+  },
+  {
+   "name": "يو دانس",
+   "url": "https://udance.ice.infomaniak.ch/udance-128.aac",
+   "live": true,
+   "group": "ma"
   }
  ]
 }

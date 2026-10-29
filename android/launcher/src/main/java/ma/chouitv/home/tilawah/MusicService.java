@@ -542,10 +542,14 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
 
     void toggle() {
         if (player == null) { resumeLastInternal(); return; }
+        // a live station has nothing to pause: pausing it only makes the player keep a buffer of a stream that moves on, so it stops
+        // (and lets go of everything); playing again joins the live stream afresh
+        if (source == Prefs.SOURCE_RADIO) { stopPlayback(); return; }
         if (playing) pause(); else resume();
     }
 
     void pause() {
+        if (source == Prefs.SOURCE_RADIO && player != null) { stopPlayback(); return; }   // see toggle()
         if (player != null && playing) {
             player.pause();
             playing = false;
@@ -798,11 +802,16 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
                 .setCategory(Notification.CATEGORY_TRANSPORT)
                 .setVisibility(Notification.VISIBILITY_PUBLIC)
                 .setColor(getResources().getColor(R.color.gold))
-                .addAction(R.drawable.ic_prev, getString(R.string.previous), command(ACTION_PREV))
-                .addAction(playing ? R.drawable.ic_pause : R.drawable.ic_play,
-                        getString(R.string.play_pause), command(ACTION_TOGGLE))
-                .addAction(R.drawable.ic_next, getString(R.string.next), command(ACTION_NEXT))
-                .addAction(R.drawable.ic_stop, getString(R.string.stop), command(ACTION_STOP));
+                .addAction(R.drawable.ic_prev, getString(R.string.previous), command(ACTION_PREV));
+        if (source == Prefs.SOURCE_RADIO) {   // a station is stopped, not paused: one stop button, no pause
+            builder.addAction(R.drawable.ic_stop, getString(R.string.stop), command(ACTION_STOP))
+                    .addAction(R.drawable.ic_next, getString(R.string.next), command(ACTION_NEXT));
+        } else {   // a recording can be paused, and stopped for good
+            builder.addAction(playing ? R.drawable.ic_pause : R.drawable.ic_play,
+                            getString(R.string.play_pause), command(ACTION_TOGGLE))
+                    .addAction(R.drawable.ic_next, getString(R.string.next), command(ACTION_NEXT))
+                    .addAction(R.drawable.ic_stop, getString(R.string.stop), command(ACTION_STOP));
+        }
         if (Build.VERSION.SDK_INT >= 21) {
             builder.setStyle(new Notification.MediaStyle()
                     .setMediaSession(session.getSessionToken())

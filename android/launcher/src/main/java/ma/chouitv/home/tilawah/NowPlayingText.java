@@ -22,10 +22,10 @@ final class NowPlayingText {
         return sleepMinutes > 0 ? s + "  ·  نوم " + digits(String.valueOf(sleepMinutes)) + " د" : s;
     }
 
-    /** What the keys do while the card has the focus: OK pauses or plays, a long OK opens the player, ◀ ▶ the previous and next surah (not for a station) */
+    /** What the keys do while the card has the focus: OK stops a station (it has no pause) or pauses/plays a recording, a long OK opens the options (pause, stop, the player), ◀ ▶ the previous and next surah (not for a station) */
     static String hint(boolean radio) {
-        return radio ? "اختيار: إيقاف/تشغيل  ·  مطولًا: فتح"
-                : "اختيار: إيقاف/تشغيل  ·  يمين/يسار: السورة  ·  مطولًا: فتح";
+        return radio ? "اختيار: إيقاف  ·  مطولًا: خيارات"
+                : "اختيار: إيقاف مؤقت  ·  يمين/يسار: السورة  ·  مطولًا: خيارات";
     }
 
     /** 0-9 as ٠-٩ */

@@ -410,8 +410,6 @@ public class MainActivity extends Activity {
         inputs.setOnClickListener(v -> showInputs(v));
         wifiPill = pill("واي فاي", R.drawable.ic_wifi);
         wifiPill.setOnClickListener(v -> launch(new Intent(Settings.ACTION_WIFI_SETTINGS)));
-        Pill tasks = pill("المهام", R.drawable.ic_mic);   // the list lives in the screensaver app
-        tasks.setOnClickListener(v -> launch(new Intent(this, TasksActivity.class)));
         Pill settings = pill("الإعدادات", R.drawable.ic_settings);
         settings.setOnClickListener(v -> launch(new Intent(Settings.ACTION_SETTINGS)));
         // the «تلاوة وأذان» pill: the Quran, the radio and the adhan are part of this app, so it opens them right here
@@ -420,18 +418,18 @@ public class MainActivity extends Activity {
         sleepPill = pill("مؤقت النوم", R.drawable.ic_sleep);
         sleepPill.setOnClickListener(v -> showSleep(v));
         List<Pill> row = new ArrayList<>(Arrays.asList(inputs, wifiPill, settings, sleepPill));
-        if (isInstalled(SAVER_PKG)) { row.add(tasks); row.add(saver); }
+        if (isInstalled(SAVER_PKG)) row.add(saver);   // (no «المهام» pill any more)
         if (getResources().getBoolean(R.bool.show_listening)) row.add(tilawah);
         for (Pill p : row) {
             right.addView(p, llp(-2, dp(Pill.HEIGHT), dp(10), 0, 0, 0));
             pills.add(p);
         }
         // «يُتلى الآن»: the first child of the row, so it sits at its right end and the pills keep their places when it comes
-        nowCard = new NowCard(this, font("medium"), font("regular"), getDrawable(R.drawable.ic_play), getDrawable(R.drawable.ic_pause));
+        nowCard = new NowCard(this, font("medium"), font("regular"), getDrawable(R.drawable.ic_play), getDrawable(R.drawable.ic_pause), getDrawable(R.drawable.ic_stop));
         nowCard.setId(View.generateViewId());
         nowCard.setVisibility(View.GONE);
-        nowCard.setOnClickListener(v -> NowPlaying.toggle(this));   // OK: pause or play
-        nowCard.setOnLongClickListener(v -> { startActivity(NowPlaying.player(this)); return true; });   // a long OK: the player
+        nowCard.setOnClickListener(v -> NowPlaying.toggle(this));   // OK: pause or play (a station has no pause: it stops)
+        nowCard.setOnLongClickListener(v -> { showNowOptions(); return true; });   // a long OK: pause / stop for good / the player
         nowCard.setOnFocusChangeListener((v, has) -> {
             if (has) { lastFocusedId = v.getId(); scroll.smoothScrollTo(0, 0); fadeGlow(1f); }
         });
@@ -862,6 +860,45 @@ public class MainActivity extends Activity {
         pw.setElevation(dp(16));
         pw.setOnDismissListener(() -> anchor.requestFocus());
         pw.showAsDropDown(anchor, 0, dp(8), Gravity.START);
+        rows.get(0).requestFocus();
+    }
+
+    /**
+     * A long OK on the «يُتلى الآن» card: what to do with the playback in the background. A recording can be paused or resumed; a station
+     * cannot (it only stops, which is what OK does); «إيقاف وتفريغ الذاكرة» ends the playback for good and the player lets go of what it
+     * loaded; the third opens the full player.
+     */
+    private void showNowOptions() {
+        NowPlaying.State s = NowPlaying.read(this);
+        if (!s.show) return;
+        LinearLayout list = new LinearLayout(this);
+        list.setOrientation(LinearLayout.VERTICAL);
+        list.setPadding(dp(8), dp(8), dp(8), dp(8));
+        GradientDrawable bg = new GradientDrawable();
+        bg.setCornerRadius(dp(16));
+        bg.setColor(0xF02A2A2E);
+        bg.setStroke(dp(1), 0x26FFFFFF);
+        list.setBackground(bg);
+        PopupWindow pw = new PopupWindow(list, dp(300), -2, true);
+        List<TextView> rows = new ArrayList<>();
+        if (!s.radio) rows.add(inputRow(getString(s.playing ? R.string.now_pause : R.string.now_resume), () -> NowPlaying.toggle(this)));
+        rows.add(inputRow(getString(R.string.now_stop), () -> NowPlaying.stop(this)));
+        rows.add(inputRow(getString(R.string.now_open), () -> startActivity(NowPlaying.player(this))));
+        for (TextView r : rows) {
+            r.setOnClickListener(v -> { pw.dismiss(); ((Runnable) v.getTag()).run(); });
+            list.addView(r, new LinearLayout.LayoutParams(-1, dp(36)));
+        }
+        for (int i = 0; i < rows.size(); i++) {
+            TextView r = rows.get(i);
+            r.setNextFocusUpId(rows.get(Math.max(0, i - 1)).getId());
+            r.setNextFocusDownId(rows.get(Math.min(rows.size() - 1, i + 1)).getId());
+            r.setNextFocusLeftId(r.getId());
+            r.setNextFocusRightId(r.getId());
+        }
+        pw.setOutsideTouchable(true);
+        pw.setElevation(dp(16));
+        pw.setOnDismissListener(() -> { if (nowCard.getVisibility() == View.VISIBLE) nowCard.requestFocus(); });
+        pw.showAsDropDown(nowCard, 0, dp(8), Gravity.START);
         rows.get(0).requestFocus();
     }
 

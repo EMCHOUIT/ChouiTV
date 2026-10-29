@@ -22,7 +22,14 @@
     <string name="stop_now">إيقاف التشغيل الآن</string>
     <string name="sleep_left">يتوقف بعد %1$s دقيقة</string>
     <string name="hint_main">يمين/يسار لتغيير القسم  •  اختيار للفتح  •  رجوع للواجهة</string>
-    <string name="hint_player">اختيار: تشغيل/إيقاف  •  يمين/يسار تقديم  •  أسفل مؤقت النوم  •  رجوع للقائمة</string>
+    <string name="hint_player">اختيار: إيقاف مؤقت/متابعة  •  يمين/يسار تقديم  •  أعلى: إيقاف  •  أسفل مؤقت النوم  •  رجوع</string>
+    <string name="hint_player_radio">اختيار: إيقاف  •  أسفل مؤقت النوم  •  رجوع للقائمة</string>
+    <string name="now_options_title">التحكم في التشغيل</string>
+    <string name="now_options_sub">الإيقاف يُنهي التشغيل في الخلفية ويفرّغ ما حُمّل في الذاكرة</string>
+    <string name="now_pause">إيقاف مؤقت</string>
+    <string name="now_resume">متابعة</string>
+    <string name="now_stop">إيقاف وتفريغ الذاكرة</string>
+    <string name="now_open">فتح المشغّل</string>
     <string name="hint_adhan">اختيار: إيقاف/تشغيل  •  أسفل مؤقت النوم  •  رجوع للقائمة</string>
     <string name="back">رجوع</string>
     <string name="stop">إيقاف</string>

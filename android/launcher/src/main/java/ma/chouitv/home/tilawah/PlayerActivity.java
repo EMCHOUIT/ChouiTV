@@ -101,7 +101,7 @@ public class PlayerActivity extends Activity {
         // an adhan is not a track: no skipping and no seeking, only stop/play and the sleep timer
         prev.setVisibility(adhan ? View.GONE : View.VISIBLE);
         next.setVisibility(adhan ? View.GONE : View.VISIBLE);
-        hint.setText(adhan ? R.string.hint_adhan : R.string.hint_player);
+        hint.setText(adhan ? R.string.hint_adhan : radio ? R.string.hint_player_radio : R.string.hint_player);
         if (radio) {
             int index = MusicService.currentStation();
             if (index >= 0 && index < cat.stations.size()) title.setText(cat.stations.get(index).name);
@@ -134,7 +134,8 @@ public class PlayerActivity extends Activity {
         String error = MusicService.currentError();
         if (error != null) artist.setText(error);
         else if (MusicService.isBuffering()) artist.setText(R.string.buffering);
-        play.setImageResource(MusicService.isPlaying() ? R.drawable.ic_pause : R.drawable.ic_play);
+        // a station is stopped, not paused: its button is a stop; a recording pauses (and UP stops it for good)
+        play.setImageResource(radio ? R.drawable.ic_stop : MusicService.isPlaying() ? R.drawable.ic_pause : R.drawable.ic_play);
         scope.setSource(MusicService.isPlaying() && !MusicService.isBuffering(), MusicService.audioSession());
 
         long left = MusicService.sleepAt() - System.currentTimeMillis();
@@ -183,6 +184,10 @@ public class PlayerActivity extends Activity {
                 return true;
             case KeyEvent.KEYCODE_DPAD_DOWN:
                 if (event.getRepeatCount() == 0) showSleep();
+                return true;
+            case KeyEvent.KEYCODE_DPAD_UP:
+            case KeyEvent.KEYCODE_MEDIA_STOP:   // stop for good: nothing left playing in the background, the player let go of
+                if (event.getRepeatCount() == 0 && !adhanPlaying()) { MusicService.stopAction(this); finish(); }
                 return true;
             default:
                 return super.onKeyDown(keyCode, event);

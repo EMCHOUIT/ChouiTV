@@ -35,8 +35,16 @@ check("MainActivity: the sleep timer's minutes follow the clock's existing minut
       "updateNowPlaying();   // the minutes left of its sleep timer" in main)
 check("NowPlaying: shown only for a surah or a station, never for the adhan or nothing",
       "source != Prefs.SOURCE_SURAH && !radio) return new State(false" in now)
-check("MainActivity: OK pauses or plays, a long OK opens the player",
-      "nowCard.setOnClickListener(v -> NowPlaying.toggle(this))" in main and "nowCard.setOnLongClickListener(v -> { startActivity(NowPlaying.player(this)); return true; })" in main)
+check("MainActivity: OK pauses or plays a recording (a station has no pause: it stops), a long OK opens the options (pause, stop and free the memory, the player)",
+      "nowCard.setOnClickListener(v -> NowPlaying.toggle(this))" in main and "nowCard.setOnLongClickListener(v -> { showNowOptions(); return true; })" in main
+      and "NowPlaying.stop(this)" in main and "NowPlaying.player(this)" in main)
+check("MusicService: a station stops instead of pausing (toggle and pause), a recording pauses; the notification has one stop for a station",
+      "if (source == Prefs.SOURCE_RADIO) { stopPlayback(); return; }" in service
+      and "if (source == Prefs.SOURCE_RADIO && player != null) { stopPlayback(); return; }" in service
+      and "a station is stopped, not paused" in service)
+player_src = (TIL / "PlayerActivity.java").read_text(encoding="utf-8")
+check("PlayerActivity: a station shows a stop button; UP stops a recording for good",
+      "radio ? R.drawable.ic_stop" in player_src and "KeyEvent.KEYCODE_DPAD_UP" in player_src and "MusicService.stopAction(this); finish();" in player_src)
 check("MainActivity: ◀ is the previous surah and ▶ the next while the card has the focus, for a surah only (a station: ◀ goes on to the pills)",
       "NowPlaying.prev(this); else NowPlaying.next(this)" in main and "if (s.show && !s.radio) {" in main and "KEYCODE_DPAD_LEFT) NowPlaying.prev" in main)
 check("MainActivity: it is the first child of the pills row, a pill's height, hidden until something plays: the pills do not move",

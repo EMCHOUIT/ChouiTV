@@ -15,9 +15,23 @@ final class HomeCardChoice {
      * successfully, else null (nothing known).
      */
     static String[] pick(String frag, String panel, String savedFrag, String savedPanel) {
-        if (frag != null && panel != null) return new String[] { frag, panel };
-        if (savedFrag != null && savedPanel != null) return new String[] { savedFrag, savedPanel };
+        if (frag != null && panel != null) return new String[] { frag, withoutTasks(panel) };
+        if (savedFrag != null && savedPanel != null) return new String[] { savedFrag, withoutTasks(savedPanel) };
         return null;
+    }
+
+    /**
+     * The home screen has no tasks card any more (the «المهام» pill and card were taken off it): «tasks» is left out of the cards the
+     * screensaver's settings name, and when it was the only one the home shows no card. The screensaver keeps its own.
+     */
+    static String withoutTasks(String panel) {
+        if ("none".equals(panel) || panel.isEmpty()) return panel;
+        StringBuilder kept = new StringBuilder();
+        for (String k : panel.split(",")) {
+            if ("tasks".equals(k.trim())) continue;
+            kept.append(kept.length() == 0 ? "" : ",").append(k.trim());
+        }
+        return kept.length() == 0 ? "none" : kept.toString();
     }
 
     /** How many cards a pick shows (1 to 3); the prayers alone when nothing is known. */
