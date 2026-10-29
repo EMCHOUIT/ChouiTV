@@ -206,8 +206,22 @@ Releases are made by hand since 3.175 (the workflow in `.github/workflows/androi
 repository is on `main`, so a push builds nothing): build both apps with `GITHUB_RUN_NUMBER=N` (N above the last release), make a release `v3.N` holding
 `chouitv-home.apk` and `chouitv-screensaver.apk` (`gh release create v3.N …`), then put the new version, the two URLs and the two SHA-256 in
 `latest.json` on `main`: that file is what the TVs, `optimize/install.sh` and ChouiTV Installer read. `releases/latest/download/<file>` always gives the
-newest numbered release. The build signs with the key it finds in `ANDROID_KEYSTORE` (a local build without it uses the debug key, which is the key the
-installed apps have: check with `apksigner verify --print-certs` that it is the same one before publishing).
+newest numbered release. Always run `optimize/check-signer.sh chouitv-home.apk chouitv-screensaver.apk` before publishing (see Signing below).
+
+## Signing
+
+Every release is signed with **one key**; the apps already on the TVs accept an update only if it is signed with the same key, so losing it, or
+signing with another one, ends the updates for good (the only way out is uninstalling, which erases the TV's settings). Its SHA-256 is pinned in
+`.github/signer-sha256.txt` (`af6154f7…f242`).
+
+- The key is the one Android Studio / Gradle made as `~/.android/debug.keystore` when the project was first built, now also kept as
+  `~/chouitv-signing/chouitv.p12` (alias `urtv`, password in `password.txt` next to it, both mode 600). It is **not** in this repository and **not**
+  in the GitHub secrets (an earlier comment said so; it was wrong).
+- A release build needs `ANDROID_KEYSTORE=<the .p12>` and `ANDROID_KEYSTORE_PASSWORD`; without them Gradle stops with an error, instead of
+  silently signing with a debug key that no TV trusts.
+- `optimize/check-signer.sh <apk>…` compares the APKs with the pinned fingerprint; run it before every release.
+- **Keep two offline copies of the `.p12` and of its password, in two places** (a USB stick and a password manager, for example). If the file is lost
+  there is no recovery: Android would not accept an update signed with a new key.
 
 ## Known limits
 

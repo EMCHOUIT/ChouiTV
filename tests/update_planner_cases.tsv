@@ -1,0 +1,22 @@
+# kind, arguments..., expected (the last column). s = the screensaver, h = the home app. See UpdatePlannerRun.java
+plan	176	s=175,h=175	ma.chouitv.screensaver,ma.chouitv.home
+plan	176	s=176,h=175	ma.chouitv.home
+plan	176	s=175,h=176	ma.chouitv.screensaver
+plan	176	s=176,h=176	-
+plan	176	s=177,h=176	-
+plan	176	h=175	ma.chouitv.screensaver,ma.chouitv.home
+mixed	176	s=176,h=175	yes
+mixed	176	s=175,h=176	yes
+mixed	176	s=175,h=175	no
+mixed	176	s=176,h=176	no
+# wait: NOW FORCE LATEST DECLINEDVERSION DECLINEDAT FAILEDAT
+wait	100000000	0	176	176	99000000	0	yes
+wait	200000000	0	176	176	99000000	0	no
+wait	100000000	1	176	176	99999999	0	no
+wait	100000000	0	177	176	99999999	0	no
+wait	100000000	0	176	0	0	99000000	yes
+wait	100000000	0	176	0	0	90000000	no
+wait	100000000	1	176	0	0	99999999	no
+stale	1000000	0	999999	no
+stale	2000000	0	999999	yes
+stale	1000000	1	999999	yes

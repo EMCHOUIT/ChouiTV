@@ -21,8 +21,9 @@ final class Updater {
 
     private static final String OFF = "التحديث التلقائي متوقف";
     private static final String RECENT = "تم الفحص مؤخراً";
-    private static final String LATEST_URL = "https://github.com/EMCHOUIT/ChouiTV/releases/latest";
-    private static final Pattern TAG = Pattern.compile("v(\\d+\\.\\d+)$");
+    // the SAME file the home app updates from: the newest version is named once, there, not guessed from the releases page
+    private static final String LATEST_URL = "https://raw.githubusercontent.com/EMCHOUIT/ChouiTV/main/latest.json";
+    private static final Pattern NAME = Pattern.compile("\"versionName\"\\s*:\\s*\"(\\d+\\.\\d+)\"");
 
     private Updater() {}
 
@@ -112,18 +113,19 @@ final class Updater {
         }
     }
 
-    /** Newest release tag, from the redirect of /releases/latest (no body read). Keeps the old value on any failure. */
+    /** Newest version, from latest.json (the file the home app updates from). Keeps the old value on any failure. */
     private static void checkLatest(Context c) {
         HttpURLConnection con = null;
         try {
-            con = (HttpURLConnection) new URL(LATEST_URL).openConnection();
-            con.setInstanceFollowRedirects(false);
+            con = (HttpURLConnection) new URL(LATEST_URL + "?t=" + (System.currentTimeMillis() / 60_000L)).openConnection();
             con.setConnectTimeout(10000);
             con.setReadTimeout(10000);
-            con.getResponseCode();
-            String loc = con.getHeaderField("Location");
-            if (loc == null) return;
-            Matcher m = TAG.matcher(loc.trim());
+            if (con.getResponseCode() != HttpURLConnection.HTTP_OK) return;
+            byte[] body = new byte[4096];
+            int n = 0, r;
+            java.io.InputStream in = con.getInputStream();
+            while (n < body.length && (r = in.read(body, n, body.length - n)) > 0) n += r;
+            Matcher m = NAME.matcher(new String(body, 0, n, "UTF-8"));
             if (!m.find()) return;
             new Prefs(c).raw().edit().putString("latestVersion", m.group(1))
                 .putLong("latestCheck", System.currentTimeMillis()).apply();

@@ -130,6 +130,15 @@
         </receiver>
         <receiver android:name=".InstallResultReceiver" android:exported="false" />
 
+        <!-- the screen of an update in progress: it drives the installs from the front (Android refuses its install screen to a background app) -->
+        <activity
+            android:name=".UpdateActivity"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:screenOrientation="landscape"
+            android:theme="@style/App"
+            android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize|screenLayout|uiMode|density" />
+
         <!-- favourites row from ADB (agents, optimize/dock.sh); DUMP = only the shell can send it -->
         <receiver
             android:name=".DockReceiver"

@@ -1380,7 +1380,7 @@ public class SettingsActivity extends Activity {
                     } catch (RuntimeException ignored) { }
                     new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> askAppsUpdate(page, false), 2500);
                 }
-                else if (data.startsWith("update: installing")) toast("جارٍ تنزيل الإصدار الجديد… اضغط OK على الشاشة لتثبيته");
+                else if (data.startsWith("update: installing") || data.startsWith("update: started")) toast("جارٍ تنزيل الإصدار الجديد… في شاشة التثبيت حرّك الريموت يمينًا إلى «تثبيت» ثم اضغط OK");
                 else if (data.startsWith("update: up to date")) toast("التطبيقان على أحدث إصدار · " + page);
                 else if (data.startsWith("update: needs permission")) {   // Android needs the person's «allow» once for the home app
                     toast("فعّل «السماح بهذا المصدر» لتلفزيونك ثم عُد واضغط التحديث من جديد");

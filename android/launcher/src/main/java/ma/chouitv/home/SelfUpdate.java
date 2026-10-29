@@ -12,6 +12,7 @@ import android.app.PendingIntent;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -27,24 +28,30 @@ import java.net.URL;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Updates of the two apps from the owner's repository (github.com/EMCHOUIT/ChouiTV). latest.json there names the newest version and its two
- * APKs with their SHA-256. When the home screen comes to the front (at most every 6 hours) and a newer version exists, the APKs are downloaded into
- * the cache, checked (hash, package name, version, the SAME signing key as the installed app), and handed to Android's installer, which asks for one
- * OK with the remote for each. The screensaver goes first, then this app (its own replacement ends this process). Nothing stays on the TV: the files
- * are deleted when the install ends or fails, and at the next check.
+ * Updates of the two apps from the owner's repository (github.com/EMCHOUIT/ChouiTV). latest.json there names the newest version and its APKs with
+ * their SHA-256. When the home screen comes to the front (at most every 6 hours) and ONE of the two apps is behind that version, the APKs that are
+ * behind are downloaded into the cache and checked (hash, package name, version, the SAME signing key as the installed app). Then UpdateActivity,
+ * which is in the front, drives the installs one after the other (the screensaver first, the home app last, because its own replacement ends this
+ * process): Android shows its «install?» screen to an app that is in the front, and refuses it to one in the background, which is why the
+ * installs are not started from a receiver. The plan (which packages are left) is kept in the preferences, so a TV that is interrupted
+ * half-way resumes the next time the home screen is in front instead of staying with one app updated and the other not.
  *
  * Android does not let an ordinary app install silently, and needs «install unknown apps» for this one:
  * adb shell appops set ma.chouitv.home REQUEST_INSTALL_PACKAGES allow
  */
 final class SelfUpdate {
+    private static final String TAG = "SelfUpdate";
     static final String MANIFEST = "https://raw.githubusercontent.com/EMCHOUIT/ChouiTV/main/latest.json";
-    static final long CHECK_EVERY_MS = 6L * 3600 * 1000, RETRY_AFTER_DECLINE_MS = 24L * 3600 * 1000;
+    private static final String APK_HOST = "https://github.com/EMCHOUIT/ChouiTV/releases/download/";   // the only place an APK may come from
+    static final long CHECK_EVERY_MS = 6L * 3600 * 1000;
     static final String ACTION_RESULT = "ma.chouitv.home.INSTALL_RESULT";
     private static final String DIR = "update";
     private static final AtomicBoolean BUSY = new AtomicBoolean();
@@ -64,64 +71,116 @@ final class SelfUpdate {
         } catch (PackageManager.NameNotFoundException e) { return -1; }
     }
 
-    /** In the background: check, and if there is a newer version, download it, verify it and start the installer. Safe to call often. */
+    /** In the background: check, and if one of the apps is behind, download, verify and start the installs. Safe to call often. */
     static void maybeStart(final Context ctx, final boolean force, final Done done) { maybeStart(ctx, force, false, done); }
 
-    /** dry: only says whether a newer version exists ("available N"), downloads and installs nothing. */
+    /** dry: only says whether a newer version exists ("available N"), downloads and installs nothing, and touches nothing of an update in progress. */
     static void maybeStart(final Context ctx, final boolean force, final boolean dry, final Done done) {
         final Context c = ctx.getApplicationContext();
         if (!BUSY.compareAndSet(false, true)) { if (done != null) done.say("busy"); return; }
         new Thread(() -> {
             String message;
             try { message = run(c, force, dry); }
-            catch (Exception e) { message = "error: " + e; }
+            catch (Throwable e) { Log.w(TAG, "check failed", e); message = "error: " + e; }   // an Error too: BUSY must be released
             finally { BUSY.set(false); }
             if (done != null) done.say(message);
-        }).start();
+        }, "self-update").start();
+    }
+
+    /** What the last attempt left behind, for `UPDATE_CHECK --ez status true` (the cause of a failure is not shown to the person, only kept here). */
+    static String status(Context c) {
+        SharedPreferences p = prefs(c);
+        return "plan=" + p.getString("updPlan", "") + " target=" + p.getInt("updTarget", 0) + " why=" + p.getString("updWhy", "")
+                + " declined=" + p.getInt("updDeclined", 0) + " failedAt=" + p.getLong("updFailedAt", 0);
     }
 
     private static String run(Context c, boolean force, boolean dry) throws Exception {
         long now = System.currentTimeMillis();
         SharedPreferences p = prefs(c);
-        if (!p.getString("updQueue", "").isEmpty()) {
-            // an install that never ended (the screen asking «install?» was closed, or Android never answered) must not block the updates for ever:
-            // after ten minutes, or when the person asks again, it is forgotten
-            if (!force && now - p.getLong("updStartedAt", 0) < 10 * 60_000L) return "an install is in progress";
-            p.edit().putString("updQueue", "").apply();
+        String planLeft = p.getString("updPlan", "");
+        if (!planLeft.isEmpty()) {
+            // a package of the plan that is on the TV at the target version is done, whatever the installer's answer said: this app itself is replaced
+            // by the new version before it can hear that its own install succeeded, so its entry is still there in the new process
+            List<String> left = planList(p);
+            int target = p.getInt("updTarget", 0);
+            for (java.util.Iterator<String> it = left.iterator(); it.hasNext(); ) if (versionCode(c, it.next()) >= target) it.remove();
+            if (left.isEmpty()) { if (!dry) finished(c); planLeft = ""; }
+            else if (!dry) p.edit().putString("updPlan", android.text.TextUtils.join("|", left)).apply();
         }
-        deleteAll(dir(c));
+        if (!planLeft.isEmpty()) {
+            // an update half-way: the installs resume in front of the person; an install that never ended is forgotten after ten minutes
+            if (!UpdatePlanner.staleInstall(now, force && !dry, p.getLong("updStartedAt", 0))) {
+                if (!dry && UpdateActivity.live == null) { String ui = launchUi(c); if (ui != null) return "error: " + ui; return "resumed"; }
+                return "an install is in progress";
+            }
+            if (dry) return "an install is in progress";
+            abandonCurrent(c);
+            clearPlan(c);
+        }
+        if (!dry) deleteAll(dir(c));
         if (!force && now - p.getLong("updCheck", 0) < CHECK_EVERY_MS) return "checked recently";
-        JSONObject m = new JSONObject(new String(download(MANIFEST), "UTF-8"));
+        JSONObject m = new JSONObject(new String(download(MANIFEST + "?t=" + (now / 60_000L)), "UTF-8"));   // the minute: a cached copy is not kept for long
         p.edit().putLong("updCheck", now).apply();
         int latest = m.getInt("versionCode");
-        long mine = versionCode(c, c.getPackageName());
-        if (latest <= mine) return "up to date (installed " + mine + ", latest " + latest + ")";
-        if (!force && p.getInt("updDeclined", 0) == latest && now - p.getLong("updDeclinedAt", 0) < RETRY_AFTER_DECLINE_MS)
-            return "version " + latest + " was declined lately";
+        JSONArray apks = m.getJSONArray("apks");
+        List<String> listed = new ArrayList<>();
+        Map<String, Long> installed = new HashMap<>();
+        for (int i = 0; i < apks.length(); i++) {
+            String pkg = apks.getJSONObject(i).getString("package");
+            if (!pkg.matches("ma\\.chouitv\\.(home|screensaver)")) return "error: unexpected package " + pkg;
+            listed.add(pkg);
+            installed.put(pkg, versionCode(c, pkg));
+        }
+        List<String> plan = UpdatePlanner.plan(latest, listed, installed);
+        if (plan.isEmpty()) return "up to date (installed " + installed + ", latest " + latest + ")";
+        if (UpdatePlanner.mustWait(now, force, latest, p.getInt("updDeclined", 0), p.getLong("updDeclinedAt", 0), p.getLong("updFailedAt", 0)))
+            return "version " + latest + " was declined or failed lately";
         // Android installs for an app only when the person allowed «install unknown apps» for it; without that the installer refuses at the last
         // step, after the download. The settings screen that asks the person is opened by whoever is in front (the screensaver's settings).
         if (Build.VERSION.SDK_INT >= 26 && !c.getPackageManager().canRequestPackageInstalls()) return "needs permission: install unknown apps";
-        if (dry) return "available " + latest;
-        JSONArray apks = m.getJSONArray("apks");
-        List<String> paths = new ArrayList<>();
+        if (dry) return "available " + latest + (UpdatePlanner.mixed(latest, listed, installed) ? " (the two apps are on different versions)" : "");
         File d = dir(c);
-        if (!d.isDirectory() && !d.mkdirs()) return "error: no cache folder";
+        if (!d.isDirectory() && !d.mkdirs()) return fail(c, "no cache folder");
         for (int i = 0; i < apks.length(); i++) {
             JSONObject a = apks.getJSONObject(i);
             String pkg = a.getString("package");
-            if (!pkg.matches("ma\\.chouitv\\.(home|screensaver)")) return "error: unexpected package " + pkg;
+            if (!plan.contains(pkg)) continue;   // already on the new version: not downloaded again
+            String url = a.getString("url");
+            if (!url.startsWith(APK_HOST)) return fail(c, "the APK of " + pkg + " is not on the project's releases: " + url);
             File f = new File(d, pkg + ".apk");
-            String sha = fetchTo(a.getString("url"), f);
-            if (!sha.equalsIgnoreCase(a.getString("sha256"))) { deleteAll(d); return "error: checksum of " + pkg + " does not match"; }
+            String sha = fetchTo(url, f);
+            if (!sha.equalsIgnoreCase(a.getString("sha256"))) { deleteAll(d); return fail(c, "checksum of " + pkg + " does not match"); }
             String bad = verify(c, f, pkg, latest);
-            if (bad != null) { deleteAll(d); return "error: " + bad; }
-            paths.add(f.getAbsolutePath());
+            if (bad != null) { deleteAll(d); return fail(c, bad); }
         }
-        if (paths.isEmpty()) return "error: no apk listed";
-        p.edit().putString("updQueue", android.text.TextUtils.join("|", paths)).putInt("updTarget", latest).putLong("updStartedAt", now).apply();
-        toast(c, "تحديث تلفزيونك " + latest + ": اضغط OK لتثبيته");
-        installNext(c);
+        p.edit().putString("updPlan", android.text.TextUtils.join("|", plan)).putInt("updTarget", latest).putLong("updStartedAt", now)
+                .putString("updWhy", "").putLong("updFailedAt", 0).apply();
+        toast(c, "تحديث تلفزيونك " + latest + ": في شاشة التثبيت حرّك الريموت يمينًا إلى «تثبيت» ثم اضغط OK");
+        String ui = launchUi(c);
+        if (ui != null) { clearPlan(c); deleteAll(d); return fail(c, ui); }
         return "installing version " + latest;
+    }
+
+    /** a technical failure: remembered (with its cause), tried again in half an hour, never shown as a refusal by the person */
+    private static String fail(Context c, String why) {
+        Log.w(TAG, why);
+        prefs(c).edit().putString("updWhy", why).putLong("updFailedAt", System.currentTimeMillis()).apply();
+        return "error: " + why;
+    }
+
+    /**
+     * Opens the screen that drives the installs, and waits for it to be there. Android refuses to start an activity for an app that is in the
+     * background; null when it opened, else why not (the update then waits for the next time the home screen is in front).
+     */
+    private static String launchUi(Context c) {
+        try {
+            c.startActivity(new Intent(c, UpdateActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP));
+        } catch (RuntimeException e) { return "cannot open the update screen: " + e; }
+        for (int i = 0; i < 40; i++) {
+            if (UpdateActivity.live != null) return null;
+            try { Thread.sleep(150); } catch (InterruptedException e) { return "interrupted"; }
+        }
+        return "the update screen did not open (the home screen is not in front)";
     }
 
     /** the file is the package it says, a newer version, and signed with the key of the installed app of that name */
@@ -132,6 +191,8 @@ final class SelfUpdate {
         try {
             got = pm.getPackageArchiveInfo(f.getAbsolutePath(), PackageManager.GET_SIGNING_CERTIFICATES);
             mine = pm.getPackageInfo(pkg, PackageManager.GET_SIGNING_CERTIFICATES);
+        } catch (PackageManager.NameNotFoundException absent) {
+            return verifyNew(pm, f, pkg, latest);   // an app that is not on the TV yet: nothing to compare the key with
         } catch (Exception e) { return pkg + " cannot be read (" + e + ")"; }
         if (got == null || !pkg.equals(got.packageName)) return "not the package " + pkg;
         if (got.getLongVersionCode() < latest) return pkg + " is older than the version announced";
@@ -141,28 +202,44 @@ final class SelfUpdate {
         return null;
     }
 
+    /** a package that is missing on the TV: it must at least be the package and version announced, and signed with the key of the other ChouiTV app */
+    private static String verifyNew(PackageManager pm, File f, String pkg, int latest) {
+        try {
+            PackageInfo got = pm.getPackageArchiveInfo(f.getAbsolutePath(), PackageManager.GET_SIGNING_CERTIFICATES);
+            if (got == null || !pkg.equals(got.packageName)) return "not the package " + pkg;
+            if (got.getLongVersionCode() < latest) return pkg + " is older than the version announced";
+            String other = UpdatePlanner.HOME.equals(pkg) ? "ma.chouitv.screensaver" : UpdatePlanner.HOME;
+            PackageInfo sibling = pm.getPackageInfo(other, PackageManager.GET_SIGNING_CERTIFICATES);
+            if (got.signingInfo == null || sibling.signingInfo == null
+                    || !certs(got.signingInfo.getApkContentsSigners()).equals(certs(sibling.signingInfo.getApkContentsSigners()))) return pkg + " is signed with another key";
+            return null;
+        } catch (Exception e) { return pkg + " cannot be checked (" + e + ")"; }
+    }
+
     private static Set<String> certs(Signature[] sigs) {
         Set<String> out = new HashSet<>();
         for (Signature s : sigs) out.add(Arrays.toString(s.toByteArray()));
         return out;
     }
 
-    /** Starts the installer for the next file of the queue (the screensaver, then this app). */
+    // ---- the installs, one package at a time (called by UpdateActivity, off the main thread) ----
+
+    /** The first package of the plan goes into an installer session; its answer comes to InstallResultReceiver, which hands it to UpdateActivity. */
     static void installNext(Context c) {
         SharedPreferences p = prefs(c);
-        String q = p.getString("updQueue", "");
-        if (q.isEmpty()) return;
-        String[] all = q.split("\\|");
-        String path = all[0];
-        String rest = android.text.TextUtils.join("|", Arrays.copyOfRange(all, 1, all.length));
-        p.edit().putString("updQueue", rest).apply();
-        File f = new File(path);
-        String pkg = f.getName().replace(".apk", "");
+        List<String> plan = planList(p);
+        if (plan.isEmpty()) { finished(c); return; }
+        abandonCurrent(c);
+        String pkg = plan.get(0);
+        File f = new File(dir(c), pkg + ".apk");
+        if (!f.isFile()) { failed(c, "the file of " + pkg + " is gone", false); return; }
+        int id = -1;
+        PackageInstaller pi = c.getPackageManager().getPackageInstaller();
         try {
-            PackageInstaller pi = c.getPackageManager().getPackageInstaller();
             PackageInstaller.SessionParams sp = new PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL);
             sp.setAppPackageName(pkg);
-            int id = pi.createSession(sp);
+            id = pi.createSession(sp);
+            p.edit().putInt("updSession", id).putString("updCurrent", pkg).apply();
             try (PackageInstaller.Session s = pi.openSession(id)) {
                 try (InputStream in = new FileInputStream(f); OutputStream out = s.openWrite("apk", 0, f.length())) {
                     byte[] buf = new byte[65536];
@@ -176,20 +253,55 @@ final class SelfUpdate {
                 s.commit(sender);
             }
         } catch (Exception e) {
-            failed(c, "install " + pkg + ": " + e);
+            if (id >= 0) { try { pi.abandonSession(id); } catch (RuntimeException ignored) { } }   // a failed session must not pile up in the system
+            failed(c, "install " + pkg + ": " + e, false);
         }
     }
 
-    /** the install ended badly or was refused: nothing more is tried for a day, and the files go */
-    static void failed(Context c, String why) {
+    /** the package that was being installed is done: the plan moves on; true when nothing is left */
+    static boolean advance(Context c) {
         SharedPreferences p = prefs(c);
-        p.edit().putString("updQueue", "").putInt("updDeclined", p.getInt("updTarget", 0)).putLong("updDeclinedAt", System.currentTimeMillis()).apply();
-        deleteAll(dir(c));
-        toast(c, "لم يكتمل تحديث تلفزيونك");
+        List<String> plan = planList(p);
+        if (!plan.isEmpty()) plan.remove(0);
+        p.edit().putString("updPlan", android.text.TextUtils.join("|", plan)).putInt("updSession", -1).apply();
+        if (plan.isEmpty()) { finished(c); return true; }
+        return false;
     }
 
+    private static List<String> planList(SharedPreferences p) {
+        String q = p.getString("updPlan", "");
+        return q.isEmpty() ? new ArrayList<String>() : new ArrayList<>(Arrays.asList(q.split("\\|")));
+    }
+
+    private static void clearPlan(Context c) { prefs(c).edit().putString("updPlan", "").putInt("updSession", -1).apply(); }
+
+    private static void abandonCurrent(Context c) {
+        int id = prefs(c).getInt("updSession", -1);
+        if (id < 0) return;
+        try { c.getPackageManager().getPackageInstaller().abandonSession(id); } catch (RuntimeException ignored) { }
+        prefs(c).edit().putInt("updSession", -1).apply();
+    }
+
+    /**
+     * The update stopped. userDeclined: the person said no at Android's screen: nothing is asked again for a day. Else it is a technical failure:
+     * its cause is kept (updWhy, in the log and in `UPDATE_CHECK --ez status true`), and it is tried again in half an hour.
+     */
+    static void failed(Context c, String why, boolean userDeclined) {
+        Log.w(TAG, (userDeclined ? "declined: " : "failed: ") + why);
+        SharedPreferences p = prefs(c);
+        SharedPreferences.Editor e = p.edit().putString("updWhy", why == null ? "" : why);
+        if (userDeclined) e.putInt("updDeclined", p.getInt("updTarget", 0)).putLong("updDeclinedAt", System.currentTimeMillis());
+        else e.putLong("updFailedAt", System.currentTimeMillis());
+        e.apply();
+        abandonCurrent(c);
+        clearPlan(c);
+        deleteAll(dir(c));
+        toast(c, userDeclined ? "أُلغي تحديث تلفزيونك" : "لم يكتمل تحديث تلفزيونك");
+    }
+
+    /** every package of the plan is installed (or this app was replaced by the new one: the plan is then found empty at the next check) */
     static void finished(Context c) {
-        prefs(c).edit().putString("updQueue", "").apply();
+        prefs(c).edit().putString("updPlan", "").putInt("updSession", -1).putInt("updDeclined", 0).putLong("updFailedAt", 0).apply();
         deleteAll(dir(c));
     }
 
@@ -206,12 +318,18 @@ final class SelfUpdate {
         HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
         c.setConnectTimeout(15000);
         c.setReadTimeout(30000);
-        try (InputStream in = c.getInputStream()) {
-            java.io.ByteArrayOutputStream b = new java.io.ByteArrayOutputStream();
-            byte[] buf = new byte[16384];
-            int n;
-            while ((n = in.read(buf)) > 0) b.write(buf, 0, n);
-            return b.toByteArray();
+        try {
+            if (c.getResponseCode() != 200) throw new java.io.IOException("HTTP " + c.getResponseCode() + " for " + url);
+            try (InputStream in = c.getInputStream()) {
+                java.io.ByteArrayOutputStream b = new java.io.ByteArrayOutputStream();
+                byte[] buf = new byte[16384];
+                int n;
+                while ((n = in.read(buf)) > 0) {
+                    b.write(buf, 0, n);
+                    if (b.size() > 64 * 1024) throw new java.io.IOException("the manifest is too big");
+                }
+                return b.toByteArray();
+            }
         } finally {
             c.disconnect();
         }
@@ -223,15 +341,17 @@ final class SelfUpdate {
         c.setConnectTimeout(15000);
         c.setReadTimeout(60000);
         MessageDigest md = MessageDigest.getInstance("SHA-256");
-        try (InputStream in = c.getInputStream(); OutputStream o = new FileOutputStream(out)) {
+        try {
             if (c.getResponseCode() != 200) throw new java.io.IOException("HTTP " + c.getResponseCode());
-            byte[] buf = new byte[65536];
-            int n;
-            long total = 0;
-            while ((n = in.read(buf)) > 0) {
-                md.update(buf, 0, n);
-                o.write(buf, 0, n);
-                if ((total += n) > 40L * 1024 * 1024) throw new java.io.IOException("file too big");
+            try (InputStream in = c.getInputStream(); OutputStream o = new FileOutputStream(out)) {
+                byte[] buf = new byte[65536];
+                int n;
+                long total = 0;
+                while ((n = in.read(buf)) > 0) {
+                    md.update(buf, 0, n);
+                    o.write(buf, 0, n);
+                    if ((total += n) > 40L * 1024 * 1024) throw new java.io.IOException("file too big");
+                }
             }
         } finally {
             c.disconnect();
