@@ -13,5 +13,8 @@ public class BootReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context c, Intent i) {
         UpdateJob.schedule(c);
+        // after the update to 4.0 (MY_PACKAGE_REPLACED) or a boot: bring over the old app's data without waiting for the home screen to open
+        final PendingResult pending = goAsync();
+        Migration.runOnce(c, pending::finish);
     }
 }

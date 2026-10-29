@@ -1,0 +1,39 @@
+# kind, arguments..., expected (the last column). See MigrationRun.java
+decide	no	yes	yes	RUN
+decide	yes	yes	yes	ALREADY_DONE
+decide	yes	no	no	ALREADY_DONE
+decide	no	no	no	NO_OLD_APP
+decide	no	no	yes	NO_OLD_APP
+decide	no	yes	no	UNTRUSTED
+photos	3	0	3
+photos	0	0	0
+photos	25	0	10
+photos	10	0	10
+photos	3	2	0
+photos	-4	0	0
+tasks	-	a|b|c	12	0,1,2
+tasks	a|b	a|b|c	12	2
+tasks	-	a|a|b	12	0,2
+tasks	-	a||b	12	0,2
+tasks	x	a|b|c	2	0,1
+tasks	-	a|b	0	-
+tasks	-	-	12	-
+owner	ma.chouitv.home/ma.chouitv.screensaver.ScreenDream	ma.chouitv.home
+owner	ma.chouitv.screensaver/ma.chouitv.screensaver.ScreenDream	ma.chouitv.screensaver
+owner	ma.chouitv.screensaver/.ScreenDream,ma.chouitv.home/ma.chouitv.screensaver.ScreenDream	ma.chouitv.screensaver
+owner	-	-
+owner	garbage	-
+finished	no	ma.chouitv.home/ma.chouitv.screensaver.ScreenDream	ma.chouitv.home	yes
+finished	no	ma.chouitv.screensaver/ma.chouitv.screensaver.ScreenDream	ma.chouitv.home	no
+finished	yes	ma.chouitv.home/ma.chouitv.screensaver.ScreenDream	ma.chouitv.home	no
+finished	no	-	ma.chouitv.home	yes
+finished	yes	-	ma.chouitv.home	no
+finished	no		ma.chouitv.home	no
+fallback	city=%D8%A7%D9%84%D8%B1%D8%A8%D8%A7%D8%B7&lat=34.02&lon=-6.84&tz=Africa%2FAbidjan&panel=verse&digits=hindi&cardstyle=glass1&photos=15&yearstrip=1	verse,hourly	1	0	cityName=الرباط;cityLat=34.02;cityLon=-6.84;cityTz=Africa/Abidjan;panel=verse;digits=hindi;cardStyle=glass1;photoMinutes=15;homePanel=verse,hourly;greeting=true;adhanBar=false;yearStrip=true
+fallback	city=Riyadh&lat=bad&lon=46.7&panel=verse	none	-	-	panel=verse;homePanel=none
+fallback	-	-	-	-	-
+fallback	panel=Verse%0Aevil&digits=hindi&tz=x	a;b	2	yes	digits=hindi
+fallback	city=Riyadh&lat=24.7&lon=46.7&tz=../etc/passwd	-	-	-	cityName=Riyadh;cityLat=24.7;cityLon=46.7
+outcome	export	12	3	3	2	2	-	export: settings 12, tasks 3/3, photos 2/2
+outcome	fallback	5	1	4	0	0	-	fallback: settings 5, tasks 1/4, photos 0/0
+outcome	export	0	0	0	0	0	not allowed	export: settings 0, tasks 0/0, photos 0/0; problem: not allowed

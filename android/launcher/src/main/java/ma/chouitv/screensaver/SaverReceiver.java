@@ -477,7 +477,8 @@ public class SaverReceiver extends BroadcastReceiver {
             + "\ngenres: " + Prefs.join(p.list("genres"), ",") + "\nlangs: " + Prefs.join(p.list("langs"), ",")
             + "\nevents: " + Prefs.join(p.list("events"), ",")
             + "\nleagues: " + Prefs.join(p.leagues(), ",")
-            + "\nautoupdate: " + p.autoUpdate();
+            + "\nautoupdate: " + p.autoUpdate()
+            + "\nmigration: " + Migration.outcome(c);
     }
 
     /** minutes the TV waits before the screensaver, "unknown" when it does not say */

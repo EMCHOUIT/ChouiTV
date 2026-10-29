@@ -157,6 +157,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
+        ma.chouitv.screensaver.Migration.runOnce(this);   // once: the old screensaver app's settings, tasks and photos come over (never throws)
         Digits.init(this);   // the screensaver's «الأرقام» setting, for every number this screen writes
         dockApps = loadDock();
         liveTvPkg = getString(R.string.live_tv_package);
