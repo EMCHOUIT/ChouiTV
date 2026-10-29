@@ -208,6 +208,25 @@ public class MainActivity extends Activity {
         homeCard.pause();
     }
 
+    /**
+     * Another app, the screensaver or a «تلاوة» screen is in front: the card's WebView (and its renderer process, 40-55 MB) is let go instead of
+     * only paused; onResume builds it again and the page paints its last picture at once. Nothing the family relies on lives in it.
+     */
+    @Override
+    protected void onStop() {
+        homeCard.destroy();
+        super.onStop();
+    }
+
+    @Override
+    public void onTrimMemory(int level) {
+        super.onTrimMemory(level);
+        if (level >= TRIM_MEMORY_UI_HIDDEN) {   // the screen is not on show: the icon caches are rebuilt when it is
+            artCache.evictAll();
+            colorCache.clear();
+        }
+    }
+
     @Override
     protected void onDestroy() {
         unregisterReceiver(packages);
