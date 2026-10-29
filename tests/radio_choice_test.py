@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The radio countries (RadioChoice.java on tests/radio_choice_cases.tsv): two at most, Morocco when nothing is chosen, never none.
+"""The radio countries (RadioChoice.java on tests/radio_choice_cases.tsv): three at most, Morocco when nothing is chosen, never none.
 Needs javac; without it the cases are skipped with a note.   Run: python3 tests/radio_choice_test.py"""
 import shutil
 import subprocess
@@ -34,5 +34,5 @@ else:
         check("every case ran", len(out) == len(cases), f"{len(out)} of {len(cases)}")
 
 src = (TIL / "RadioChoice.java").read_text(encoding="utf-8")
-check("at most two countries", "static final int MAX = 2;" in src)
+check("at most three countries", "static final int MAX = 3;" in src)
 sys.exit(1 if failed else 0)

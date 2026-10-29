@@ -22,7 +22,7 @@ import java.util.Locale;
 import java.util.Set;
 
 /**
- * The radios of the countries the person chose (two at most): which countries, which stations stay ticked, the favourites, and the
+ * The radios of the countries the person chose (three at most): which countries, which stations stay ticked, the favourites, and the
  * small per-country lists kept on the TV. The lists are made every day by optimize/radio_catalog.py (only streams that answered,
  * family-safe, 120 at most per country) and downloaded on request, never in the background. Morocco's radios ship with the app.
  */

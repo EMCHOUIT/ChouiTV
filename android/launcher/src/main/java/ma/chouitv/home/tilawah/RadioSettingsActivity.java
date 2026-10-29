@@ -21,7 +21,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * «الإذاعات» settings: the countries (two at most, one tick each), the lists' update, and for each chosen country the stations to keep.
+ * «الإذاعات» settings: the countries (three at most, one tick each), the lists' update, and for each chosen country the stations to keep.
  * One screen, two pages: the countries, then (EXTRA_COUNTRY) the stations of one of them.
  */
 public class RadioSettingsActivity extends Activity {

@@ -16,7 +16,7 @@
 #   optimize/music.sh adhan add FILE       the person's own recording as the adhan («أذان من ملفي»): made small here (mono AAC, about
 #                                          48 kbps, at most 5 minutes; needs ffmpeg on this computer), put on the TV, and made the voice.
 #                                          One file only: a new one replaces it. It stays on the TV; nothing bundled, nothing sent anywhere
-#   optimize/music.sh radio-countries [ma,fr]   the countries whose radios the «الإذاعات» tab lists: two at most (ma = the radios chosen by hand,
+#   optimize/music.sh radio-countries [ma,fr]   the countries whose radios the «الإذاعات» tab lists: three at most (ma = the radios chosen by hand,
 #                                          bundled); no value shows them. Others: dz tn eg sa ae qa kw jo lb iq ly sd fr be es de gb us ca tr it nl sn
 #   optimize/music.sh radio-update         download the lists of the chosen countries now (small files, only streams that answered; never automatic)
 #   optimize/music.sh adhan voice own      use it again (voice 1-21 switches back); optimize/music.sh adhan own-clear removes it
@@ -99,7 +99,7 @@ Usage: optimize/music.sh <command> [arguments]
   stations                station indices for `radio`
   surah <id> <1-114>      play a surah, e.g. surah sudais 1
   radio <index>           play a live station, e.g. radio 0
-  radio-countries [a,b]   the radios' countries (two at most, e.g. ma,fr); no value shows them
+  radio-countries [a,b,c]   the radios' countries (three at most, e.g. ma,fr,sa); no value shows them
   radio-update            download the lists of the chosen countries now
   pause | resume | toggle | next | prev | stop
   seek <seconds>          jump forward/back (e.g. seek -10)

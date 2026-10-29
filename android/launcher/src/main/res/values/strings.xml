@@ -77,10 +77,10 @@
     <string name="radio_updating">جارٍ التحديث…</string>
     <string name="radio_update_failed">تعذّر التحديث. تأكد من الاتصال ثم أعد المحاولة.</string>
     <string name="radio_settings_title">الإذاعات · البلدان</string>
-    <string name="radio_settings_count">%1$s من %2$s بلدان. لتبقى التلفاز سريعًا، بلدان اثنان على الأكثر.</string>
+    <string name="radio_settings_count">%1$s من %2$s بلدان. لتبقى التلفاز سريعًا، ثلاثة بلدان على الأكثر.</string>
     <string name="radio_settings_hint">اختيار للتحديد  •  رجوع</string>
     <string name="radio_builtin">إذاعات مختارة، مضمّنة</string>
-    <string name="radio_full">اكتمل الحدّ: بلدان اثنان. ألغِ بلدًا لتختار آخر.</string>
+    <string name="radio_full">اكتمل الحدّ: ثلاثة بلدان. ألغِ بلدًا لتختار آخر.</string>
     <string name="radio_keep_one">يجب أن يبقى بلد واحد على الأقل.</string>
     <string name="radio_lists">القوائم</string>
     <string name="radio_never">لم يتم بعد</string>

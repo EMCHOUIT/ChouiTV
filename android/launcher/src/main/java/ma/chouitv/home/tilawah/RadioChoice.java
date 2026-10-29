@@ -5,7 +5,7 @@ import java.util.List;
 
 /** Which countries' radios the person keeps: at most MAX, Morocco (the radios chosen by hand) first by default. No Android here, so a test can run it. */
 final class RadioChoice {
-    static final int MAX = 2;
+    static final int MAX = 3;
     static final String HOME = "ma";
 
     private RadioChoice() {}
