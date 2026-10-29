@@ -12,7 +12,7 @@ import java.net.URLDecoder;
  * same signing key) and, when that app is missing or older, values in res/values/config.xml.
  */
 final class Place {
-    static final Uri CONFIG = Uri.parse("content://ma.chouitv.screensaver.config");
+    static final Uri CONFIG = Uri.parse("content://ma.chouitv.home.config");
 
     final double lat, lng;
     final String tz;

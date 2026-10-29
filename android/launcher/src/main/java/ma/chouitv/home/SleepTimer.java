@@ -76,7 +76,7 @@ final class SleepTimer {
             done = "screen off";
         } else {
             try {
-                c.startActivity(new Intent(Intent.ACTION_MAIN).setClassName("ma.chouitv.screensaver", "ma.chouitv.screensaver.MainActivity")
+                c.startActivity(new Intent(Intent.ACTION_MAIN).setClassName(c.getPackageName(), "ma.chouitv.screensaver.MainActivity")
                     .putExtra("sleeping", true).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                 done = "screensaver";
             } catch (RuntimeException e) {

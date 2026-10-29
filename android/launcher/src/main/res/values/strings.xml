@@ -101,4 +101,5 @@
     <string name="radio_stations_count">%1$s من %2$s إذاعة محدّدة</string>
     <string name="radio_tick_all">تحديد الكل</string>
     <string name="radio_untick_all">إلغاء تحديد الكل</string>
+    <string name="saver_name">شاشة تلفزيونك</string>
 </resources>

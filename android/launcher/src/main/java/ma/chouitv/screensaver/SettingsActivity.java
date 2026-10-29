@@ -1,5 +1,6 @@
 package ma.chouitv.screensaver;
 
+import ma.chouitv.home.R;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
@@ -123,7 +124,7 @@ public class SettingsActivity extends Activity {
             v.setText(TABS[i]);
             v.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
             v.setTypeface(font("Thmanyah-Medium"));
-            v.setTextColor(getColorStateList(R.color.tab_text));
+            v.setTextColor(getColorStateList(R.color.saver_tab_text));
             v.setBackgroundResource(R.drawable.tab_pill);
             v.setGravity(Gravity.CENTER);
             v.setPadding(dp(20), 0, dp(20), 0);
@@ -145,7 +146,7 @@ public class SettingsActivity extends Activity {
         preview.setText("▶  معاينة");
         preview.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
         preview.setTypeface(font("Thmanyah-Medium"));
-        preview.setTextColor(getColorStateList(R.color.tab_text));
+        preview.setTextColor(getColorStateList(R.color.saver_tab_text));
         preview.setBackgroundResource(R.drawable.tab_pill_gold);
         preview.setGravity(Gravity.CENTER);
         preview.setPadding(dp(20), 0, dp(20), 0);

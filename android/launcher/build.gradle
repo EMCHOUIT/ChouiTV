@@ -18,6 +18,13 @@ android {
         // the same version as the screensaver (see android/app/build.gradle)
         versionCode((System.getenv('GITHUB_RUN_NUMBER') ?: '1') as int)
         versionName "3.${System.getenv('GITHUB_RUN_NUMBER') ?: '0'}"
+        // when this build was made, shown under the settings (Morocco time, the TVs' own clock); the branch the page, fonts and photos are fetched from
+        buildConfigField "String", "BUILD_DATE", "\"${new java.text.SimpleDateFormat('yyyy-MM-dd HH:mm').with { setTimeZone(TimeZone.getTimeZone('GMT')); format(new Date()) }}\""
+        buildConfigField "String", "BRANCH", "\"${System.getenv('CHOUITV_BRANCH') ?: 'main'}\""
+    }
+
+    buildFeatures {
+        buildConfig true   // off by default since AGP 8
     }
 
     signingConfigs {
@@ -41,10 +48,14 @@ android {
         }
     }
 
-    // wallpapers are the screensaver's Saudi photos, copied in at build time
+    // one set of assets for the whole app: the page (built by ../../src/build.py into dist/), the fonts, the photos (backgrounds/, used by the home screen
+    // and the screensaver alike) and the club lists (shared/), next to the Quran lists and fonts of src/main/assets
     sourceSets {
-        main { assets.srcDirs += ["$buildDir/generated/wallpapers", "$buildDir/generated/web"] }
+        main { assets.srcDirs += ['../../dist', '../../assets'] }
     }
+
+    // dist/ also holds urtv.html (the stand-alone page for a browser, 3.5 MB): not for a TV
+    androidResources { ignoreAssetsPattern '!urtv.html' }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -53,17 +64,3 @@ android {
 
     lint { abortOnError false }
 }
-
-def copyWallpapers = tasks.register('copyWallpapers', Copy) {
-    from('../../assets/backgrounds') { include '*.jpg' }
-    into "$buildDir/generated/wallpapers/wallpapers"
-}
-preBuild.dependsOn copyWallpapers
-
-// the optional home-screen card is the screensaver's page in card-only mode, with its woff2 fonts
-def copyWeb = tasks.register('copyWeb', Copy) {
-    from('../../dist') { include 'tv.html'; into 'web' }
-    from('../../assets/fonts') { include '*.woff2'; into 'fonts' }
-    into "$buildDir/generated/web"
-}
-preBuild.dependsOn copyWeb

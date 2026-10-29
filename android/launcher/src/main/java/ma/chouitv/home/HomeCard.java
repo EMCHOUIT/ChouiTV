@@ -31,7 +31,7 @@ import java.util.Collections;
  * the card by what the page says about where it is (liveRect), so the page stays the one place that lays the cards out.
  */
 final class HomeCard {
-    private static final Uri CONFIG = Uri.parse("content://ma.chouitv.screensaver.config");
+    private static final Uri CONFIG = Uri.parse("content://ma.chouitv.home.config");
     private static final String PREFS = "homecard";   // the last settings read from the screensaver
     private static final String FONTS = "https://raw.githubusercontent.com/EMCHOUIT/ChouiTV/main/assets/fonts/";
 
@@ -80,13 +80,12 @@ final class HomeCard {
         String want = readUrl();
         if (want == null) { destroy(); return; }
         if (!want.equals(url)) { destroy(); create(want); }
-        web.onResume();
-        web.resumeTimers();
+        web.onResume();   // not resumeTimers/pauseTimers: those act on every WebView of the process, and the screensaver's page lives in this process now
     }
 
     /** onPause: no timers or network while an app is in front. */
     void pause() {
-        if (web != null) { web.onPause(); web.pauseTimers(); }
+        if (web != null) web.onPause();
     }
 
     void destroy() {

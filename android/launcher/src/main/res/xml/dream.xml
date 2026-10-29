@@ -1,3 +1,3 @@
 <?xml version="1.0" encoding="utf-8"?>
 <dream xmlns:android="http://schemas.android.com/apk/res/android"
-    android:settingsActivity="ma.chouitv.screensaver/.SettingsActivity" />
+    android:settingsActivity="ma.chouitv.home/ma.chouitv.screensaver.SettingsActivity" />

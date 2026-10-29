@@ -1,5 +1,6 @@
 package ma.chouitv.screensaver;
 
+import ma.chouitv.home.BuildConfig;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;

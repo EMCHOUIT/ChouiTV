@@ -10,7 +10,7 @@ import android.net.Uri;
  * cross-process query) for itself, eight times a minute.
  */
 final class ConfigSnapshot {
-    static final Uri URI = Uri.parse("content://ma.chouitv.screensaver.config");
+    static final Uri URI = Uri.parse("content://ma.chouitv.home.config");
 
     /** "city=..&lat=..&lon=..&tz=..&..." as the page reads it; null when the screensaver is missing or does not answer */
     final String fragment;

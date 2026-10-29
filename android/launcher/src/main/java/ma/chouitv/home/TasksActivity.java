@@ -29,7 +29,7 @@ import java.util.List;
  * No dialogs, like DockActivity: rows are built right-aligned by hand. `am start -n ma.chouitv.home/.TasksActivity`.
  */
 public class TasksActivity extends Activity {
-    private static final Uri TASKS = Uri.parse("content://ma.chouitv.screensaver.config/tasks");
+    private static final Uri TASKS = Uri.parse("content://ma.chouitv.home.config/tasks");
     private static final int SPEECH = 41;
     /** from the home screen's «المهام» card: the list opens with the focus on «🎤 تكلّم», so one more OK starts the voice adding */
     static final String EXTRA_MIC = "mic";

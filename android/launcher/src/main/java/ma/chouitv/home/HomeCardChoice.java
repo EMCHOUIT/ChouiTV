@@ -5,7 +5,7 @@ package ma.chouitv.home;
  * Plain Java (no Android classes) so tests/home_card_test.py can run it.
  */
 final class HomeCardChoice {
-    static final String BASE = "file:///android_asset/web/tv.html#";
+    static final String BASE = "file:///android_asset/tv.html#";
     static final String PRAYERS = BASE + "panel=prayers&widget=1";
 
     private HomeCardChoice() { }

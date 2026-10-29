@@ -101,6 +101,14 @@ public class MainActivity extends Activity {
     private ImageView wallBack, wallFront;
     private View gridShade;
     private String[] wallpapers = new String[0];
+
+    /** the photos among the files of backgrounds/ (it also holds backgrounds.json) */
+    private static String[] jpgs(String[] all) {
+        java.util.List<String> out = new java.util.ArrayList<>();
+        if (all != null) for (String n : all) if (n.endsWith(".jpg")) out.add(n);
+        java.util.Collections.sort(out);
+        return out.toArray(new String[0]);
+    }
     private int wallIndex = -1;
     private long wallChangedAt;
     private final Handler handler = new Handler(Looper.getMainLooper());
@@ -276,7 +284,7 @@ public class MainActivity extends Activity {
         gridShade.setAlpha(0f);
         root.addView(gridShade, new FrameLayout.LayoutParams(-1, -1));
         try {
-            wallpapers = getAssets().list("wallpapers");
+            wallpapers = jpgs(getAssets().list("backgrounds"));
         } catch (java.io.IOException ignored) { }
 
         glow = new View(this);
@@ -1161,7 +1169,7 @@ public class MainActivity extends Activity {
     }
 
     // The owner's own photos («صوري»), read from the screensaver app's ConfigProvider (READ_CONFIG, read only).
-    static final Uri OWN = Uri.parse("content://ma.chouitv.screensaver.config/own");
+    static final Uri OWN = Uri.parse("content://ma.chouitv.home.config/own");
 
     /** {how many, mode, rev}: none, mix and 0 when the screensaver app has none or does not answer */
     private Object[] ownInfo() {
@@ -1196,7 +1204,7 @@ public class MainActivity extends Activity {
         prefs().edit().putInt("wallpaper", wallIndex).apply();
         wallChangedAt = SystemClock.elapsedRealtime();
         final int idx = wallIndex;
-        final String fallback = "wallpapers/" + wallpapers[idx % wallpapers.length];
+        final String fallback = "backgrounds/" + wallpapers[idx % wallpapers.length];
         new Thread(() -> {
             if (!only) {   // no network while only the owner's photos show
                 refreshPhotoIndex();
@@ -1386,7 +1394,7 @@ public class MainActivity extends Activity {
         try {
             startActivity(new Intent().setClassName("com.android.systemui", "com.android.systemui.Somnambulator").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         } catch (RuntimeException e) {
-            try { startActivity(new Intent(Intent.ACTION_MAIN).setClassName(SAVER_PKG, "ma.chouitv.screensaver.MainActivity").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); }
+            try { startActivity(new Intent(Intent.ACTION_MAIN).setClassName(getPackageName(), "ma.chouitv.screensaver.MainActivity").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); }
             catch (RuntimeException ignored) { openPackage(SAVER_PKG); }
         }
         if (!prefs().getBoolean("saverHint", false)) {   // once: where the settings went
