@@ -23,6 +23,8 @@ import java.util.List;
  *   update  ContentValues i = N                      -> 1 when task N is marked done
  *   delete  .../tasks/N                              -> 1 when task N is gone
  *
+ * .../export (read-only, 3.185): one row, column json = the settings file of SaverReceiver EXPORT (SettingsBackup.export).
+ *
  * «صوري»: the owner's own photos (Own). query .../own gives n (how many), mode (mix|only) and rev (changes whenever
  * the photos do); openFile .../own/N opens photo N (1..n) read-only, which READ_CONFIG allows the launcher. Nothing
  * else can be read or written there. .../own-in takes the next photo from the shell (`content write`), which the
@@ -38,6 +40,16 @@ public class ConfigProvider extends ContentProvider {
             MatrixCursor o = new MatrixCursor(new String[] {"n", "mode", "rev"});
             o.addRow(new Object[] {Own.count(getContext()), Own.mode(getContext()), p.ownRev()});
             return o;
+        }
+        if (isExport(uri)) {
+            // 3.185: the whole settings file, exactly what SaverReceiver EXPORT gives, for the one-package 4.0 to bring over
+            MatrixCursor e = new MatrixCursor(new String[] {"json"});
+            try {
+                e.addRow(new Object[] {SettingsBackup.export(getContext()).toString(2)});
+            } catch (org.json.JSONException x) {
+                return null;
+            }
+            return e;
         }
         if (isTasks(uri)) {
             MatrixCursor t = new MatrixCursor(new String[] {"i", "t", "done", "at"});
@@ -56,6 +68,10 @@ public class ConfigProvider extends ContentProvider {
     }
 
     @Override public String getType(Uri uri) { return null; }
+
+    private static boolean isExport(Uri uri) {
+        return uri != null && uri.getPathSegments().size() == 1 && "export".equals(uri.getPathSegments().get(0));
+    }
 
     private static boolean isOwn(Uri uri) {
         return uri != null && uri.getPathSegments().size() == 1 && "own".equals(uri.getPathSegments().get(0));
