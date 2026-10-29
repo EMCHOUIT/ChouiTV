@@ -1,14 +1,37 @@
-# kind, arguments..., expected (the last column). s = the screensaver, h = the home app. See UpdatePlannerRun.java
-plan	176	s=175,h=175	ma.chouitv.screensaver,ma.chouitv.home
-plan	176	s=176,h=175	ma.chouitv.home
-plan	176	s=175,h=176	ma.chouitv.screensaver
-plan	176	s=176,h=176	-
-plan	176	s=177,h=176	-
-plan	176	h=175	ma.chouitv.screensaver,ma.chouitv.home
-mixed	176	s=176,h=175	yes
-mixed	176	s=175,h=176	yes
-mixed	176	s=175,h=175	no
-mixed	176	s=176,h=176	no
+# kind, arguments..., expected (the last column). s = the old screensaver, h = the home app. See UpdatePlannerRun.java
+# plan LATEST LISTED INSTALLED : the one-entry manifest of 4.0
+plan	400	h	h=399	ma.chouitv.home
+plan	400	h	h=400	-
+plan	400	h	h=401	-
+plan	400	h	h=185	ma.chouitv.home
+# the old two-entry manifest: only our own package is acted on, the screensaver is never installed
+plan	184	sh	s=183,h=183	ma.chouitv.home
+plan	184	sh	s=183,h=184	-
+plan	184	sh	h=184	-
+plan	184	sh	h=183	ma.chouitv.home
+plan	184	s	s=183,h=183	-
+# accept PKG APKVERSION ANNOUNCED INSTALLED SAMESIGNER
+accept	h	400	400	399	1	ok
+accept	h	401	400	399	1	ok
+accept	h	399	400	399	1	older-than-announced
+accept	h	300	400	399	1	older-than-announced
+accept	h	400	400	400	1	not-newer
+accept	h	399	399	400	1	not-newer
+accept	h	400	400	399	0	signer
+accept	s	400	400	399	1	package
+accept	ma.chouitv.other	400	400	399	1	package
+# signer GOT MINE
+signer	aa,bb	aa,bb	yes
+signer	aa	bb	no
+signer	aa	aa,bb	no
+signer	aa,bb	aa	no
+signer			no
+signer		aa	no
+# left TARGET PLAN INSTALLED : the new process finds its own install done
+left	400	h	h=400	-
+left	400	h	h=401	-
+left	400	h	h=399	ma.chouitv.home
+left	400	h		ma.chouitv.home
 # wait: NOW FORCE LATEST DECLINEDVERSION DECLINEDAT FAILEDAT
 wait	100000000	0	176	176	99000000	0	yes
 wait	200000000	0	176	176	99000000	0	no

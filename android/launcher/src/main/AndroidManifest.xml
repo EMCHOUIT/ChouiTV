@@ -120,15 +120,6 @@
                 <action android:name="ma.chouitv.home.UPDATE_CHECK" />
             </intent-filter>
         </receiver>
-        <!-- the same check, asked by the screensaver's settings: the BACKUP permission is the same signing key only -->
-        <receiver
-            android:name=".UpdateNowReceiver"
-            android:exported="true"
-            android:permission="ma.chouitv.home.permission.BACKUP">
-            <intent-filter>
-                <action android:name="ma.chouitv.home.UPDATE_NOW" />
-            </intent-filter>
-        </receiver>
         <receiver android:name=".InstallResultReceiver" android:exported="false" />
 
         <!-- the screen of an update in progress: it drives the installs from the front (Android refuses its install screen to a background app) -->

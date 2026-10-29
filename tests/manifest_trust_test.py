@@ -25,6 +25,10 @@ pub = (ROOT / "optimize/manifest-pub.b64").read_text().strip()
 check("the apps carry the public key of optimize/manifest-pub.b64", f'"{pub}"' in trust)
 update = (HOME / "SelfUpdate.java").read_text(encoding="utf-8")
 check("SelfUpdate believes a version file only when its signature checks", "ManifestTrust.verify(" in update and ".sig" in update)
+check("the signature is checked before the file is parsed, so nothing from an unsigned file is acted on",
+      update.index("ManifestTrust.verify(") < update.index("new JSONObject(new String(file"))
+check("a signature mismatch is retried in 30 minutes (right after a release the file and its signature can come from two moments)",
+      "now - CHECK_EVERY_MS + 30 * 60_000L" in update)
 
 if shutil.which("javac") is None or shutil.which("openssl") is None or shutil.which("java") is None:
     print("SKIP signature cases: javac, java or openssl not found")

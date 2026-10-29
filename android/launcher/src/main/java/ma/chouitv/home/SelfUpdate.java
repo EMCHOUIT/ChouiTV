@@ -36,18 +36,26 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Updates of the two apps from the owner's repository (github.com/EMCHOUIT/ChouiTV). latest.json there names the newest version and its APKs with
- * their SHA-256. When the home screen comes to the front (at most every 6 hours) and ONE of the two apps is behind that version, the APKs that are
- * behind are downloaded into the cache and checked (hash, package name, version, the SAME signing key as the installed app). Then UpdateActivity,
- * which is in the front, drives the installs one after the other (the screensaver first, the home app last, because its own replacement ends this
- * process): Android shows its «install?» screen to an app that is in the front, and refuses it to one in the background, which is why the
- * installs are not started from a receiver. The plan (which packages are left) is kept in the preferences, so a TV that is interrupted
- * half-way resumes the next time the home screen is in front instead of staying with one app updated and the other not.
+ * Self-update of the ONE ChouiTV app (package ma.chouitv.home since 4.0) from the owner's repository (github.com/EMCHOUIT/ChouiTV). latest.json
+ * there (signed: ManifestTrust) names the newest version and its APK with its SHA-256. When the home screen comes to the front (at most every
+ * 6 hours) and this app is behind that version, its APK is downloaded into the cache and checked (hash, package name, version announced and newer
+ * than ours, the SAME signing key as OUR installed signature). Then UpdateActivity, which is in the front, drives the install: Android shows its
+ * «install?» screen to an app that is in the front, and refuses it to one in the background, which is why the install is not started from a
+ * receiver. Installing ourselves ends this process; the new process finds the plan entry already at the target version and drops it.
+ * An old-format manifest that also lists ma.chouitv.screensaver is tolerated: that entry is ignored (the old screensaver is never reinstalled).
+ *
+ * Entry point for the settings screen (same process, same module; Java package ma.chouitv.screensaver):
+ *   public static void SelfUpdate.checkNow(android.content.Context ctx, boolean dry, SelfUpdate.Callback cb)
+ *   public interface SelfUpdate.Callback { void say(String message); }
+ * It forces the check (the 6 h wait and a recent refusal are ignored). dry = only says «available N» / «up to date …» and installs nothing.
+ * cb (may be null) is called ONCE, on a background thread (post to the UI thread), with: "available N", "up to date …", "needs permission: install
+ * unknown apps", "installing version N", "resumed", "busy", "an install is in progress", "checked recently", "version N was declined or failed
+ * lately", or "error: …". There is no "update: " prefix.
  *
  * Android does not let an ordinary app install silently, and needs «install unknown apps» for this one:
  * adb shell appops set ma.chouitv.home REQUEST_INSTALL_PACKAGES allow
  */
-final class SelfUpdate {
+public final class SelfUpdate {
     private static final String TAG = "SelfUpdate";
     static final String MANIFEST = "https://raw.githubusercontent.com/EMCHOUIT/ChouiTV/main/latest.json";
     private static final String APK_HOST = "https://github.com/EMCHOUIT/ChouiTV/releases/download/";   // the only place an APK may come from
@@ -59,6 +67,14 @@ final class SelfUpdate {
     private SelfUpdate() {}
 
     interface Done { void say(String message); }
+
+    /** the answer of {@link #checkNow}: one message, on a background thread */
+    public interface Callback { void say(String message); }
+
+    /** The settings screen's button (same process): a forced check; dry = only says whether a newer version exists. See the comment at the top. */
+    public static void checkNow(Context ctx, boolean dry, final Callback cb) {
+        maybeStart(ctx, true, dry, cb == null ? null : new Done() { @Override public void say(String message) { cb.say(message); } });
+    }
 
     private static SharedPreferences prefs(Context c) { return Dock.prefs(c); }
 
@@ -101,9 +117,10 @@ final class SelfUpdate {
         if (!planLeft.isEmpty()) {
             // a package of the plan that is on the TV at the target version is done, whatever the installer's answer said: this app itself is replaced
             // by the new version before it can hear that its own install succeeded, so its entry is still there in the new process
-            List<String> left = planList(p);
-            int target = p.getInt("updTarget", 0);
-            for (java.util.Iterator<String> it = left.iterator(); it.hasNext(); ) if (versionCode(c, it.next()) >= target) it.remove();
+            List<String> all = planList(p);
+            Map<String, Long> have = new HashMap<>();
+            for (String pkg : all) have.put(pkg, versionCode(c, pkg));
+            List<String> left = UpdatePlanner.remaining(all, p.getInt("updTarget", 0), have);
             if (left.isEmpty()) { if (!dry) finished(c); planLeft = ""; }
             else if (!dry) p.edit().putString("updPlan", android.text.TextUtils.join("|", left)).apply();
         }
@@ -131,13 +148,13 @@ final class SelfUpdate {
         JSONObject m = new JSONObject(new String(file, "UTF-8"));
         int latest = m.getInt("versionCode");
         JSONArray apks = m.getJSONArray("apks");
+        // one package since 4.0. Any other entry (the old screensaver of a 3.x manifest, or an unknown name) is ignored, never installed.
         List<String> listed = new ArrayList<>();
         Map<String, Long> installed = new HashMap<>();
+        installed.put(UpdatePlanner.HOME, versionCode(c, UpdatePlanner.HOME));
         for (int i = 0; i < apks.length(); i++) {
             String pkg = apks.getJSONObject(i).getString("package");
-            if (!pkg.matches("ma\\.chouitv\\.(home|screensaver)")) return "error: unexpected package " + pkg;
-            listed.add(pkg);
-            installed.put(pkg, versionCode(c, pkg));
+            if (UpdatePlanner.HOME.equals(pkg) && !listed.contains(pkg)) listed.add(pkg);
         }
         List<String> plan = UpdatePlanner.plan(latest, listed, installed);
         if (plan.isEmpty()) return "up to date (installed " + installed + ", latest " + latest + ")";
@@ -146,13 +163,13 @@ final class SelfUpdate {
         // Android installs for an app only when the person allowed «install unknown apps» for it; without that the installer refuses at the last
         // step, after the download. The settings screen that asks the person is opened by whoever is in front (the screensaver's settings).
         if (Build.VERSION.SDK_INT >= 26 && !c.getPackageManager().canRequestPackageInstalls()) return "needs permission: install unknown apps";
-        if (dry) return "available " + latest + (UpdatePlanner.mixed(latest, listed, installed) ? " (the two apps are on different versions)" : "");
+        if (dry) return "available " + latest;
         File d = dir(c);
         if (!d.isDirectory() && !d.mkdirs()) return fail(c, "no cache folder");
         for (int i = 0; i < apks.length(); i++) {
             JSONObject a = apks.getJSONObject(i);
             String pkg = a.getString("package");
-            if (!plan.contains(pkg)) continue;   // already on the new version: not downloaded again
+            if (!plan.contains(pkg)) continue;   // not our package, or already on the new version: not downloaded
             String url = a.getString("url");
             if (!url.startsWith(APK_HOST)) return fail(c, "the APK of " + pkg + " is not on the project's releases: " + url);
             File f = new File(d, pkg + ".apk");
@@ -191,37 +208,26 @@ final class SelfUpdate {
         return "the update screen did not open (the home screen is not in front)";
     }
 
-    /** the file is the package it says, a newer version, and signed with the key of the installed app of that name */
+    /** the file is our package, the version announced, newer than the installed one, and signed with OUR installed signature (the decision: UpdatePlanner.refusal) */
     private static String verify(Context c, File f, String pkg, int latest) {
         PackageManager pm = c.getPackageManager();
         if (Build.VERSION.SDK_INT < 28) return "this Android is too old to check the signature";
         PackageInfo mine, got;
         try {
             got = pm.getPackageArchiveInfo(f.getAbsolutePath(), PackageManager.GET_SIGNING_CERTIFICATES);
-            mine = pm.getPackageInfo(pkg, PackageManager.GET_SIGNING_CERTIFICATES);
-        } catch (PackageManager.NameNotFoundException absent) {
-            return verifyNew(pm, f, pkg, latest);   // an app that is not on the TV yet: nothing to compare the key with
+            mine = pm.getPackageInfo(UpdatePlanner.HOME, PackageManager.GET_SIGNING_CERTIFICATES);
         } catch (Exception e) { return pkg + " cannot be read (" + e + ")"; }
-        if (got == null || !pkg.equals(got.packageName)) return "not the package " + pkg;
-        if (got.getLongVersionCode() < latest) return pkg + " is older than the version announced";
+        if (got == null || mine == null) return pkg + " cannot be read";
         if (got.signingInfo == null || mine.signingInfo == null) return "no signature to compare for " + pkg;
-        Set<String> a = certs(got.signingInfo.getApkContentsSigners()), b = certs(mine.signingInfo.getApkContentsSigners());
-        if (a.isEmpty() || !a.equals(b)) return pkg + " is signed with another key";
-        return null;
-    }
-
-    /** a package that is missing on the TV: it must at least be the package and version announced, and signed with the key of the other ChouiTV app */
-    private static String verifyNew(PackageManager pm, File f, String pkg, int latest) {
-        try {
-            PackageInfo got = pm.getPackageArchiveInfo(f.getAbsolutePath(), PackageManager.GET_SIGNING_CERTIFICATES);
-            if (got == null || !pkg.equals(got.packageName)) return "not the package " + pkg;
-            if (got.getLongVersionCode() < latest) return pkg + " is older than the version announced";
-            String other = UpdatePlanner.HOME.equals(pkg) ? "ma.chouitv.screensaver" : UpdatePlanner.HOME;
-            PackageInfo sibling = pm.getPackageInfo(other, PackageManager.GET_SIGNING_CERTIFICATES);
-            if (got.signingInfo == null || sibling.signingInfo == null
-                    || !certs(got.signingInfo.getApkContentsSigners()).equals(certs(sibling.signingInfo.getApkContentsSigners()))) return pkg + " is signed with another key";
-            return null;
-        } catch (Exception e) { return pkg + " cannot be checked (" + e + ")"; }
+        boolean same = UpdatePlanner.sameSigner(certs(got.signingInfo.getApkContentsSigners()), certs(mine.signingInfo.getApkContentsSigners()));
+        String why = UpdatePlanner.refusal(got.packageName, got.getLongVersionCode(), latest, mine.getLongVersionCode(), same);
+        if (why == null) return null;
+        switch (why) {
+            case "package": return "not the package " + pkg;
+            case "older-than-announced": return pkg + " is older than the version announced";
+            case "not-newer": return pkg + " is not newer than the installed version";
+            default: return pkg + " is signed with another key";
+        }
     }
 
     private static Set<String> certs(Signature[] sigs) {

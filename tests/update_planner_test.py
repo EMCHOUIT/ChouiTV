@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-"""What an update has to do (UpdatePlanner.java on tests/update_planner_cases.tsv): both apps of the pair are looked at, the home app goes last, a
-mixed state is repaired, a person who refused waits a day and a technical failure only 30 minutes. Needs javac; without it the cases are skipped.
+"""What an update has to do (UpdatePlanner.java on tests/update_planner_cases.tsv), ONE package since 4.0: a one-entry manifest, an old two-entry one
+(only our own package is acted on), our package already at target, a lower or equal versionCode refused, a foreign-signed APK refused, the plan
+entry dropped in the new process, a person who refused waits a day and a technical failure only 30 minutes. Needs javac; without it the cases are skipped.
 Run: python3 tests/update_planner_test.py"""
 import shutil
 import subprocess

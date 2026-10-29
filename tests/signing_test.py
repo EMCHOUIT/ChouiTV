@@ -17,7 +17,7 @@ def check(name, ok, detail=""):
 
 pin = (ROOT / ".github/signer-sha256.txt").read_text(encoding="utf-8").strip()
 check("the pinned signer fingerprint is a SHA-256", re.fullmatch(r"[0-9a-f]{64}", pin) is not None, pin)
-for module in ("launcher", "app"):
+for module in ("launcher",):   # one module since 4.0 (android/app was merged into the launcher)
     g = (ROOT / "android" / module / "build.gradle").read_text(encoding="utf-8")
     check(f"{module}: a release build without ANDROID_KEYSTORE fails", "throw new GradleException('ANDROID_KEYSTORE is not set" in g)
     check(f"{module}: no fallback to the debug key", "signingConfigs.debug" not in g)

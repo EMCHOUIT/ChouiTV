@@ -3,11 +3,12 @@ package ma.chouitv.home;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
- * What an update has to do, decided from numbers only (no Android here, so tests/update_planner_test.py can run it). The apps come as a pair
- * and talk to each other, so «needs an update» looks at BOTH installed versions, not only this app's: a TV left with the screensaver at 176 and
- * the home screen at 175 is still behind. The home app goes last, because installing it replaces the process that is doing the update.
+ * What an update has to do, decided from numbers only (no Android here, so tests/update_planner_test.py can run it). Since 4.0 there is ONE package,
+ * ma.chouitv.home (the home screen, the screensaver and its settings all live in it). latest.json lists only that package; an old manifest that
+ * also lists ma.chouitv.screensaver is tolerated, but that entry is ignored: a 4.0 app must never install the old screensaver again.
  */
 final class UpdatePlanner {
     static final String HOME = "ma.chouitv.home";
@@ -17,29 +18,32 @@ final class UpdatePlanner {
     private UpdatePlanner() {}
 
     /**
-     * The packages to install, in order: every listed package installed below `latest` (or missing: -1), the home app last.
-     * installed: package → versionCode, -1 when it is not on the TV.
+     * The packages to install: [HOME] when it is listed and installed below latest, else empty. Any other listed package is ignored.
+     * installed: package to versionCode, -1 when it is not on the TV.
      */
     static List<String> plan(long latest, List<String> listed, Map<String, Long> installed) {
         List<String> out = new ArrayList<>();
-        boolean home = false;
-        for (String pkg : listed) {
-            Long have = installed.get(pkg);
-            if (have != null && have >= latest) continue;
-            if (HOME.equals(pkg)) home = true; else if (!out.contains(pkg)) out.add(pkg);
-        }
-        if (home) out.add(HOME);
+        if (!listed.contains(HOME)) return out;
+        Long have = installed.get(HOME);
+        if (have == null || have < latest) out.add(HOME);
         return out;
     }
 
-    /** true when one app of the pair is at `latest` or more and another is behind: the mixed state the update must repair */
-    static boolean mixed(long latest, List<String> listed, Map<String, Long> installed) {
-        boolean ahead = false, behind = false;
-        for (String pkg : listed) {
-            Long have = installed.get(pkg);
-            if (have == null || have < latest) behind = true; else ahead = true;
-        }
-        return ahead && behind;
+    /**
+     * Whether a downloaded APK may be installed: null, or why not. pkg/apkVersion: what the file says it is; announced: latest.json's versionCode;
+     * installed: our own installed versionCode; sameSigner: its signing key is the one of the installed app.
+     */
+    static String refusal(String pkg, long apkVersion, long announced, long installed, boolean sameSigner) {
+        if (!HOME.equals(pkg)) return "package";
+        if (apkVersion < announced) return "older-than-announced";
+        if (apkVersion <= installed) return "not-newer";
+        if (!sameSigner) return "signer";
+        return null;
+    }
+
+    /** the signing certificates of the file are those of the installed app, and there is at least one */
+    static boolean sameSigner(Set<String> got, Set<String> mine) {
+        return !got.isEmpty() && got.equals(mine);
     }
 
     /**
@@ -52,8 +56,18 @@ final class UpdatePlanner {
         return failedAt > 0 && now - failedAt < RETRY_AFTER_FAILURE_MS;
     }
 
-    /** an install left «in progress» is forgotten after ten minutes, or at once when the person asks again */
+    /** an install left in progress is forgotten after ten minutes, or at once when the person asks again */
     static boolean staleInstall(long now, boolean force, long startedAt) {
         return force || now - startedAt >= 10 * 60_000L;
+    }
+
+    /** the plan entries still to do: those not yet at the target version (this app replaced by the new one finds its own entry done) */
+    static List<String> remaining(List<String> plan, long target, Map<String, Long> installed) {
+        List<String> out = new ArrayList<>();
+        for (String pkg : plan) {
+            Long have = installed.get(pkg);
+            if (have == null || have < target) out.add(pkg);
+        }
+        return out;
     }
 }

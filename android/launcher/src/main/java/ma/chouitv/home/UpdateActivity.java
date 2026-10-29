@@ -13,11 +13,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 /**
- * The screen of an update in progress (SelfUpdate): the installs of the apps that are behind, one after the other. It is in the front, which is what
- * lets Android show its «install?» screen (an app in the background is refused that), and it keeps the person told: which app is being installed and
- * that OK on the remote is what is asked. It answers three ways: an install done (the next one starts), refused by the person (nothing is asked
- * again for a day), or failed for a technical reason (its cause is kept, and it is tried again later). The home app is installed last: its own
- * replacement ends this screen with the process.
+ * The screen of an update in progress (SelfUpdate): the install of this app (one package since 4.0). It is in the front, which is what lets Android
+ * show its «install?» screen (an app in the background is refused that), and it keeps the person told that OK on the remote is what is asked. It
+ * answers three ways: an install done, refused by the person (nothing is asked again for a day), or failed for a technical reason (its cause is
+ * kept, and it is tried again later). Installing ourselves replaces this process: the install result usually never arrives here, and the new
+ * process finds the plan entry already at the target version (SelfUpdate.run).
  */
 public class UpdateActivity extends Activity {
     /** set while the screen is there: SelfUpdate waits for it before it starts the installs */
@@ -83,7 +83,7 @@ public class UpdateActivity extends Activity {
                     answered = true;
                     new Thread(() -> {
                         final boolean done = SelfUpdate.advance(getApplicationContext());
-                        ui.post(() -> { if (done) finish(); else { detail.setText("تم تثبيت أول تطبيق، جارٍ تثبيت الثاني…"); startNext(); } });
+                        ui.post(() -> { if (done) finish(); else { startNext(); } });
                     }, "update-advance").start();
                     break;
                 case PackageInstaller.STATUS_FAILURE_ABORTED:   // the person cancelled
