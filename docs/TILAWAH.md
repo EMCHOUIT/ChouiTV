@@ -1,11 +1,51 @@
 # Tilawah «تلاوة» — the Quran, the radio and the adhan
 
-The «تلاوة» screen is part of the **home app** (`ma.chouitv.home`), not an app of its own: the pill in the top bar
+The «تلاوة» screen is part of the **home app** (`ma.chouitv.home`, which since 4.0 also holds the screensaver and its settings: see «4.0: one app»), not an app of its own: the pill in the top bar
 opens it, and it is never listed among the TV's apps. It plays the Quran only — forty reciters' Hafs
 murattal (114 surahs each) and live Quran radio — plus the five daily adhans at Umm al-Qura times.
 There is no local/USB music, no Spotify or YouTube Music, no account, no ads and no analytics.
 
 Package `ma.chouitv.home` · classes `ma.chouitv.home.tilawah` · label «تلاوة» · minSdk 26, targetSdk 30.
+
+## 4.0: one app
+
+Until 3.x there were two apps: the home screen (`ma.chouitv.home`, with «تلاوة») and the screensaver with its settings
+(`ma.chouitv.screensaver`). From 4.0 they are **one package and one APK**, `ma.chouitv.home` (`chouitv-home.apk`, module `android/launcher`;
+`android/app` is gone). Only the Java *package name* of the screensaver's sources stayed, so the files did not have to be rewritten:
+they live in `android/launcher/src/main/java/ma/chouitv/screensaver/` and still say `package ma.chouitv.screensaver`.
+
+| | until 3.x | 4.0 |
+|---|---|---|
+| application id(s) | `ma.chouitv.home` + `ma.chouitv.screensaver` | `ma.chouitv.home` |
+| release assets | `chouitv-home.apk` + `chouitv-screensaver.apk` | `chouitv-home.apk` (`latest.json` lists only `ma.chouitv.home` in `apks`) |
+| settings receiver | `ma.chouitv.screensaver/.SaverReceiver` | `ma.chouitv.home/ma.chouitv.screensaver.SaverReceiver` |
+| dream | `ma.chouitv.screensaver/.ScreenDream` | `ma.chouitv.home/ma.chouitv.screensaver.ScreenDream` |
+| settings / preview | `ma.chouitv.screensaver/.SettingsActivity`, `.MainActivity` | `ma.chouitv.home/ma.chouitv.screensaver.SettingsActivity`, `…MainActivity` |
+| settings provider | `content://ma.chouitv.screensaver.config` | `content://ma.chouitv.home.config` (for the shell only, through DUMP; `content write --uri content://ma.chouitv.home.config/own-in` hands over a photo) |
+
+- The **action names** keep their prefix: `ma.chouitv.screensaver.GET|SET|CITIES|UPDATE|TASKS|PHOTOS|EXPORT|IMPORT`. The home receivers
+  (`ma.chouitv.home.*`: `MusicReceiver`, `DockReceiver`, `UpdateReceiver`…) did not change.
+- **Signing is unchanged**: one pinned key (`.github/signer-sha256.txt`); `optimize/check-signer.sh chouitv-home.apk` now checks the only APK.
+  The two apps used to need a same-key signature for the permissions between them; with one package that guard is between components of the same app (the manifest is the reference for what remains).
+- **Moving a TV** from 3.x: `optimize/migrate-to-v4.sh` (see below). `optimize/install.sh all` on a 3.x TV would leave the old screensaver
+  app installed beside the new one, so use the migration. `optimize/install.sh app` only installs or updates the app, without switching
+  Home or the screensaver.
+
+### Migration note (3.x to 4.0)
+
+`optimize/migrate-to-v4.sh [settings.json] [--yes]`, in this order, so the TV is never without a screensaver or a home screen:
+
+1. the old screensaver's settings are exported (`ma.chouitv.screensaver/.SaverReceiver`, action `ma.chouitv.screensaver.EXPORT`) to
+   `optimize/run/settings-before-v4.json`; nothing has changed on the TV yet;
+2. 4.0 is installed over the home app (same package, same key); the old screensaver app is still there and still the TV's screensaver;
+3. once the new receiver answers, the settings are imported (`IMPORT`, `--es json_b64 … --es apply yes`, all or nothing);
+4. the TV's `screensaver_components` and `screensaver_default_component` are pointed at the new dream (only if the TV used ours or none;
+   another screensaver is left alone, and a screensaver switch that was off stays off);
+5. the result is checked (app installed, receiver answers, dream registered, screensaver and Home not pointing at the old app); only then,
+   and after a question (not with `--yes`), `ma.chouitv.screensaver` is uninstalled. Any failed check stops there, with the old app kept.
+
+Not carried over: the photos «صوري» and the tasks (the export does not hold them and they live in the old app's storage);
+`optimize/photos.sh` adds photos again. `tests/migrate_v4_test.py` runs the whole route against a stub.
 
 ## What is in here
 
@@ -88,8 +128,8 @@ right and the left arrow to the left.
   Aladhan calls `method=4`. Once a day the times are quietly replaced by Aladhan's (asked for the city's own date, kept under a key that names the
   city, so a city change the same day asks again; a time written «5:12 (+03)» is read as 5:12), the alarm is set again for
   them, and Isha is always recomputed from Maghrib so Ramadan stays right.
-- **The city** is the one picked in the screensaver (its `ConfigProvider`: `lat`, `lon`, `tz`);
-  without the screensaver, `config.xml`'s `latitude`, `longitude` and `timezone` are used.
+- **The city** is the one picked in the screensaver settings (the app's own `ConfigProvider`, authority `ma.chouitv.home.config`: `lat`, `lon`, `tz`);
+  without a picked city, `config.xml`'s `latitude`, `longitude` and `timezone` are used.
 - **The switch is off by default.** «الأذان التلقائي» turns it on; the choice is remembered.
 - **The alarm** is one `AlarmManager` alarm for the next of the five prayers (action `ADHAN_ALARM`, naming the receiver; the
   shell's `ma.chouitv.home.ADHAN` is «adhan now» and reaches `MusicReceiver` only). It is exact when Android allows it; from
@@ -203,14 +243,14 @@ python3 tests/tilawah_test.py
 ```
 
 Releases are made by hand since 3.175 (the workflow in `.github/workflows/android.yml` only runs on the branches `master` and `next`, and the
-repository is on `main`, so a push builds nothing): build both apps with `GITHUB_RUN_NUMBER=N` (N above the last release), make a release `v3.N` holding
-`chouitv-home.apk` and `chouitv-screensaver.apk` (`gh release create v3.N …`), then put the new version, the two URLs and the two SHA-256 in
+repository is on `main`, so a push builds nothing): build the app with `GITHUB_RUN_NUMBER=N` (N above the last release; `gradle -p android :launcher:assembleRelease`), make a release `v3.N` holding
+`chouitv-home.apk` only (`gh release create v3.N …`), then put the new version, its URL and its SHA-256 in
 `latest.json` on `main`: that file is what the TVs, `optimize/install.sh` and ChouiTV Installer read. `releases/latest/download/<file>` always gives the
-newest numbered release. Always run `optimize/check-signer.sh chouitv-home.apk chouitv-screensaver.apk` before publishing (see Signing below).
+newest numbered release. Always run `optimize/check-signer.sh chouitv-home.apk` before publishing (see Signing below).
 
 ## Signing
 
-Every release is signed with **one key**; the apps already on the TVs accept an update only if it is signed with the same key, so losing it, or
+Every release is signed with **one key**; the app already on the TVs accepts an update only if it is signed with the same key, so losing it, or
 signing with another one, ends the updates for good (the only way out is uninstalling, which erases the TV's settings). Its SHA-256 is pinned in
 `.github/signer-sha256.txt` (`af6154f7…f242`).
 

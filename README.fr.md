@@ -305,7 +305,7 @@ L'application **Channels** accompagne ChouiTV dans le dock et diffuse **en direc
 <p align="center"><img src="docs/media/guide-choose-fr.png" alt="Trois façons d'installer ChouiTV : depuis votre téléphone, avec une IA, à la main avec ADB" width="100%"></p>
 
 > [!NOTE]
-> 📺 **Fonctionne sur les télés Android TV et Google TV** (testé sur une télé Xiaomi sous Android 11). Les deux applis viennent des [versions de ChouiTV](https://github.com/EMCHOUIT/ChouiTV/releases/latest) et les mises à jour arrivent d'une pression sur **OK**.
+> 📺 **Fonctionne sur les télés Android TV et Google TV** (testé sur une télé Xiaomi sous Android 11). L'appli vient des [versions de ChouiTV](https://github.com/EMCHOUIT/ChouiTV/releases/latest) et les mises à jour arrivent d'une pression sur **OK**.
 
 Il y a **trois façons** d'installer ChouiTV. La plus simple passe par votre téléphone, et elle a son propre dépôt : [**ChouiTV Installer**](https://github.com/EMCHOUIT/ChouiTV-Installer).
 
@@ -391,21 +391,24 @@ et appuyez sur **Allow** sur l'écran de la télé.
 </details>
 
 <details>
-<summary>⬇️ <b>2. Téléchargez les deux applis</b></summary>
+<summary>⬇️ <b>2. Téléchargez l'appli</b></summary>
 
-- [`chouitv-home.apk`](https://github.com/EMCHOUIT/ChouiTV/releases/latest/download/chouitv-home.apk) : l'accueil et l'écoute.
-- [`chouitv-screensaver.apk`](https://github.com/EMCHOUIT/ChouiTV/releases/latest/download/chouitv-screensaver.apk) : l'écran de veille et les réglages.
+Depuis la 4.0, ChouiTV est **une seule appli** :
+
+- [`chouitv-home.apk`](https://github.com/EMCHOUIT/ChouiTV/releases/latest/download/chouitv-home.apk) : l'accueil, l'écoute, l'écran de veille et les réglages.
 </details>
 
 <details>
 <summary>🔁 <b>3. Vous avez l'ancienne version ? Migrez-la</b></summary>
 
-Les deux applis ont de nouveaux noms (`ma.chouitv.*`) : l'ancienne n'est donc pas mise à jour par-dessus. Le script reprend vos réglages, installe la nouvelle et supprime l'ancienne :
+Jusqu'à la 3.x il y avait deux applis (`ma.chouitv.home` et `ma.chouitv.screensaver`) ; la 4.0 n'en est qu'une. L'accueil se met à jour sur place ; la seconde appli n'est plus livrée : le script sauvegarde ses réglages, installe la 4.0, reprend les réglages et, seulement après vérification, supprime l'ancien écran de veille (il demande d'abord ; `--yes` évite la question) :
 
 ```bash
-optimize/migrate-to-chouitv.sh                # les réglages de cette télé (depuis l'ancienne 3.170 ou plus récente)
-optimize/migrate-to-chouitv.sh settings.json   # ou depuis un export d'une autre télé
+optimize/migrate-to-v4.sh                # une télé en 3.x : les réglages de cette télé
+optimize/migrate-to-v4.sh settings.json   # ou depuis un export d'une autre télé
 ```
+
+Les photos «صوري» et les tâches sont dans le stockage de l'ancienne appli et ne sont pas reprises (`optimize/photos.sh` remet les photos). Une télé encore sous les tout anciens noms (`sa.urtv.*`) utilise `optimize/migrate-to-chouitv.sh`, qui va directement à la 4.0.
 
 </details>
 
@@ -413,11 +416,10 @@ optimize/migrate-to-chouitv.sh settings.json   # ou depuis un export d'une autre
 <summary>📺 <b>4. Installez et réglez</b></summary>
 
 ```bash
-adb install -r chouitv-screensaver.apk
 adb install -r chouitv-home.apk
 adb shell settings put secure screensaver_enabled 1
-adb shell settings put secure screensaver_components ma.chouitv.screensaver/.ScreenDream
-adb shell settings put secure screensaver_default_component ma.chouitv.screensaver/.ScreenDream
+adb shell settings put secure screensaver_components ma.chouitv.home/ma.chouitv.screensaver.ScreenDream
+adb shell settings put secure screensaver_default_component ma.chouitv.home/ma.chouitv.screensaver.ScreenDream
 ```
 
 Puis appuyez sur **Home** et choisissez le nouvel écran d'accueil si la télé le demande. (Certaines télés gardent l'accueil du constructeur : la l'option 2, ou les scripts du projet ci-dessous, s'en chargent en toute sécurité.)
@@ -486,7 +488,7 @@ Ils sont calculés pour votre ville ; vous pouvez ajuster chaque prière en minu
 
 <details><summary>↩️ <b>Comment tout remettre comme avant ?</b></summary>
 
-`optimize/reset.sh`, ou désinstallez les deux applis puis réactivez l'accueil du constructeur dans les paramètres de la télé.
+`optimize/reset.sh`, ou désinstallez l'appli puis réactivez l'accueil du constructeur dans les paramètres de la télé.
 </details>
 
 <img src="docs/media/divider.png" alt="" width="100%">

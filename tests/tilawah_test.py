@@ -182,8 +182,8 @@ home = text(JAVA / "MainActivity.java")
 check("the home screen has the «الاستماع» pill", 'pill("الاستماع"' in home and "tilawah.MainActivity" in home)
 
 card = text(JAVA / "HomeCard.java")
-check("the home card reads the screensaver's settings",
-      "ma.chouitv.screensaver.config" in card)
+check("the home card reads the settings provider (the app's own, since 4.0)",
+      "ma.chouitv.home.config" in card)
 choice = text(JAVA / "HomeCardChoice.java")
 check("the home card falls back to the prayer times, after the last choice it read",
       "panel=prayers&widget=1" in choice and "HomeCardChoice.pick(" in card)
@@ -254,7 +254,7 @@ check("the adhan never becomes the «متابعة» row",
 check("the alarm is exact and survives idle",
       "setExactAndAllowWhileIdle" in text(TILAWAH / "AdhanScheduler.java"))
 check("device location comes from the screensaver",
-      "ma.chouitv.screensaver.config" in text(TILAWAH / "Place.java"))
+      "ma.chouitv.home.config" in text(TILAWAH / "Place.java"))
 
 prefs_src = text(TILAWAH / "Prefs.java")
 check("the adhan is off until it is switched on", 'getBoolean("adhan_on", false)' in prefs_src)
@@ -276,7 +276,7 @@ check("music.sh drives the new component",
       "ma.chouitv.home/.tilawah.MusicReceiver" in music and "ma.chouitv.listening" not in music)
 check("music.sh can test the adhan", "adhan voice" in music and "ma.chouitv.home.ADHAN_" in music)
 install = text(ROOT / "optimize/install.sh")
-check("install still knows the two apps", "chouitv-home.apk" in install and "chouitv-screensaver.apk" in install)
+check("install knows the one app (4.0): chouitv-home.apk only", "chouitv-home.apk" in install and "chouitv-screensaver.apk" not in install)
 reset = text(ROOT / "optimize/reset.sh")
 check("reset still removes the old standalone app", "ma.chouitv.listening" in reset)
 check("reset puts the adhan appop back", "SCHEDULE_EXACT_ALARM" in reset)

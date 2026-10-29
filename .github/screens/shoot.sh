@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Runs on the CI emulator (see .github/workflows/screens.yml): installs both apps and takes the pictures with screencap.
-#   shoot.sh SAVER_APK HOME_APK OUT_DIR
+# Runs on the CI emulator (see .github/workflows/screens.yml): installs the app (one APK since 4.0) and takes the pictures with screencap.
+#   shoot.sh HOME_APK OUT_DIR
 # Every shot is best effort: the remote's keys go in one by one and what is on screen is saved under a fixed name.
 set +e
-SAVER_APK=$1; HOME_APK=$2; OUT=$3
+HOME_APK=$1; OUT=$2
 mkdir -p "$OUT"
 LOG="$OUT/log.txt"
 exec > >(tee -a "$LOG") 2>&1
@@ -13,14 +13,13 @@ adb shell settings put global device_provisioned 1
 adb shell settings put secure user_setup_complete 1
 adb shell wm size 1920x1080
 adb shell wm density 320
-adb install -r -g "$SAVER_APK" || adb install -r "$SAVER_APK"
 adb install -r -g "$HOME_APK" || adb install -r "$HOME_APK"
 
 key() { for k in "$@"; do adb shell input keyevent "$k"; sleep 0.6; done; }
 shot() { sleep "${2:-1.5}"; adb exec-out screencap -p > "$OUT/$1.png"; echo "shot $1 $(stat -c %s "$OUT/$1.png" 2>/dev/null)"; }
 start() { adb shell am start -W --activity-clear-task -n "$1" > /dev/null; }
-saver() { adb shell "am broadcast -n ma.chouitv.screensaver/.SaverReceiver -a ma.chouitv.screensaver.SET $*" > /dev/null; }   # values with no spaces
-task() { adb shell "am broadcast -n ma.chouitv.screensaver/.SaverReceiver -a ma.chouitv.screensaver.TASKS --es op add --es text '$1'" > /dev/null; }
+saver() { adb shell "am broadcast -n ma.chouitv.home/ma.chouitv.screensaver.SaverReceiver -a ma.chouitv.screensaver.SET $*" > /dev/null; }   # values with no spaces
+task() { adb shell "am broadcast -n ma.chouitv.home/ma.chouitv.screensaver.SaverReceiver -a ma.chouitv.screensaver.TASKS --es op add --es text '$1'" > /dev/null; }
 music() { adb shell "am broadcast -n ma.chouitv.home/.tilawah.MusicReceiver -a $*" > /dev/null; }
 
 # ---- the settings that make the screens show something: a card on the home screen, three places for cards, the matches of two clubs
@@ -85,13 +84,13 @@ shot home-now-playing 2
 key DPAD_UP DPAD_UP DPAD_UP DPAD_LEFT
 shot home-now-playing-card-focused 1
 saver --es panel matches --es cardstyle dark3
-adb shell am start -W --activity-clear-task -n ma.chouitv.screensaver/.MainActivity > /dev/null
+adb shell am start -W --activity-clear-task -n ma.chouitv.home/ma.chouitv.screensaver.MainActivity > /dev/null
 sleep 25
 shot saver-now-playing 2
 music ma.chouitv.home.STOP
 
 # ---- the screensaver's settings: the top, the pickers, the end
-start ma.chouitv.screensaver/.SettingsActivity
+start ma.chouitv.home/ma.chouitv.screensaver.SettingsActivity
 shot settings-01-top 3
 key DPAD_DOWN DPAD_DOWN DPAD_DOWN DPAD_DOWN
 shot settings-02-scrolled 1

@@ -55,7 +55,7 @@ printf '%s\n' \
   "echo '== disabled packages'; pm list packages -d | wc -l" \
   "echo '== on screen'; dumpsys activity activities 2> /dev/null | grep -m1 -E 'topResumedActivity|mResumedActivity'; dumpsys dreams 2> /dev/null | grep -m1 -iE 'dreaming|mCurrentDream'" \
   "echo '== biggest'; dumpsys meminfo | sed -n '/Total [PR]SS by process/,/^$/p' | head -16" \
-  "echo '== our apps'; for p in ma.chouitv.screensaver ma.chouitv.home; do echo \"\$p: \$(dumpsys meminfo \$p 2> /dev/null | grep -m1 -E '^ *TOTAL')\"; done" \
+  "echo '== our apps'; for p in ma.chouitv.home; do echo \"\$p: \$(dumpsys meminfo \$p 2> /dev/null | grep -m1 -E '^ *TOTAL')\"; done" \
   | tv --batch > "$out"
 [ "$mode" = --screensaver ] && tv "input keyevent KEYCODE_HOME" > /dev/null
 
@@ -76,6 +76,6 @@ if [ -f optimize/run/summary.md ] && grep -q "^| $label |" optimize/run/summary.
   mv optimize/run/summary.md.tmp optimize/run/summary.md
 fi
 printf '| %s | %s | %s | %s | %s | %s |\n' "$label" "$avail" "$swap" "$procs" "${idle:+$idle%}" "$disabled" | tee -a optimize/run/summary.md
-# our two apps' own memory (TOTAL PSS, MB), one line under the table; the table's columns stay as they are
+# our app's own memory (TOTAL PSS, MB; home, screensaver and settings are one process family since 4.0), one line under the table; the table's columns stay as they are
 ours() { local v; v=$(sed -nE "s/^$1:[[:space:]]*TOTAL( PSS:)?[[:space:]]*([0-9]+).*/\2/p" "$out" | head -1); if [ -n "$v" ]; then echo "$(( v / 1024 )) MB"; else echo "not running"; fi; }
-echo "our apps (TOTAL PSS): screensaver $(ours ma.chouitv.screensaver), home $(ours ma.chouitv.home)"
+echo "our app (TOTAL PSS): ChouiTV $(ours ma.chouitv.home)"

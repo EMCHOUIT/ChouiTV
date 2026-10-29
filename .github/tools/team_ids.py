@@ -63,7 +63,7 @@ WIKIDATA = "https://www.wikidata.org/w/api.php"
 SPARQL = "https://query.wikidata.org/sparql"
 ENWIKI = "https://en.wikipedia.org/w/api.php"
 UA = "ChouiTV club list (github.com/EMCHOUIT/ChouiTV)"
-PREFS = ROOT / "android/app/src/main/java/ma/chouitv/screensaver/Prefs.java"
+PREFS = ROOT / "android/launcher/src/main/java/ma/chouitv/screensaver/Prefs.java"
 OUT = Path(os.environ.get("TEAMS_OUT", "teams"))
 CACHE = ROOT / ".github/tools/teams-cache.json"
 FULL = os.environ.get("RUN_FULL") == "1"

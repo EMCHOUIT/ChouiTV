@@ -14,14 +14,14 @@ Logs on failure: `adb logcat -d -t 300 | grep -iE "urtv|chromium|AndroidRuntime"
 |---|---|---|
 | S1 | On the TV: Settings → Device preferences → About → press Build 7× → Developer options → enable **USB/Network debugging**. Note the TV's IP. | Debugging on |
 | S2 | `adb connect <TV_IP>:5555` then `adb devices` | Device listed as `device` |
-| S3 | `curl -L -o chouitv-screensaver.apk https://github.com/EMCHOUIT/ChouiTV/releases/latest/download/chouitv-screensaver.apk` | ~2–5 MB file. To test an older build, use its tag in the URL instead of `latest/download` (with the scripts: `APK_TAG=v3.176 optimize/install.sh saver`) |
-| S4 | `adb uninstall sa.yourtv.screensaver` and `adb uninstall com.abdullah.tvsaver` (ignore "not installed") | The pre-rename app is gone (it would show twice) |
-| S5 | `adb install chouitv-screensaver.apk` | `Success` |
-| S6 | `adb shell dumpsys package ma.chouitv.screensaver \| grep versionName` | `versionName=3.<number>` |
+| S3 | `curl -L -o chouitv-home.apk https://github.com/EMCHOUIT/ChouiTV/releases/latest/download/chouitv-home.apk` | The one APK (4.0: home screen, «تلاوة», screensaver and settings in one app). To test an older build, use its tag in the URL instead of `latest/download` (with the scripts: `APK_TAG=v3.N optimize/install.sh saver`) |
+| S4 | `adb uninstall sa.yourtv.screensaver`, `adb uninstall com.abdullah.tvsaver` and, on a TV that had 3.x, `adb uninstall ma.chouitv.screensaver` (ignore "not installed"; to keep the settings of a 3.x TV use `optimize/migrate-to-v4.sh` instead, see M1–M5) | The old separate screensaver app is gone (it would show twice) |
+| S5 | `adb install chouitv-home.apk` | `Success` |
+| S6 | `adb shell dumpsys package ma.chouitv.home \| grep versionName` | `versionName=3.<number>` |
 
 ## 1. Settings screen
 
-Open: `adb shell am start -n ma.chouitv.screensaver/.SettingsActivity`
+Open: `adb shell am start -n ma.chouitv.home/ma.chouitv.screensaver.SettingsActivity`
 Navigate with the remote, or `adb shell input keyevent DPAD_DOWN|DPAD_UP|DPAD_CENTER|BACK`.
 
 | ID | Action | Expected |
@@ -45,15 +45,15 @@ Navigate with the remote, or `adb shell input keyevent DPAD_DOWN|DPAD_UP|DPAD_CE
 | A17 | تحديث التطبيق والشاشة الآن (last rows of «الرئيسية والنظام») | Toast «تم التحديث» or «الصفحة محدثة» (not «لا يوجد اتصال»); with a newer version of the apps the home screen opens and Android asks to install it; without «install unknown apps» allowed, Android's page for it opens |
 | A17b | The lines under «تحديث التطبيق والشاشة الآن» (focus that row: the list scrolls to them) | Plain text, in no button: «الإصدار الحالي: ٣٫N», «الإصدار المتاح: …» (the number, «لا يوجد أحدث» or «لم يُفحص بعد»), «طريقة التحديث: …حدّث تلفزيوني…»; the row itself says only «ينزّل أحدث نسخة من الشاشة» |
 | A18 | بدء شاشة التوقف بعد (TV without «Modify system settings» for the app, the usual case) | The row shows the TV's current delay (e.g. «١٠ دقائق»); pressing it shows the toast «غيّرها من إعدادات التلفاز، أو بأمر من مساعدك» and opens the TV's screensaver settings; the delay is unchanged |
-| A18b | بدء شاشة التوقف بعد, after `adb shell appops set ma.chouitv.screensaver WRITE_SETTINGS allow` | Pressing it lists دقيقة واحدة, دقيقتان, ٥ دقائق, ١٠ دقائق, ١٥ دقيقة, ٣٠ دقيقة with the current one selected; pick ٥ دقائق → the row says «٥ دقائق» and `adb shell settings get system screen_off_timeout` prints `300000`; set it back afterwards |
+| A18b | بدء شاشة التوقف بعد, after `adb shell appops set ma.chouitv.home WRITE_SETTINGS allow` | Pressing it lists دقيقة واحدة, دقيقتان, ٥ دقائق, ١٠ دقائق, ١٥ دقيقة, ٣٠ دقيقة with the current one selected; pick ٥ دقائق → the row says «٥ دقائق» and `adb shell settings get system screen_off_timeout` prints `300000`; set it back afterwards |
 | A18c | الأرقام → عربية 123, then preview; then back to هندية ١٢٣ | With 123 the clock, both dates, prayer times, countdowns, weather, scores and the home screen card show 0-9; with ١٢٣ they show ٠-٩ as before; the row shows the choice |
 | A18d | شكل البطاقة → each of الحالية, داكنة, زجاجية, داكنة بإطار, زجاجية بإطار, then preview and wait over a minute | الحالية is the card as before. The others change the card's tint and corners; داكنة has a thin gold line on the side facing the clock; the «بإطار» ones have an inner gold frame with a diamond top and bottom and the header centred. For the first minute (the photo is still drifting) the card is a plain tint; after it the photo behind the card is blurred, lined up with the photo around it, and nothing on screen moves or flickers. The home screen card keeps its own look |
 | A18c | تبديل الصورة كل | Row shows «٣٠ دقيقة» on a fresh install; the list has ٥ دقائق, ١٠ دقائق, ١٥ دقيقة, ٣٠ دقيقة, ٦٠ دقيقة; pick ٥ دقائق → the row shows it, and in the preview the photo changes at the next five-minute mark (hh:00, :05, …) |
-| A19 | Force-close and reopen: `adb shell am force-stop ma.chouitv.screensaver` then A1 | All choices from A4–A15 kept |
+| A19 | Force-close and reopen: `adb shell am force-stop ma.chouitv.home` then A1 | All choices from A4–A15 kept |
 
 ## 2. Preview / screen content
 
-Open: «معاينة الشاشة» row, or `adb shell am start -n ma.chouitv.screensaver/.MainActivity`. Wait 60 s for data.
+Open: «معاينة الشاشة» row, or `adb shell am start -n ma.chouitv.home/ma.chouitv.screensaver.MainActivity`. Wait 60 s for data.
 
 | ID | Check | Expected |
 |---|---|---|
@@ -96,7 +96,7 @@ Use the TV's clock or wait for the real moment; take a screenshot at each.
 
 | ID | Action | Expected |
 |---|---|---|
-| D1 | TV Settings → screensaver → choose «شاشة تلفزيونك», or `adb shell settings put secure screensaver_components ma.chouitv.screensaver/.ScreenDream` | Selected |
+| D1 | TV Settings → screensaver → choose «شاشة تلفزيونك», or `adb shell settings put secure screensaver_components ma.chouitv.home/ma.chouitv.screensaver.ScreenDream` | Selected |
 | D2 | Start now: `adb shell am start -n "com.android.systemui/.Somnambulator"` (or wait for the idle timer) | The screen appears full screen |
 | D3 | Press any remote key | Screensaver exits |
 | D4 | Leave the TV idle for the timer set in TV settings | Starts by itself |
@@ -138,7 +138,7 @@ Use the TV's clock or wait for the real moment; take a screenshot at each.
 
 | ID | Action | Expected |
 |---|---|---|
-| L1 | Fresh install of both apps, press Home | No card on the home screen (the screensaver's card choice is «لا شيء» by default) |
+| L1 | Fresh install of the app, press Home | No card on the home screen (the screensaver's card choice is «لا شيء» by default) |
 | L2 | Screensaver settings → «بطاقة على الشاشة الرئيسية» → مواقيت الصلاة, then Home | Card under the pills on the left: today's prayers, next one gold. D-pad never lands on it |
 | L3 | Repeat L2 with each option, then «لا شيء» | Card follows the choice; «لا شيء» removes it |
 | L4 | On the home screen, look at the top bar and the app rows, then press ▶ and ◀ on the pills and on the favourites | Everything reads from the right (المصادر، واي فاي، الإعدادات، شاشة التوقف، تلاوة; the first app of a row on the right); the right arrow always moves the highlight to the right and the left arrow to the left |
@@ -244,3 +244,18 @@ A7 | FAIL | "الدوري الهولندي" shows لا توجد نتائج | A7.
 ```
 
 Send back the table plus every FAIL screenshot/log.
+
+---
+
+## M. Moving a 3.x TV to 4.0 (one app)
+
+On a TV that still has both `ma.chouitv.home` and `ma.chouitv.screensaver` (3.x) with some settings changed (city, a team, a card). Run from the repository: `optimize/migrate-to-v4.sh` (it asks before removing the old app; `--yes` skips the question).
+
+| ID | Action | Expected |
+|---|---|---|
+| M1 | Run `optimize/migrate-to-v4.sh` | It saves `optimize/run/settings-before-v4.json` first, installs 4.0, says «Carrying the settings over:» and shows the changes imported; the old screensaver keeps working until the end |
+| M2 | At the question «Remove ma.chouitv.screensaver?» answer `n` | «Left installed»; `adb shell pm list packages ma.chouitv` lists both; the TV's screensaver is already `ma.chouitv.home/ma.chouitv.screensaver.ScreenDream` (`optimize/saver.sh show`) |
+| M3 | Run it again and answer `y` (or run with `--yes`) | «Done: the TV runs ChouiTV 4.0»; `adb shell pm list packages ma.chouitv` lists only `ma.chouitv.home` |
+| M4 | `optimize/saver.sh show` and open the settings: `adb shell am start -n ma.chouitv.home/ma.chouitv.screensaver.SettingsActivity` | The city, teams and cards from before; the photos «صوري» and the tasks are empty (not carried over, said in the question) |
+| M5 | Press Home, wait for the screensaver (or `optimize/start-saver.sh`) | ChouiTV is Home; the screensaver starts from the new dream; after a restart both are still the same |
+

@@ -318,7 +318,7 @@
 </div>
 
 > [!NOTE]
-> 📺 **يعمل على تلفزيونات Android TV و Google TV** (جُرّب على تلفزيون شاومي بأندرويد 11). التطبيقان يأتيان من [إصدارات ChouiTV](https://github.com/EMCHOUIT/ChouiTV/releases/latest)، وتصلك التحديثات تلقائيًا بضغطة **OK**.
+> 📺 **يعمل على تلفزيونات Android TV و Google TV** (جُرّب على تلفزيون شاومي بأندرويد 11). التطبيق يأتي من [إصدارات ChouiTV](https://github.com/EMCHOUIT/ChouiTV/releases/latest)، وتصلك التحديثات تلقائيًا بضغطة **OK**.
 
 <div dir="rtl" align="right">
 
@@ -403,21 +403,24 @@ adb connect <عنوان-التلفزيون>:5555
 </details>
 
 <details>
-<summary>⬇️ <b>2. نزّل التطبيقين</b></summary>
+<summary>⬇️ <b>2. نزّل التطبيق</b></summary>
 
-- [`chouitv-home.apk`](https://github.com/EMCHOUIT/ChouiTV/releases/latest/download/chouitv-home.apk): الواجهة الرئيسية والاستماع.
-- [`chouitv-screensaver.apk`](https://github.com/EMCHOUIT/ChouiTV/releases/latest/download/chouitv-screensaver.apk): شاشة التوقف والإعدادات.
+منذ 4.0 صار ChouiTV **تطبيقًا واحدًا**:
+
+- [`chouitv-home.apk`](https://github.com/EMCHOUIT/ChouiTV/releases/latest/download/chouitv-home.apk): الواجهة الرئيسية والاستماع وشاشة التوقف والإعدادات.
 </details>
 
 <details>
 <summary>🔁 <b>3. عندك النسخة القديمة؟ انقلها</b></summary>
 
-التطبيقان صارا باسمين جديدين (`ma.chouitv.*`)، فلا يُحدَّث القديم فوقهما. السكربت ينقل إعداداتك ويثبّت الجديد ثم يحذف القديم:
+حتى 3.x كان هناك تطبيقان (`ma.chouitv.home` و`ma.chouitv.screensaver`)، وصارا في 4.0 تطبيقًا واحدًا. الواجهة الرئيسية تُحدَّث في مكانها، أما تطبيق شاشة التوقف فلم يعد يُصدَر: السكربت يحفظ إعداداته ويثبّت 4.0 وينقل الإعدادات، ولا يحذف القديم إلا بعد التحقق (يسألك أولًا، و`--yes` يتجاوز السؤال):
 
 ```bash
-optimize/migrate-to-chouitv.sh                # إعدادات التلفزيون نفسه (من النسخة القديمة 3.170 أو أحدث)
-optimize/migrate-to-chouitv.sh settings.json   # أو من ملف تصدير تلفزيون آخر
+optimize/migrate-to-v4.sh                # تلفزيون على 3.x: إعدادات التلفزيون نفسه
+optimize/migrate-to-v4.sh settings.json   # أو من ملف تصدير تلفزيون آخر
 ```
+
+صوري والمهام تبقى في مخزن التطبيق القديم فلا تُنقل (`optimize/photos.sh` يعيد إضافة الصور). التلفزيون الذي ما زال بالأسماء القديمة جدًا (`sa.urtv.*`) يستعمل `optimize/migrate-to-chouitv.sh` الذي ينقله مباشرة إلى 4.0.
 
 </details>
 
@@ -425,11 +428,10 @@ optimize/migrate-to-chouitv.sh settings.json   # أو من ملف تصدير ت�
 <summary>📺 <b>4. ثبّت واضبط</b></summary>
 
 ```bash
-adb install -r chouitv-screensaver.apk
 adb install -r chouitv-home.apk
 adb shell settings put secure screensaver_enabled 1
-adb shell settings put secure screensaver_components ma.chouitv.screensaver/.ScreenDream
-adb shell settings put secure screensaver_default_component ma.chouitv.screensaver/.ScreenDream
+adb shell settings put secure screensaver_components ma.chouitv.home/ma.chouitv.screensaver.ScreenDream
+adb shell settings put secure screensaver_default_component ma.chouitv.home/ma.chouitv.screensaver.ScreenDream
 ```
 
 ثم اضغط زر **Home** واختر الواجهة الجديدة إن سألك التلفزيون. (بعض التلفزيونات تُبقي واجهة الشركة: الخيار 2، أو سكربتات المشروع أدناه، تتكفّل بذلك بأمان.)
@@ -498,7 +500,7 @@ adb install -r channels/out/channels-release.apk
 
 <details><summary>↩️ <b>كيف أرجع كل شيء كما كان؟</b></summary>
 
-`optimize/reset.sh`، أو أزِل التطبيقين ثم فعّل واجهة الشركة من إعدادات التلفزيون.
+`optimize/reset.sh`، أو أزِل التطبيق ثم فعّل واجهة الشركة من إعدادات التلفزيون.
 </details>
 
 <img src="docs/media/divider.png" alt="" width="100%">

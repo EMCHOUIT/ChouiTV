@@ -45,30 +45,30 @@ real = tmp / "py"
 real.write_text('#!/bin/bash\nif [ "$2" = optimize/tv.py ]; then exec ' + str(fake) + ' "$@"; else exec python3 "$@"; fi\n'); real.chmod(0o755)
 import json
 def run(*args, **state):
-    base = {"maker": "TCL", "installed": ["ma.chouitv.home", "ma.chouitv.screensaver"], "ops": {"AUTO_START": {}, "APP_AUTO_START": {}}, "honour": True, "written": False}
+    base = {"maker": "TCL", "installed": ["ma.chouitv.home"], "ops": {"AUTO_START": {}, "APP_AUTO_START": {}}, "honour": True, "written": False}
     base.update(state)
     (tmp / "state.json").write_text(json.dumps(base)); (tmp / "log").write_text("")
     r = subprocess.run(["bash", str(ROOT / "optimize/autostart.sh"), *args], capture_output=True, text=True, cwd=ROOT,
                        env={**os.environ, "PY": str(real), "TVSTATE": str(tmp / "state.json"), "LOG": str(tmp / "log")})
     return r.returncode, (r.stdout + r.stderr).strip(), (tmp / "log").read_text(), json.loads((tmp / "state.json").read_text())
 
-rc, out, log, st = run(ops={"AUTO_START": {"ma.chouitv.home": "ignore", "ma.chouitv.screensaver": "ignore"}, "APP_AUTO_START": {}})
-check("a TCL G08 build (AUTO_START): both apps allowed, written to disk, the line says so",
-      rc == 0 and out == "Auto-start (TCL): ma.chouitv.home allow, ma.chouitv.screensaver allow" and st["written"], out)
+rc, out, log, st = run(ops={"AUTO_START": {"ma.chouitv.home": "ignore"}, "APP_AUTO_START": {}})
+check("a TCL G08 build (AUTO_START): the one app allowed, written to disk, the line says so",
+      rc == 0 and out == "Auto-start (TCL): ma.chouitv.home allow" and st["written"], out)
 check("both op names are tried and the grant is written (G08 and G10 name it differently)", "APP_AUTO_START allow" in log and "AUTO_START allow" in log and "write-settings" in log, log)
-rc, out, log, st = run(ops={"AUTO_START": {}, "APP_AUTO_START": {"ma.chouitv.home": "ignore", "ma.chouitv.screensaver": "ignore"}})
+rc, out, log, st = run(ops={"AUTO_START": {}, "APP_AUTO_START": {"ma.chouitv.home": "ignore"}})
 check("a TCL G10 build (APP_AUTO_START): allowed too", rc == 0 and "ma.chouitv.home allow" in out and "!!" not in out, out)
 rc, out, log, st = run(maker="Sony")
 check("not a TCL: nothing is set, said in one line", rc == 0 and out == "Auto-start: not a TCL, nothing to allow" and "appops set" not in log, out + log)
-rc, out, log, st = run(maker="Haier", tclpkgs=["com.tcl.bi"], ops={"AUTO_START": {"ma.chouitv.home": "ignore", "ma.chouitv.screensaver": "ignore"}, "APP_AUTO_START": {}})
+rc, out, log, st = run(maker="Haier", tclpkgs=["com.tcl.bi"], ops={"AUTO_START": {"ma.chouitv.home": "ignore"}, "APP_AUTO_START": {}})
 check("a TCL-based set whose maker says otherwise (com.tcl.* packages): treated as TCL", "Auto-start (TCL)" in out, out)
-rc, out, log, st = run(honour=False, ops={"AUTO_START": {"ma.chouitv.home": "ignore", "ma.chouitv.screensaver": "ignore"}, "APP_AUTO_START": {}})
+rc, out, log, st = run(honour=False, ops={"AUTO_START": {"ma.chouitv.home": "ignore"}, "APP_AUTO_START": {}})
 check("a TCL that keeps refusing: a !! line that names the app and what to do", "!! Auto-start (TCL): not allowed for" in out and "ma.chouitv.home(ignore)" in out, out)
 rc, out, log, st = run(ops={"AUTO_START": {}, "APP_AUTO_START": {}})
 check("a TCL with neither op: nothing to allow, no !! line", "!!" not in out, out)
-rc, out, log, st = run("check", ops={"AUTO_START": {"ma.chouitv.home": "ignore", "ma.chouitv.screensaver": "allow"}, "APP_AUTO_START": {}})
+rc, out, log, st = run("check", ops={"AUTO_START": {"ma.chouitv.home": "ignore"}, "APP_AUTO_START": {}})
 check("check only reads: no appops set, and a refused app is reported", "appops set" not in log and "!! Auto-start (TCL)" in out and "ma.chouitv.home(ignore)" in out, out + log)
-rc, out, log, st = run(installed=["ma.chouitv.screensaver"], ops={"AUTO_START": {"ma.chouitv.screensaver": "ignore"}, "APP_AUTO_START": {}})
-check("the home app is not installed (SKIP_LAUNCHER): only the screensaver", out == "Auto-start (TCL): ma.chouitv.screensaver allow" and "appops set ma.chouitv.home" not in log, out)
+rc, out, log, st = run(installed=[], ops={"AUTO_START": {}, "APP_AUTO_START": {}})
+check("the app is not installed: said in one line, nothing set", out == "Auto-start (TCL): our app is not installed" and "appops set" not in log, out)
 print("\nall auto-start checks passed" if not failed else f"\n{failed} failed")
 sys.exit(1 if failed else 0)

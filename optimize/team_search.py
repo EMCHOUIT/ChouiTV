@@ -1,6 +1,6 @@
 """Search our club list (assets/shared/teams.json) by an Arabic or English name, offline and without crashing.
 
-The TV settings screen has the same code in android/app/.../TeamSearch.java; tests/team_search_cases.tsv runs
+The TV settings screen has the same code in android/launcher/.../screensaver/TeamSearch.java; tests/team_search_cases.tsv runs
 against both, so they can't drift apart.
 
 Names are compared after normalising:

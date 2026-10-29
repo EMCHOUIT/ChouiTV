@@ -55,18 +55,18 @@
 #   optimize/saver.sh prayeradj on|off             «تعديل وقت الصلاة» (off by default): each prayer moved by its own whole minutes, -20..20
 #   optimize/saver.sh prayeradj fajr +2 maghrib -1   the minutes of fajr dhuhr asr maghrib isha (the others stay); sunrise is never moved
 #   optimize/saver.sh update                       download the latest screen now
-# Only ADB can change these (ma.chouitv.screensaver/.SaverReceiver needs the shell's DUMP).
+# Only ADB can change these (ma.chouitv.home/ma.chouitv.screensaver.SaverReceiver needs the shell's DUMP; since 4.0 it is part of the one app ma.chouitv.home).
 set -euo pipefail
 cd "$(dirname "$0")/.."
 PY="${PY:-optimize/venv/bin/python}"
 send() {   # $1 action, $2 extras; prints the receiver's answer (the "data" of am broadcast); exit 1 on "error:"
   local out
-  out=$("$PY" -I optimize/tv.py "am broadcast -n ma.chouitv.screensaver/.SaverReceiver -a ma.chouitv.screensaver.$1 ${2:-}" \
+  out=$("$PY" -I optimize/tv.py "am broadcast -n ma.chouitv.home/ma.chouitv.screensaver.SaverReceiver -a ma.chouitv.screensaver.$1 ${2:-}" \
     | sed -n '/data="/,$p' | sed '1s/.*data="//; $s/"$//')
   echo "$out"
   [[ "$out" != error:* ]]
 }
-OURS=ma.chouitv.screensaver/.ScreenDream
+OURS=ma.chouitv.home/ma.chouitv.screensaver.ScreenDream
 BACKUP="${SAVER_BACKUP:-optimize/run/backup.txt}"   # optimize/backup.sh's copy of the TV as it came
 active() {   # one line: which screensaver the TV uses now
   local out comp en
@@ -75,7 +75,7 @@ active() {   # one line: which screensaver the TV uses now
   comp=$(sed -n 1p <<< "$out"); en=$(sed -n 2p <<< "$out"); comp="${comp%%,*}"
   if [ "$en" = 0 ]; then echo "screensaver now: off (the TV's screensaver switch is off)"
   elif [ -z "$comp" ] || [ "$comp" = null ]; then echo "screensaver now: the TV's own default"
-  elif [[ "$comp" == ma.chouitv.screensaver/* ]]; then echo "screensaver now: ours (شاشة تلفزيونك)"
+  elif [[ "$comp" == ma.chouitv.home/* ]]; then echo "screensaver now: ours (شاشة تلفزيونك)"
   else echo "screensaver now: the TV's own, $comp"; fi
 }
 stock_dream() {   # a screensaver this TV lists besides ours: component, or nothing
@@ -98,7 +98,7 @@ set1() {   # $1 the extra's name, $2 its value
 case "${1:-}" in
   show)   rc=0; send GET || rc=$?; active; exit "$rc" ;;   # the version line stays first
   on)
-    "$PY" -I optimize/tv.py "pm list packages ma.chouitv.screensaver" | tr -d '\r' | grep -qx 'package:ma.chouitv.screensaver' \
+    "$PY" -I optimize/tv.py "pm list packages ma.chouitv.home" | tr -d '\r' | grep -qx 'package:ma.chouitv.home' \
       || { echo "!! Our screensaver is not installed on this TV: optimize/install.sh saver"; exit 1; }
     printf '%s\n' "settings put secure screensaver_enabled 1" "settings put secure screensaver_components $OURS" \
       "settings put secure screensaver_default_component $OURS" | "$PY" -I optimize/tv.py --batch > /dev/null
@@ -110,7 +110,7 @@ case "${1:-}" in
       prev=$(sed -n 1p <<< "$vals"); enabled=$(sed -n 2p <<< "$vals")
     fi
     prev="${prev%%,*}"
-    case "$prev" in ""|null|ma.chouitv.screensaver/*) prev= ;; esac   # none then, or a backup taken with ours already set
+    case "$prev" in ""|null|ma.chouitv.home/*|ma.chouitv.screensaver/*) prev= ;; esac   # none then, or a backup taken with ours already set
     if [ -n "$prev" ]; then why="the one from before setup"; else why="a stock one"; prev=$(stock_dream); fi
     if [ -n "$prev" ] && [[ "$prev" =~ ^[A-Za-z0-9_.]+/[A-Za-z0-9_.\$]+$ ]]; then
       case "$enabled" in 0|1) ;; *) enabled=1 ;; esac

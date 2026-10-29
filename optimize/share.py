@@ -94,21 +94,16 @@ def computer():
 
 
 def live_versions():
-    """The two apps' versionName as the TV says it now, «Versions: screensaver 3.124, home 3.124»; None when the TV does not
+    """The app's versionName as the TV says it now, «Versions: ChouiTV 4.0» (one app since 4.0); None when the TV does not
     answer (then report.md's line, written at the last setup, is all there is)."""
     tv_py = Path(__file__).resolve().parent / "tv.py"
-    found = []
-    for package in ("ma.chouitv.screensaver", "ma.chouitv.home"):
-        try:
-            out = subprocess.run([sys.executable, "-I", str(tv_py), f"dumpsys package {package} 2> /dev/null | grep -m1 versionName"],
-                                 capture_output=True, text=True, timeout=60, env={**os.environ, "TV_TRIES": "1"})
-        except Exception:  # noqa: BLE001
-            return None
-        m = re.search(r"versionName=(\S+)", out.stdout) if out.returncode == 0 else None
-        if not m:
-            return None
-        found.append(m.group(1))
-    return f"Versions: screensaver {found[0]}, home {found[1]}"
+    try:
+        out = subprocess.run([sys.executable, "-I", str(tv_py), "dumpsys package ma.chouitv.home 2> /dev/null | grep -m1 versionName"],
+                             capture_output=True, text=True, timeout=60, env={**os.environ, "TV_TRIES": "1"})
+    except Exception:  # noqa: BLE001
+        return None
+    m = re.search(r"versionName=(\S+)", out.stdout) if out.returncode == 0 else None
+    return f"Versions: ChouiTV {m.group(1)}" if m else None
 
 
 def steps():

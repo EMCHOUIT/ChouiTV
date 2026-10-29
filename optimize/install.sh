@@ -1,16 +1,20 @@
 #!/usr/bin/env bash
-# Download the latest APKs from GitHub and install them on the TV.
-#   optimize/install.sh saver      شاشة تلفزيونك: install + make it the screensaver
-#   optimize/install.sh launcher   the home screen: install + make it the default Home
-#                                  (it carries the «تلاوة» screens: the Quran recitations and the radio)
+# Download the latest APK from GitHub and install it on the TV.
+# Since 4.0 ChouiTV is ONE app (ma.chouitv.home, chouitv-home.apk): the home screen, the screensaver شاشة تلفزيونك, its
+# settings and the «تلاوة» screens (the Quran recitations and the radio) all live in it.
+#   optimize/install.sh app        only install/update the app: no screensaver or home switching (what optimize/migrate-to-v4.sh uses)
+#   optimize/install.sh saver      install the app + make its dream the screensaver (the home screen is not switched)
+#   optimize/install.sh launcher   install the app + make it the default Home
 #   optimize/install.sh extras     two free apps from their own GitHub releases: TV Bro (a TV web browser,
 #                                  github.com/truefedex/tv-bro) and SmartTube (YouTube without ads,
 #                                  github.com/yuliskov/SmartTube), the build that fits the TV's processor
 #   optimize/install.sh channels   the Channels app (live TV, our 311 Arabic channels): from the `channels` release of
 #                                  EMCHOUIT/ChouiTV; installs over an older build (same key)
-#   optimize/install.sh all        saver, launcher and channels
-# The first install of the screensaver replaces an APK signed with another key: uninstall the old one first
-# (pm uninstall ma.chouitv.screensaver) — this script does that only if a plain install fails.
+#   optimize/install.sh all        the app (screensaver and home) and channels
+# An APK signed with another key cannot be replaced: uninstall the old one first (pm uninstall ma.chouitv.home) —
+# this script does that only if a plain install fails.
+# A TV still on 3.x (two apps, the second one ma.chouitv.screensaver) is moved with optimize/migrate-to-v4.sh, which
+# carries the settings over; a plain "install.sh all" there would leave the old screensaver app beside the new one.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 PY="${PY:-optimize/venv/bin/python}"
@@ -18,8 +22,9 @@ PY="${PY:-optimize/venv/bin/python}"
 if [ -n "${APK_TAG:-}" ]; then REL=https://github.com/EMCHOUIT/ChouiTV/releases/download/$APK_TAG   # APK_TAG=v3.N: that numbered build
 else REL=https://github.com/EMCHOUIT/ChouiTV/releases/latest/download; fi
 CH_REL=https://github.com/EMCHOUIT/ChouiTV/releases/download/channels   # one fixed release; its APK is replaced when the list changes
-what="${1:?usage: optimize/install.sh saver|launcher|channels|extras|all}"
-case "$what" in saver|launcher|channels|extras|all) ;; *) echo "usage: optimize/install.sh saver|launcher|channels|extras|all" >&2; exit 2;; esac
+what="${1:?usage: optimize/install.sh app|saver|launcher|channels|extras|all}"
+case "$what" in app|saver|launcher|channels|extras|all) ;; *) echo "usage: optimize/install.sh app|saver|launcher|channels|extras|all" >&2; exit 2;; esac
+home_pushed=0   # the app is installed once per run, whichever of saver/launcher comes first
 failed=0   # an extra that did not install: the rest are still tried, then run.sh must not count the step as done
 
 # curl with up to 3 tries. A Windows curl (Schannel) that can't reach the certificate revocation server fails every
@@ -165,13 +170,19 @@ if [ "$what" = extras ]; then
   [ "$failed" = 0 ] || exit 1
 fi
 
+if [ "$what" = app ]; then
+  push_install chouitv-home.apk ma.chouitv.home
+  echo "ChouiTV installed. The screensaver and Home are left as they were."
+fi
+
 if [ "$what" = saver ] || [ "$what" = all ]; then
-  push_install chouitv-screensaver.apk ma.chouitv.screensaver
+  push_install chouitv-home.apk ma.chouitv.home
+  home_pushed=1
   printf '%s\n' \
     "settings put secure screensaver_enabled 1" \
-    "settings put secure screensaver_components ma.chouitv.screensaver/.ScreenDream" \
-    "settings put secure screensaver_default_component ma.chouitv.screensaver/.ScreenDream" \
-    "am start --activity-clear-task -n ma.chouitv.screensaver/.SettingsActivity" \
+    "settings put secure screensaver_components ma.chouitv.home/ma.chouitv.screensaver.ScreenDream" \
+    "settings put secure screensaver_default_component ma.chouitv.home/ma.chouitv.screensaver.ScreenDream" \
+    "am start --activity-clear-task -n ma.chouitv.home/ma.chouitv.screensaver.SettingsActivity" \
     | "$PY" -I optimize/tv.py --batch
   echo "Screensaver installed and selected. Its settings screen is open on the TV."
 fi
@@ -197,7 +208,7 @@ if [ "$what" = launcher ] || [ "$what" = all ]; then
   echo "Stock home: $STOCK"
 
   # 1. The new home must be installed and working BEFORE anything is disabled.
-  push_install chouitv-home.apk ma.chouitv.home
+  [ "$home_pushed" = 1 ] || push_install chouitv-home.apk ma.chouitv.home   # the saver step of "all" just did it
   "$PY" -I optimize/tv.py "pm grant ma.chouitv.home android.permission.ACCESS_FINE_LOCATION" || true
   # exact alarms for the adhan (Android 12 and newer; older TVs need nothing)
   "$PY" -I optimize/tv.py "appops set ma.chouitv.home SCHEDULE_EXACT_ALARM allow" || true
@@ -339,10 +350,9 @@ fi
 # and share.sh agree. (Only when the report exists; no report, nothing to correct.)
 if [ "$what" != extras ] && [ -f "${URTV_RUN_DIR:-optimize/run}/report.md" ]; then
   rep="${URTV_RUN_DIR:-optimize/run}/report.md"
-  vs=$("$PY" -I optimize/tv.py "dumpsys package ma.chouitv.screensaver 2> /dev/null | grep -m1 versionName" 2> /dev/null | sed 's/.*=//' | tr -d '\r ') || vs=""
   vh=$("$PY" -I optimize/tv.py "dumpsys package ma.chouitv.home 2> /dev/null | grep -m1 versionName" 2> /dev/null | sed 's/.*=//' | tr -d '\r ') || vh=""
-  if [ -n "$vs$vh" ]; then
-    line="Versions: screensaver ${vs:-none}, home ${vh:-none}"
+  if [ -n "$vh" ]; then
+    line="Versions: ChouiTV ${vh:-none}"
     if grep -q '^Versions:' "$rep"; then
       awk -v l="$line" '/^Versions:/ { print l; next } { print }' "$rep" > "$rep.tmp" && mv "$rep.tmp" "$rep"
     else

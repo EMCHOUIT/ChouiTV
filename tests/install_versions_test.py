@@ -28,11 +28,11 @@ def run(report, what="saver", answer="3.124"):
     out = (tmp / "report.md").read_text(encoding="utf-8") if report is not None else None
     return r.returncode, out
 
-old = "Home: ma.chouitv.home/.MainActivity\nVersions: screensaver 3.89, home 3.89\nExtras: TV Bro no\n"
+old = "Home: ma.chouitv.home/.MainActivity\nVersions: ChouiTV 3.89\nExtras: TV Bro no\n"
 code, out = run(old)
-check("install: the report's old Versions line is replaced", code == 0 and out == old.replace("3.89, home 3.89", "3.124, home 3.124").replace("screensaver 3.89", "screensaver 3.124"), repr(out))
+check("install: the report's old Versions line is replaced", code == 0 and out == old.replace("3.89", "3.124"), repr(out))
 code, out = run("Home: x\n")
-check("install: a report with no Versions line gets one", code == 0 and out == "Home: x\nVersions: screensaver 3.124, home 3.124\n", repr(out))
+check("install: a report with no Versions line gets one", code == 0 and out == "Home: x\nVersions: ChouiTV 3.124\n", repr(out))
 code, out = run(old, answer="")
 check("install: the TV does not answer: the report stays as it was", code == 0 and out == old, repr(out))
 code, out = run(old, what="extras")

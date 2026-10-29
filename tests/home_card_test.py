@@ -10,7 +10,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "android/launcher/src/main/java/ma/chouitv/home/HomeCardChoice.java"
-B = "file:///android_asset/web/tv.html#"
+B = "file:///android_asset/tv.html#"
 # frag, panel (read now), saved frag, saved panel ("-" = nothing) -> the page
 CASES = [
     ("city=Riyadh&panel=old&week=1", "matches", "-", "-", B + "city=Riyadh&panel=matches&home_panel=matches&widget=1"),   # read: its own panel/week dropped

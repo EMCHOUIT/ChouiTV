@@ -391,21 +391,24 @@ and press **Allow** on the TV screen.
 </details>
 
 <details>
-<summary>⬇️ <b>2. Download the two apps</b></summary>
+<summary>⬇️ <b>2. Download the app</b></summary>
 
-- [`chouitv-home.apk`](https://github.com/EMCHOUIT/ChouiTV/releases/latest/download/chouitv-home.apk): the home screen and the listening screens.
-- [`chouitv-screensaver.apk`](https://github.com/EMCHOUIT/ChouiTV/releases/latest/download/chouitv-screensaver.apk): the screensaver and the settings.
+Since 4.0 ChouiTV is **one app**:
+
+- [`chouitv-home.apk`](https://github.com/EMCHOUIT/ChouiTV/releases/latest/download/chouitv-home.apk): the home screen, the listening screens, the screensaver and the settings.
 </details>
 
 <details>
 <summary>🔁 <b>3. Have the old version? Move it over</b></summary>
 
-The two apps now have new names (`ma.chouitv.*`), so the old ones are not updated in place. The script carries your settings over, installs the new apps and removes the old ones:
+Until 3.x there were two apps (`ma.chouitv.home` and `ma.chouitv.screensaver`); 4.0 is one. The home app updates in place; the second app is not shipped any more, so the script saves its settings, installs 4.0, carries the settings over and, only after checking, removes the old screensaver app (it asks first; `--yes` skips the question):
 
 ```bash
-optimize/migrate-to-chouitv.sh                # this TV's own settings (from the old 3.170 or newer)
-optimize/migrate-to-chouitv.sh settings.json   # or from another TV's export file
+optimize/migrate-to-v4.sh                # a 3.x TV: this TV's own settings
+optimize/migrate-to-v4.sh settings.json   # or from another TV's export file
 ```
+
+The photos «صوري» and the tasks live in the old app's storage and are not carried over (`optimize/photos.sh` adds the photos again). A TV still on the very old names (`sa.urtv.*`) uses `optimize/migrate-to-chouitv.sh`, which goes straight to 4.0.
 
 </details>
 
@@ -413,11 +416,10 @@ optimize/migrate-to-chouitv.sh settings.json   # or from another TV's export fil
 <summary>📺 <b>4. Install and set up</b></summary>
 
 ```bash
-adb install -r chouitv-screensaver.apk
 adb install -r chouitv-home.apk
 adb shell settings put secure screensaver_enabled 1
-adb shell settings put secure screensaver_components ma.chouitv.screensaver/.ScreenDream
-adb shell settings put secure screensaver_default_component ma.chouitv.screensaver/.ScreenDream
+adb shell settings put secure screensaver_components ma.chouitv.home/ma.chouitv.screensaver.ScreenDream
+adb shell settings put secure screensaver_default_component ma.chouitv.home/ma.chouitv.screensaver.ScreenDream
 ```
 
 Then press **Home** and choose the new launcher if the TV asks. (Some TVs keep the manufacturer's launcher: option 2, or the project scripts below, handle that safely.)
@@ -437,7 +439,7 @@ git clone --depth 1 https://github.com/EMCHOUIT/ChouiTV
 cd ChouiTV
 optimize/setup.sh          # prepares Python and the tools
 optimize/find-tv.sh        # finds the TV on the network
-optimize/install.sh all    # downloads the latest release, installs and sets up the launcher and screensaver
+optimize/install.sh all    # downloads the latest release, installs and sets up the app (launcher and screensaver)
 ```
 
 Note: **cleaning the TV** (removing tracking, ads and trial apps) is an important step for better performance: it frees 85 to 215 MB of memory. The assistant asks before starting: if you agree it cleans, if you decline it installs only what our apps need (`SKIP_CLEANUP=1`), and you can ask for the cleanup later. From your phone, [ChouiTV Installer](https://github.com/EMCHOUIT/ChouiTV-Installer) offers the same cleanup as an option: it shows the plan first, turns off only what you choose and lets you undo everything.
@@ -486,7 +488,7 @@ They are calculated for your city, and you can adjust each prayer in minutes fro
 
 <details><summary>↩️ <b>How do I put everything back?</b></summary>
 
-`optimize/reset.sh`, or remove the two apps and re-enable the manufacturer's launcher in the TV settings.
+`optimize/reset.sh`, or remove the app and re-enable the manufacturer's launcher in the TV settings.
 </details>
 
 <img src="docs/media/divider.png" alt="" width="100%">
