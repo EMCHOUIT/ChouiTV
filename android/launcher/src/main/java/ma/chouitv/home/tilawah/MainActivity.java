@@ -66,7 +66,7 @@ public class MainActivity extends Activity {
         list = listView;
         radioPane = new RadioPane(this, new RadioPane.Host() {
             @Override public void openPlayer() { MainActivity.this.openPlayer(); }
-            @Override public void openSettings() { startActivity(new Intent(MainActivity.this, RadioSettingsActivity.class)); }
+            @Override public void openSettings() { startActivity(new Intent(MainActivity.this, RadioCountriesActivity.class)); }
             @Override public void focusTabs() { tabViews[tab].requestFocus(); }
         });
         radioPane.setVisibility(View.GONE);

@@ -122,24 +122,76 @@ final class RadioStore {
 
     interface Done { void done(boolean ok, int countries); }
 
-    /** Downloads the lists of the chosen countries (one small file each); the old ones stay if the network fails. Runs off the main thread, answers on it. */
-    static void update(final Context context, final Done done) {
+    /** A download with its progress, one country (one small file) at a time; every call comes on the main thread. */
+    interface Progress {
+        int WAITING = 0, LOADING = 1, DONE = 2, FAILED = 3;
+        /** a country's state changed; finished = the countries done (well or not) so far, total = the countries to download */
+        void step(String cc, int state, int finished, int total);
+        /** the end: got = lists downloaded, failed = the countries that could not be (their old list stays), total = how many were asked */
+        void done(int got, java.util.List<String> failed, int total);
+    }
+
+    /** The chosen countries that have a list to download (Morocco's radios ship with the app). */
+    static List<String> toDownload(Context c) {
+        List<String> out = new ArrayList<>();
+        for (String cc : chosen(c)) if (!cc.equals(RadioChoice.HOME)) out.add(cc);
+        return out;
+    }
+
+    /** Downloads the lists of the chosen countries; the old ones stay for a country that fails. Off the main thread, answers on it. */
+    static void update(final Context context, final Progress progress) {
         final Context c = context.getApplicationContext();
+        final List<String> targets = toDownload(c);
+        final Handler ui = new Handler(Looper.getMainLooper());
+        for (String cc : targets) ui.post(() -> progress.step(cc, Progress.WAITING, 0, targets.size()));
         new Thread(() -> {
-            int got = 0, tried = 0;
-            for (String cc : chosen(c)) {
-                if (cc.equals(RadioChoice.HOME)) continue;
-                tried++;
-                if (fetch(c, cc)) got++;
+            final List<String> failed = new ArrayList<>();
+            int finished = 0;
+            for (final String cc : targets) {
+                final int before = finished;
+                ui.post(() -> progress.step(cc, Progress.LOADING, before, targets.size()));
+                boolean ok = fetch(c, cc);
+                finished++;
+                if (!ok) failed.add(cc);
+                final int after = finished;
+                final boolean good = ok;
+                ui.post(() -> progress.step(cc, good ? Progress.DONE : Progress.FAILED, after, targets.size()));
             }
+            final int got = targets.size() - failed.size();
             if (got > 0) sp(c).edit().putLong("updated", System.currentTimeMillis()).apply();
-            final boolean ok = tried > 0 && got == tried;
-            final int n = got;
-            new Handler(Looper.getMainLooper()).post(() -> {
-                if (n > 0) changed(c);
-                if (done != null) done.done(ok, n);
+            ui.post(() -> {
+                if (got > 0) changed(c);
+                progress.done(got, failed, targets.size());
             });
         }, "radio-update").start();
+    }
+
+    /** The same without the progress (the command line, the list that was never downloaded). */
+    static void update(final Context context, final Done done) {
+        update(context, new Progress() {
+            @Override public void step(String cc, int state, int finished, int total) { }
+            @Override public void done(int got, List<String> failed, int total) { if (done != null) done.done(failed.isEmpty() && total > 0, got); }
+        });
+    }
+
+    private static final String[] DAYS = {"الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"};
+    private static final String[] MONTHS = {"يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"};
+
+    /** «الخميس 29 أكتوبر 2026، 12:35 ص» (the digits are the screen's own setting, applied by Ui.digits where it is shown). */
+    static String stamp(long at) {
+        java.util.Calendar k = java.util.Calendar.getInstance();
+        k.setTimeInMillis(at);
+        int h = k.get(java.util.Calendar.HOUR);
+        return DAYS[k.get(java.util.Calendar.DAY_OF_WEEK) - 1] + " " + k.get(java.util.Calendar.DAY_OF_MONTH) + " " + MONTHS[k.get(java.util.Calendar.MONTH)]
+                + " " + k.get(java.util.Calendar.YEAR) + "، " + (h == 0 ? 12 : h) + ":" + String.format(Locale.US, "%02d", k.get(java.util.Calendar.MINUTE))
+                + " " + (k.get(java.util.Calendar.AM_PM) == java.util.Calendar.AM ? "ص" : "م");
+    }
+
+    /** How many radios the downloaded lists of the chosen countries hold (for «١٦٥ إذاعة»). */
+    static int downloadedStations(Context c) {
+        int n = 0;
+        for (String cc : toDownload(c)) n += read(c, cc).size();
+        return n;
     }
 
     private static boolean fetch(Context c, String cc) {
@@ -175,6 +227,13 @@ final class RadioStore {
 
     /** «المغرب», «فرنسا»… in Arabic whatever the TV's language. */
     static String countryName(String cc) {
+        switch (cc.toLowerCase(Locale.ROOT)) {   // the long official names, in the short form people say
+            case "sa": return "السعودية";
+            case "ae": return "الإمارات";
+            case "gb": return "بريطانيا";
+            case "us": return "أمريكا";
+            default:
+        }
         String name = new Locale("", cc.toUpperCase(Locale.ROOT)).getDisplayCountry(new Locale("ar"));
         return name == null || name.isEmpty() ? cc.toUpperCase(Locale.ROOT) : name;
     }

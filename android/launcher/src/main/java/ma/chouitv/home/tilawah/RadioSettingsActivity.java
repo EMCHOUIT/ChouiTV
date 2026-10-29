@@ -50,6 +50,11 @@ public class RadioSettingsActivity extends Activity {
         super.onCreate(state);
         ma.chouitv.home.Digits.init(this);
         country = getIntent().getStringExtra(EXTRA_COUNTRY);
+        if (country == null) {   // the countries have their own page now (RadioCountriesActivity); this one is the stations of one country
+            startActivity(new Intent(this, RadioCountriesActivity.class));
+            finish();
+            return;
+        }
         FrameLayout root = new FrameLayout(this);
         root.setBackgroundResource(R.color.bg);
         root.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);

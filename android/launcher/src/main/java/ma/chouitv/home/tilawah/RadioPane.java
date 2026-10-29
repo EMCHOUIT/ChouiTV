@@ -1,13 +1,15 @@
 package ma.chouitv.home.tilawah;
 
 import android.content.Context;
-import android.view.Gravity;
+import android.graphics.drawable.GradientDrawable;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.GridView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import ma.chouitv.home.R;
@@ -19,9 +21,10 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * The «الإذاعات» tab: the countries the person chose in a narrow column (with the favourites above and the way to the settings below),
- * and the stations of the one under the focus beside it. ◀ ▶ move between the two, ▲ ▼ inside one, OK plays, a long OK is a favourite.
- * Two plain lists, only the rows on screen are built, so 120 stations cost nothing.
+ * The «الإذاعات» tab: the countries the person chose as chips under the tabs (the favourites first, the way to the settings last),
+ * the stations of the one chosen in a grid of four, and a bar at the bottom while a station plays (OK on it stops).
+ * ▲ from the first row of stations goes to the chips, ▲ from the chips to the tabs. OK plays, a long OK is a favourite.
+ * Only the cards on screen are built, so 120 stations cost nothing.
  */
 final class RadioPane extends LinearLayout {
 
@@ -32,12 +35,12 @@ final class RadioPane extends LinearLayout {
     }
 
     private static final int C_FAV = 0, C_COUNTRY = 1, C_CHOOSE = 2;
-    private static final int S_HEADER = 0, S_STATION = 1, S_NOTE = 2, S_UPDATE = 3;
+    private static final int S_STATION = 1, S_NOTE = 2, S_UPDATE = 3;
 
     private static final class CRow {
         final int kind;
-        final String cc, title, detail;
-        CRow(int kind, String cc, String title, String detail) { this.kind = kind; this.cc = cc; this.title = title; this.detail = detail; }
+        final String cc, title;
+        CRow(int kind, String cc, String title) { this.kind = kind; this.cc = cc; this.title = title; }
     }
 
     private static final class SRow {
@@ -48,64 +51,67 @@ final class RadioPane extends LinearLayout {
 
     private final Host host;
     private final Catalog cat;
-    private final ListView countries, stations;
+    private final LinearLayout chips;
+    private final GridView grid;
+    private final TextView bar;
     private final List<CRow> cRows = new ArrayList<>();
     private final List<SRow> sRows = new ArrayList<>();
-    private final BaseAdapter cAdapter, sAdapter;
-    private int active;          // the country row whose stations are shown
+    private final List<TextView> chipViews = new ArrayList<>();
+    private final BaseAdapter adapter;
+    private final Handler tick = new Handler(Looper.getMainLooper());
+    private int active;          // the chip whose stations are shown
     private boolean updating;
+    private String barShown = "";
 
     RadioPane(Context context, Host host) {
         super(context);
         this.host = host;
         this.cat = Catalog.get(context);
-        setOrientation(HORIZONTAL);
-        setLayoutDirection(View.LAYOUT_DIRECTION_RTL);   // the countries on the right, as the tabs
-        countries = makeList(context);
-        stations = makeList(context);
-        cAdapter = new CAdapter();
-        sAdapter = new SAdapter();
-        countries.setAdapter(cAdapter);
-        stations.setAdapter(sAdapter);
-        addView(countries, new LayoutParams(dp(250), ViewGroup.LayoutParams.MATCH_PARENT));
-        LayoutParams sp = new LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f);
-        sp.setMarginEnd(dp(8));
-        sp.setMarginStart(dp(16));
-        addView(stations, sp);
+        setOrientation(VERTICAL);
+        setLayoutDirection(View.LAYOUT_DIRECTION_RTL);   // the chips and the cards start at the right, as the tabs
 
-        countries.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override public void onItemSelected(AdapterView<?> p, View v, int position, long id) {
-                if (position >= 0 && position < cRows.size() && cRows.get(position).kind != C_CHOOSE && position != active) {
-                    active = position;
-                    buildStations();
-                    stations.setSelectionFromTop(0, 0);   // each country opens at its top, its first section's title included
-                }
-                cAdapter.notifyDataSetChanged();
-            }
+        chips = new LinearLayout(context);
+        chips.setOrientation(HORIZONTAL);
+        addView(chips, new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        grid = new GridView(context);
+        grid.setNumColumns(4);
+        grid.setStretchMode(GridView.STRETCH_COLUMN_WIDTH);
+        grid.setHorizontalSpacing(dp(12));
+        grid.setVerticalSpacing(dp(12));
+        grid.setSelector(android.R.color.transparent);
+        grid.setVerticalScrollBarEnabled(false);
+        grid.setFadingEdgeLength(0);
+        grid.setClipToPadding(false);
+        grid.setPadding(dp(2), dp(4), dp(2), dp(8));
+        grid.setFocusable(true);
+        adapter = new Cards();
+        grid.setAdapter(adapter);
+        LayoutParams gp = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f);
+        gp.topMargin = dp(12);
+        addView(grid, gp);
+
+        bar = new TextView(context);
+        bar.setTextSize(15);
+        bar.setTypeface(Ui.font(context, "Thmanyah-Medium.otf"));
+        bar.setTextColor(getResources().getColor(R.color.sand));
+        bar.setGravity(android.view.Gravity.CENTER_VERTICAL);
+        bar.setPadding(dp(18), 0, dp(18), 0);
+        bar.setFocusable(true);
+        bar.setVisibility(View.GONE);
+        paintBar(false);
+        bar.setOnFocusChangeListener((v, has) -> paintBar(has));
+        bar.setOnClickListener(v -> { MusicService.stopAction(getContext()); bar.postDelayed(this::refresh, 400); });
+        LayoutParams bp = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(46));
+        bp.topMargin = dp(8);
+        addView(bar, bp);
+
+        grid.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override public void onItemSelected(AdapterView<?> p, View v, int position, long id) { adapter.notifyDataSetChanged(); }
             @Override public void onNothingSelected(AdapterView<?> p) { }
         });
-        stations.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override public void onItemSelected(AdapterView<?> p, View v, int position, long id) {
-                // a row under a section title keeps the title in view (a plain selection scrolls the row to the very top)
-                if (position > 0 && position - 1 < sRows.size() && sRows.get(position - 1).kind == S_HEADER
-                        && stations.getFirstVisiblePosition() >= position) {
-                    final int at = position;
-                    stations.post(() -> stations.setSelectionFromTop(at, dp(46)));
-                }
-                sAdapter.notifyDataSetChanged();
-            }
-            @Override public void onNothingSelected(AdapterView<?> p) { }
-        });
-        OnFocusChangeListener repaint = (v, has) -> { cAdapter.notifyDataSetChanged(); sAdapter.notifyDataSetChanged(); };
-        countries.setOnFocusChangeListener(repaint);
-        stations.setOnFocusChangeListener(repaint);
-
-        countries.setOnItemClickListener((p, v, position, id) -> {
-            CRow row = cRows.get(position);
-            if (row.kind == C_CHOOSE) host.openSettings();
-            else stations.requestFocus();
-        });
-        stations.setOnItemClickListener((p, v, position, id) -> {
+        grid.setOnFocusChangeListener((v, has) -> adapter.notifyDataSetChanged());
+        grid.setOnItemClickListener((p, v, position, id) -> {
             SRow row = sRows.get(position);
             if (row.kind == S_STATION) {
                 MusicService.playRadio(getContext(), row.index);
@@ -114,29 +120,39 @@ final class RadioPane extends LinearLayout {
                 update();
             }
         });
-        stations.setOnItemLongClickListener((p, v, position, id) -> {
+        grid.setOnItemLongClickListener((p, v, position, id) -> {
             SRow row = sRows.get(position);
             if (row.kind != S_STATION) return false;
             RadioStore.toggleFavourite(getContext(), cat.stations.get(row.index).url);
             int keep = position;
             refresh();
-            stations.setSelection(Math.min(keep, sRows.size() - 1));
+            grid.setSelection(Math.min(keep, sRows.size() - 1));
             return true;
         });
     }
 
-    private ListView makeList(Context c) {
-        ListView l = new ListView(c);
-        l.setDivider(null);
-        l.setDividerHeight(dp(9));
-        l.setSelector(android.R.color.transparent);
-        l.setFadingEdgeLength(0);
-        l.setVerticalScrollBarEnabled(false);
-        l.setClipToPadding(false);
-        l.setPadding(0, 0, 0, dp(8));
-        l.setItemsCanFocus(false);
-        l.setFocusable(true);
-        return l;
+    @Override protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        tick.post(ticker);
+    }
+
+    @Override protected void onDetachedFromWindow() {
+        tick.removeCallbacks(ticker);
+        super.onDetachedFromWindow();
+    }
+
+    /** Once a second: the bar and the «مباشر» mark follow what plays (a station stopped from the home card, a new one started). */
+    private final Runnable ticker = new Runnable() {
+        @Override public void run() {
+            String now = playingSignature();
+            if (!now.equals(barShown)) { barShown = now; buildStations(); updateBar(); }
+            tick.postDelayed(this, 1000);
+        }
+    };
+
+    private String playingSignature() {
+        boolean on = MusicService.currentSource() == Prefs.SOURCE_RADIO && MusicService.isPlaying();
+        return on ? "r" + MusicService.currentStation() : "-";
     }
 
     private int dp(int v) { return (int) (v * getResources().getDisplayMetrics().density); }
@@ -148,39 +164,99 @@ final class RadioPane extends LinearLayout {
         Context c = getContext();
         String keepCc = active < cRows.size() ? cRows.get(active).cc : null;
         cRows.clear();
-        int favs = favouriteIndexes().size();
-        cRows.add(new CRow(C_FAV, "*", "★  " + c.getString(R.string.radio_favourites) + (favs == 0 ? "" : "  ·  " + Ui.arabic(favs)), ""));
+        cRows.add(new CRow(C_FAV, "*", "★  " + c.getString(R.string.radio_favourites)));
         for (String cc : RadioStore.chosen(c)) {
             int n = 0;
             for (Catalog.Station s : cat.stations) if (cc.equals(s.group)) n++;
-            cRows.add(new CRow(C_COUNTRY, cc, RadioStore.countryName(cc) + (n == 0 ? "" : "  ·  " + Ui.arabic(n)), ""));   // one line: the four rows fit without scrolling
+            cRows.add(new CRow(C_COUNTRY, cc, RadioStore.countryName(cc) + (n == 0 ? "" : "  " + Ui.arabic(n))));
         }
-        cRows.add(new CRow(C_CHOOSE, "", "⚙  " + c.getString(R.string.radio_choose), ""));
+        cRows.add(new CRow(C_CHOOSE, "", "⚙"));
         active = 1;
         for (int i = 0; i < cRows.size(); i++) if (cRows.get(i).kind != C_CHOOSE && cRows.get(i).cc.equals(keepCc)) active = i;
-        cAdapter.notifyDataSetChanged();
+        buildChips();
         buildStations();
+        barShown = playingSignature();
+        updateBar();
+    }
+
+    private void buildChips() {
+        chips.removeAllViews();
+        chipViews.clear();
+        for (int i = 0; i < cRows.size(); i++) {
+            final int at = i;
+            TextView t = new TextView(getContext());
+            t.setText(cRows.get(i).title);
+            t.setTextSize(17);
+            t.setTypeface(Ui.font(getContext(), "Thmanyah-Medium.otf"));
+            t.setGravity(android.view.Gravity.CENTER);
+            t.setPadding(dp(20), 0, dp(20), 0);
+            t.setFocusable(true);
+            t.setOnFocusChangeListener((v, has) -> {
+                if (has && cRows.get(at).kind != C_CHOOSE && at != active) {   // moving over a country shows its stations
+                    active = at;
+                    buildStations();
+                    grid.setSelection(0);
+                }
+                paintChips();
+            });
+            t.setOnClickListener(v -> {
+                if (cRows.get(at).kind == C_CHOOSE) host.openSettings();
+                else if (sRows.size() > 0) grid.requestFocus();
+            });
+            LayoutParams lp = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(40));
+            lp.setMarginEnd(dp(8));
+            chips.addView(t, lp);
+            chipViews.add(t);
+        }
+        paintChips();
+    }
+
+    private void paintChips() {
+        for (int i = 0; i < chipViews.size(); i++) {
+            TextView t = chipViews.get(i);
+            boolean isActive = i == active && cRows.get(i).kind != C_CHOOSE;
+            boolean focused = t.hasFocus();
+            GradientDrawable d = new GradientDrawable();
+            d.setCornerRadius(dp(20));
+            d.setColor(isActive ? 0xE6DCB86F : 0x14FFFFFF);
+            d.setStroke(dp(2), focused ? 0xFFDCB86F : isActive ? 0xE6DCB86F : 0x00000000);
+            t.setBackground(d);
+            t.setTextColor(getResources().getColor(isActive ? R.color.bg : R.color.sand));
+        }
+    }
+
+    private void paintBar(boolean focused) {
+        GradientDrawable d = new GradientDrawable();
+        d.setCornerRadius(dp(23));
+        d.setColor(0x66000000);
+        d.setStroke(dp(2), focused ? 0xFFDCB86F : 0x73DCB86F);
+        bar.setBackground(d);
+    }
+
+    private void updateBar() {
+        boolean on = MusicService.currentSource() == Prefs.SOURCE_RADIO;
+        int index = MusicService.currentStation();
+        if (!on || index < 0 || index >= cat.stations.size()) {
+            if (bar.hasFocus()) grid.requestFocus();
+            bar.setVisibility(View.GONE);
+            return;
+        }
+        bar.setText("■   " + Ui.digits(getContext().getString(R.string.radio_now_bar, cat.stations.get(index).name)));
+        bar.setVisibility(View.VISIBLE);
     }
 
     /** The country of the radio that plays, so the tab opens on it; else the first country. */
     void selectPlayingCountry() {
         int playing = MusicService.currentSource() == Prefs.SOURCE_RADIO ? MusicService.currentStation() : -1;
+        active = Math.min(1, cRows.size() - 1);
         if (playing >= 0 && playing < cat.stations.size()) {
             String cc = cat.stations.get(playing).group;
-            for (int i = 0; i < cRows.size(); i++) {
-                if (cRows.get(i).kind == C_COUNTRY && cRows.get(i).cc.equals(cc)) {
-                    active = i;
-                    countries.setSelection(i);
-                    buildStations();
-                    int at = stationRow(playing);
-                    if (at >= 0) stations.setSelection(at);
-                    return;
-                }
-            }
+            for (int i = 0; i < cRows.size(); i++) if (cRows.get(i).kind == C_COUNTRY && cRows.get(i).cc.equals(cc)) active = i;
         }
-        active = Math.min(1, cRows.size() - 1);
-        countries.setSelection(active);
+        paintChips();
         buildStations();
+        int at = stationRow(playing);
+        grid.setSelection(at >= 0 ? at : 0);
     }
 
     private int stationRow(int index) {
@@ -193,7 +269,7 @@ final class RadioPane extends LinearLayout {
         List<String> chosen = RadioStore.chosen(getContext());
         for (int i = 0; i < cat.stations.size(); i++) {
             Catalog.Station s = cat.stations.get(i);
-            if ((chosen.contains(s.group)) && RadioStore.favourite(getContext(), s.url)) out.add(i);
+            if (chosen.contains(s.group) && RadioStore.favourite(getContext(), s.url)) out.add(i);
         }
         sortByName(out);
         return out;
@@ -228,20 +304,12 @@ final class RadioPane extends LinearLayout {
             for (int i = 0; i < cat.stations.size(); i++) if (country.cc.equals(cat.stations.get(i).group)) mine.add(i);
             if (country.cc.equals(RadioChoice.HOME)) sortByName(mine);
             if (mine.isEmpty()) {
-                sRows.add(new SRow(S_NOTE, -1, c.getString(R.string.radio_not_downloaded, country.title), null));
+                sRows.add(new SRow(S_NOTE, -1, c.getString(R.string.radio_not_downloaded, RadioStore.countryName(country.cc)), null));
                 sRows.add(new SRow(S_UPDATE, -1, updating ? c.getString(R.string.radio_updating) : c.getString(R.string.radio_update), null));
             }
-            String section = null;
-            for (int i : mine) {
-                Catalog.Station s = cat.stations.get(i);
-                if (!s.section.isEmpty() && !s.section.equals(section)) {
-                    section = s.section;
-                    sRows.add(new SRow(S_HEADER, -1, RadioStore.sectionName(section), null));
-                }
-                addStation(i, false);
-            }
+            for (int i : mine) addStation(i, false);
         }
-        sAdapter.notifyDataSetChanged();
+        adapter.notifyDataSetChanged();
     }
 
     private void addStation(int index, boolean withCountry) {
@@ -249,9 +317,9 @@ final class RadioPane extends LinearLayout {
         boolean live = MusicService.currentSource() == Prefs.SOURCE_RADIO && MusicService.isPlaying() && MusicService.currentStation() == index;
         StringBuilder d = new StringBuilder();
         if (live) d.append("●  ").append(getContext().getString(R.string.live));
-        if (withCountry) d.append(d.length() > 0 ? "  •  " : "").append(RadioStore.countryName(s.group));
-        if (!s.kind.isEmpty()) d.append(d.length() > 0 ? "  •  " : "").append(s.kind);
-        if (!s.place.isEmpty()) d.append(d.length() > 0 ? "  •  " : "").append(s.place);
+        if (withCountry) d.append(d.length() > 0 ? "  ·  " : "").append(RadioStore.countryName(s.group));
+        if (!s.section.isEmpty()) d.append(d.length() > 0 ? "  ·  " : "").append(RadioStore.sectionName(s.section));
+        if (!s.kind.isEmpty()) d.append(d.length() > 0 ? "  ·  " : "").append(s.kind);
         String title = (RadioStore.favourite(getContext(), s.url) ? "★  " : "") + s.name;
         sRows.add(new SRow(S_STATION, index, title, d.toString()));
     }
@@ -269,95 +337,78 @@ final class RadioPane extends LinearLayout {
 
     // ---- focus, for the activity ----
 
-    boolean hasListFocus() { return countries.hasFocus() || stations.hasFocus(); }
+    boolean hasListFocus() {
+        if (grid.hasFocus() || bar.hasFocus()) return true;
+        for (TextView t : chipViews) if (t.hasFocus()) return true;
+        return false;
+    }
 
-    boolean stationsFocused() { return stations.hasFocus(); }
+    /** the stations (or the bar) have the focus, not the chips: «رجوع» then goes up to the chips */
+    boolean stationsFocused() { return grid.hasFocus() || bar.hasFocus(); }
 
-    void focusCountries() { countries.requestFocus(); }
+    void focusCountries() {
+        if (active < chipViews.size()) chipViews.get(active).requestFocus();
+    }
 
-    void focusFirst() { if (sRows.size() > 0 && countries.getSelectedItemPosition() < 0) countries.setSelection(active); countries.requestFocus(); }
+    /** From the tabs: the stations (the playing one when it is here), else the chips. */
+    void focusFirst() {
+        if (sRows.size() > 0 && grid.getSelectedItemPosition() < 0) grid.setSelection(0);
+        if (sRows.size() > 0) grid.requestFocus(); else focusCountries();
+    }
 
-    /** True when ▲ would leave the list: the first row, or the row under the first header. */
+    /** True when ▲ would leave the pane: the chips have the focus. */
     boolean atTop() {
-        ListView l = stations.hasFocus() ? stations : countries;
-        int at = l.getSelectedItemPosition();
-        if (l == stations) {
-            int first = 0;
-            while (first < sRows.size() && sRows.get(first).kind == S_HEADER) first++;
-            return at <= first;
-        }
-        return at <= 0;
+        for (TextView t : chipViews) if (t.hasFocus()) return true;
+        return false;
     }
 
-    // ---- adapters ----
+    // ---- the cards ----
 
-    private TextView text(int sp, String font, int color) {
-        TextView t = new TextView(getContext());
-        t.setTextSize(sp);
-        t.setTypeface(Ui.font(getContext(), font));
-        t.setTextColor(getResources().getColor(color));
-        t.setSingleLine(true);
-        t.setEllipsize(android.text.TextUtils.TruncateAt.END);
-        return t;
-    }
-
-    private View row(View convert, String title, String detail, boolean selected, boolean current) {
-        LinearLayout box;
-        TextView name, sub;
-        if (convert instanceof LinearLayout && convert.getTag() != null) {
-            box = (LinearLayout) convert;
-            name = (TextView) box.getChildAt(0);
-            sub = (TextView) box.getChildAt(1);
-        } else {
-            box = new LinearLayout(getContext());
-            box.setOrientation(VERTICAL);
-            box.setPadding(dp(20), dp(9), dp(16), dp(9));
-            name = text(20, "Thmanyah-Medium.otf", R.color.sand);
-            sub = text(13, "Thmanyah-Light.otf", R.color.dim);
-            box.addView(name);
-            box.addView(sub);
-            box.setTag(Boolean.TRUE);
-        }
-        box.setBackgroundResource(selected ? R.drawable.row_selected : R.drawable.row_bg);
-        name.setText(Ui.digits(title));
-        name.setTextColor(getResources().getColor(current ? R.color.gold : R.color.sand));
-        boolean none = detail == null || detail.isEmpty();
-        sub.setVisibility(none ? View.GONE : View.VISIBLE);
-        sub.setText(none ? "" : Ui.digits(detail));
-        return box;
-    }
-
-    private final class CAdapter extends BaseAdapter {
-        @Override public int getCount() { return cRows.size(); }
-        @Override public Object getItem(int p) { return cRows.get(p); }
-        @Override public long getItemId(int p) { return p; }
-        @Override public View getView(int position, View convert, ViewGroup parent) {
-            CRow r = cRows.get(position);
-            boolean sel = countries.hasFocus() && position == countries.getSelectedItemPosition();
-            return row(convert, r.title, r.detail, sel, position == active && r.kind != C_CHOOSE);
-        }
-    }
-
-    private final class SAdapter extends BaseAdapter {
+    private final class Cards extends BaseAdapter {
         @Override public int getCount() { return sRows.size(); }
         @Override public Object getItem(int p) { return sRows.get(p); }
         @Override public long getItemId(int p) { return p; }
         @Override public boolean areAllItemsEnabled() { return false; }
         @Override public boolean isEnabled(int p) { int k = sRows.get(p).kind; return k == S_STATION || k == S_UPDATE; }
-        @Override public int getViewTypeCount() { return 2; }
-        @Override public int getItemViewType(int p) { return sRows.get(p).kind == S_HEADER ? 0 : 1; }
+
         @Override public View getView(int position, View convert, ViewGroup parent) {
             SRow r = sRows.get(position);
-            if (r.kind == S_HEADER) {
-                TextView h = convert instanceof TextView ? (TextView) convert : text(16, "Thmanyah-Medium.otf", R.color.gold);
-                h.setPadding(dp(10), dp(12), dp(10), dp(4));
-                h.setText(r.title);
-                h.setGravity(Gravity.START);
-                return h;
+            LinearLayout box;
+            TextView name, sub;
+            if (convert instanceof LinearLayout && convert.getTag() != null) {
+                box = (LinearLayout) convert;
+                name = (TextView) box.getChildAt(0);
+                sub = (TextView) box.getChildAt(1);
+            } else {
+                box = new LinearLayout(getContext());
+                box.setOrientation(VERTICAL);
+                box.setPadding(dp(16), dp(12), dp(14), dp(12));
+                box.setMinimumHeight(dp(78));
+                name = new TextView(getContext());
+                name.setTextSize(18);
+                name.setTypeface(Ui.font(getContext(), "Thmanyah-Medium.otf"));
+                name.setMaxLines(2);
+                name.setEllipsize(android.text.TextUtils.TruncateAt.END);
+                sub = new TextView(getContext());
+                sub.setTextSize(12);
+                sub.setTypeface(Ui.font(getContext(), "Thmanyah-Light.otf"));
+                sub.setTextColor(getResources().getColor(R.color.dim));
+                sub.setSingleLine(true);
+                sub.setEllipsize(android.text.TextUtils.TruncateAt.END);
+                box.addView(name);
+                box.addView(sub);
+                box.setTag(Boolean.TRUE);
             }
-            boolean sel = stations.hasFocus() && position == stations.getSelectedItemPosition();
+            boolean sel = grid.hasFocus() && position == grid.getSelectedItemPosition();
             boolean live = r.detail != null && r.detail.startsWith("●");
-            return row(convert, r.title, r.detail, sel, live);
+            box.setBackgroundResource(sel ? R.drawable.row_selected : R.drawable.row_bg);
+            name.setText(Ui.digits(r.title));
+            name.setTextColor(getResources().getColor(live || r.kind == S_UPDATE ? R.color.gold : R.color.sand));
+            boolean none = r.detail == null || r.detail.isEmpty();
+            sub.setVisibility(none ? View.GONE : View.VISIBLE);
+            sub.setText(none ? "" : Ui.digits(r.detail));
+            box.setAlpha(r.kind == S_NOTE ? 0.8f : 1f);
+            return box;
         }
     }
 }

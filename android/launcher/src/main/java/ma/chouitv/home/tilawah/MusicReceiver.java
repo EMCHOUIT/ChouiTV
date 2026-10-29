@@ -101,7 +101,7 @@ public class MusicReceiver extends BroadcastReceiver {
                 return;
             }
             case "ma.chouitv.home.RADIO_UPDATE":   // optimize/music.sh radio-update: download the lists of the chosen countries now
-                RadioStore.update(context, null);
+                RadioStore.update(context, (RadioStore.Done) null);
                 setResultData("updating the lists of " + RadioChoice.join(RadioStore.chosen(context)));
                 return;
             default:

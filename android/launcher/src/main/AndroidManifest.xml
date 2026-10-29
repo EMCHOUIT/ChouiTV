@@ -170,6 +170,13 @@
             android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize|screenLayout|uiMode|density" />
 
         <activity
+            android:name=".tilawah.RadioCountriesActivity"
+            android:exported="false"
+            android:screenOrientation="landscape"
+            android:theme="@style/App"
+            android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize|screenLayout|uiMode|density" />
+
+        <activity
             android:name=".tilawah.RadioSettingsActivity"
             android:exported="false"
             android:screenOrientation="landscape"
