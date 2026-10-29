@@ -243,6 +243,7 @@ public class SettingsActivity extends Activity {
         sink = new LinearLayout(this);
         target = list;
         sec(0);
+        if (Migration.unfinished(this)) migrationRow();   // 4.0: the old app is still there, or its screensaver is still the chosen one
         header("الموقع");
         row("المدينة", prefs.city()[0], R.drawable.ic_place, new Runnable() { public void run() { pickCity(); } });
         choiceRow("المنطقة الزمنية", "tz_choice", "", Prefs.TZ_CHOICES);
@@ -1400,6 +1401,62 @@ public class SettingsActivity extends Activity {
             sendOrderedBroadcast(ask, null, answer, null, 0, null, null);
         } catch (RuntimeException e) {
             toast("التطبيق الرئيسي غير مثبّت · " + page);
+        }
+    }
+
+    // ---------- the move to the one-app version (4.0) ----------
+
+    /** At the very top while the person has a step left: the data came over by itself, the two steps below are theirs to do. */
+    private void migrationRow() {
+        boolean old = Migration.installed(this, MigrationCore.OLD_PACKAGE);
+        row("إكمال الانتقال إلى النسخة الجديدة", old ? "انتقلت إعداداتك ومهامك وصورك · بقيت خطوتان: شاشة التوقف، ثم إزالة التطبيق القديم"
+                : "بقيت خطوة واحدة: اختر شاشة التوقف الجديدة", R.drawable.ic_screensaver,
+            new Runnable() { public void run() { migrationGuide(); } });
+    }
+
+    private boolean oldDreamChosen() {
+        return MigrationCore.OLD_PACKAGE.equals(MigrationCore.dreamOwner(Migration.chosenDream(this)));
+    }
+
+    private void migrationGuide() {
+        final boolean old = Migration.installed(this, MigrationCore.OLD_PACKAGE);
+        final List<String> items = new ArrayList<>();
+        items.add("١. اختر شاشة التوقف");
+        if (old) items.add("٢. إزالة التطبيق القديم");
+        new Dlg(this).setTitle("إكمال الانتقال إلى النسخة الجديدة")
+            .setItems(items.toArray(new String[0]), (d, i) -> { if (i == 0) migrationPickDream(); else migrationRemoveOld(); })
+            .setNegativeButton("لاحقاً", null).show();
+    }
+
+    private void migrationPickDream() {
+        new Dlg(this).setTitle("اختر شاشة التوقف")
+            .setMessage("انتقلت إعداداتك ومهامك وصورك إلى هذا التطبيق. ستفتح إعدادات التلفزيون: اختر «تفضيلات الجهاز» ثم «شاشة التوقف»."
+                + " ستجد «شاشة تلفزيونك» مرتين: المحدَّدة الآن هي القديمة، فاختر الأخرى. هي شاشة هذا التطبيق نفسه."
+                + " حتى تختارها تبقى الشاشة القديمة تعمل كما هي.")
+            .setPositiveButton("فتح الإعدادات", (d, i) -> openDreamSettings())
+            .setNegativeButton("إلغاء", null).show();
+    }
+
+    private void migrationRemoveOld() {
+        String msg = "سيُزال التطبيق القديم «شاشة تلفزيونك». لن تضيع إعداداتك ومهامك وصورك: هي محفوظة في هذا التطبيق."
+            + " سيسألك التلفزيون للتأكيد: اختر «موافق».";
+        final Dlg b = new Dlg(this);
+        b.setTitle("إزالة التطبيق القديم");
+        if (oldDreamChosen()) {   // removing it now would leave the TV without its screensaver
+            b.setMessage("شاشة التوقف الحالية ما زالت القديمة. اختر الجديدة أولاً حتى لا تتوقف الشاشة.\n\n" + msg)
+                .setPositiveButton("اختر الشاشة أولاً", (d, i) -> migrationPickDream())
+                .setNeutralButton("إزالة على أي حال", (d, i) -> deleteOldApp());
+        } else {
+            b.setMessage(msg).setPositiveButton("إزالة", (d, i) -> deleteOldApp());
+        }
+        b.setNegativeButton("إلغاء", null).show();
+    }
+
+    private void deleteOldApp() {
+        try {
+            startActivity(new Intent(Intent.ACTION_DELETE, android.net.Uri.parse("package:" + MigrationCore.OLD_PACKAGE)));
+        } catch (RuntimeException e) {
+            toast("تعذّر فتح شاشة الإزالة · أزل «شاشة تلفزيونك» القديم من إعدادات التلفزيون ← التطبيقات");
         }
     }
 

@@ -39,6 +39,11 @@
     <!-- only used if the owner allows it for the app: the idle delay row and SaverReceiver's idle -->
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
 
+    <!-- 4.0 is one app: the old screensaver app (ma.chouitv.screensaver, same signing key) stays installed after the update; Migration reads its
+         settings, tasks and photos once (its READ_CONFIG is a signature permission), and the settings offer to remove it -->
+    <uses-permission android:name="ma.chouitv.screensaver.READ_CONFIG" />
+    <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
+
     <uses-feature android:name="android.software.leanback" android:required="false" />
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
 
@@ -61,6 +66,8 @@
         <intent>
             <action android:name="android.speech.action.RECOGNIZE_SPEECH" />
         </intent>
+        <!-- the old screensaver app of 3.184 and before: is it still there, and who signed it (Migration) -->
+        <package android:name="ma.chouitv.screensaver" />
         <package android:name="com.tcl.tv" />
         <package android:name="com.tcl.suspension" />
         <!-- the stock Google homes (Dock.GOOGLE_HOMES): so getPackageInfo sees a disabled one on Android 11+ -->
