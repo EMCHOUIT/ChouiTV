@@ -12,8 +12,8 @@ import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 /**
- * The home app's own settings for «تصدير الإعدادات / استيراد الإعدادات»: the adhan (on, muezzin, volume, the prayers whose adhan is off) and the
- * favourites row of the dock (what is shown, hidden, the names). The screensaver's settings screen asks for them through BackupProvider (same signing
+ * The home app's own settings for «تصدير الإعدادات / استيراد الإعدادات»: the adhan (on, muezzin, volume, the prayers whose adhan is off), the
+ * favourites row of the dock (what is shown, hidden, the names) and the radios (the countries, the stations unticked, the favourites). The screensaver's settings screen asks for them through BackupProvider (same signing
  * key) and puts them in the one file. Nothing else of this app is exported: not what is playing, not update state, not the person's own recording.
  */
 public final class BackupData {
@@ -29,6 +29,7 @@ public final class BackupData {
         JSONObject o = new JSONObject();
         o.put("adhan", dump(adhanPrefs(c), ADHAN));
         o.put("dock", dump(Dock.prefs(c), DOCK));
+        o.put("radio", ma.chouitv.home.tilawah.RadioBackup.export(c));   // the radios' countries, the stations unticked, the favourites
         return o;
     }
 
@@ -43,9 +44,11 @@ public final class BackupData {
 
     /** Checks the whole file, then writes it: what is not in it goes back to its default. Returns how many settings changed; throws with the reason when it is refused. */
     public static int apply(Context c, JSONObject o) throws JSONException {
-        JSONObject adhan = o.optJSONObject("adhan"), dock = o.optJSONObject("dock");
+        JSONObject adhan = o.optJSONObject("adhan"), dock = o.optJSONObject("dock"), radio = o.optJSONObject("radio");
         if (adhan == null) adhan = new JSONObject();
         if (dock == null) dock = new JSONObject();
+        if (radio == null) radio = new JSONObject();   // a file from before the radios: they go back to their default (Morocco)
+        ma.chouitv.home.tilawah.RadioBackup.check(radio);
         for (Iterator<String> it = adhan.keys(); it.hasNext(); ) {
             String k = it.next();
             Object v = adhan.get(k);
@@ -66,7 +69,7 @@ public final class BackupData {
             String s = (String) v;
             if (k.equals("names") ? s.length() > 6000 : !PACKAGES.matcher(s).matches()) throw new IllegalArgumentException(k + " is not valid");
         }
-        int n = write(adhanPrefs(c), ADHAN, adhan) + write(Dock.prefs(c), DOCK, dock);
+        int n = write(adhanPrefs(c), ADHAN, adhan) + write(Dock.prefs(c), DOCK, dock) + ma.chouitv.home.tilawah.RadioBackup.apply(c, radio);
         ma.chouitv.home.tilawah.AdhanSync.reschedule(c);   // the alarm follows the adhan settings
         c.sendBroadcast(new android.content.Intent(Dock.CHANGED).setPackage(c.getPackageName()));   // a running home screen redraws its favourites row
         return n;

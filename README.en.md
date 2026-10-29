@@ -30,7 +30,7 @@
 <a href="#thanks">💚 Credits</a>
 </p>
 
-<p align="center"><img src="docs/media/stats.png" alt="12 tasbih formulas · 311 Arabic channels · 24 Moroccan radios · 40 reciters · 90 Moroccan cities · 5 tabs" width="100%"></p>
+<p align="center"><img src="docs/media/stats.png" alt="12 tasbih formulas · 311 Arabic channels · 37 Moroccan radios · 40 reciters · 90 Moroccan cities · 5 tabs" width="100%"></p>
 
 <a id="new"></a>
 
@@ -49,6 +49,7 @@
 - 📥 **Import**: the screen shows **what will change** before applying
 - ↩️ **Undo** the last import
 - 🚚 Ideal for moving from one TV to another
+- 📻 Includes the **radios**: the chosen countries, hidden stations and favourites (the lists download again by themselves on the other TV)
 
 </td>
 <td width="50%" valign="top">
@@ -70,7 +71,7 @@
 <img src="docs/media/whatsnew-reciters.png" alt="Reciters">
 
 - 🧱 **Four reciters per row**, with their number of surahs
-- ↔️ **Left/right** switches section: Reciters, Moroccan radios, Live Quran, Adhan
+- ↔️ **Left/right** switches section: Reciters, Radios, Live Quran, Adhan
 
 </td>
 <td valign="top">
@@ -102,7 +103,7 @@ Your TV spends hours waiting. **ChouiTV** turns that waiting into **remembrance,
 </tr>
 <tr>
 <td align="center">🇲🇦<br><b>Moroccan touch</b><br><sub>Weather for your family, Amazigh calendar, occasions, Atlas Lions</sub></td>
-<td align="center">🎧<br><b>Quran and radios</b><br><sub>40 reciters, 24 Moroccan radios, the Quran live</sub></td>
+<td align="center">🎧<br><b>Quran and radios</b><br><sub>40 reciters, 37 Moroccan radios and up to 3 countries of your choice, the Quran live</sub></td>
 <td align="center">📡<br><b>311 Arabic channels</b><br><sub>Moroccan and Arab channels live, sorted into groups</sub></td>
 </tr>
 </table>
@@ -126,7 +127,7 @@ Your TV spends hours waiting. **ChouiTV** turns that waiting into **remembrance,
 <td width="50%"><img src="docs/media/home.png" alt="Home screen"><br>🏠 <sub>Home screen and the «Now playing» card</sub></td>
 </tr>
 <tr>
-<td><img src="docs/media/listen-morocco.png" alt="Moroccan radios"><br>📻 <sub>Moroccan radios as cards, in alphabetical order</sub></td>
+<td><img src="docs/media/listen-morocco.png" alt="Moroccan radios"><br>📻 <sub>Radios: the countries as chips, 4 stations a row</sub></td>
 <td><img src="docs/media/player-oscilloscope.png" alt="Oscilloscope"><br>〰️ <sub>Player and a transparent oscilloscope in the app's colours</sub></td>
 </tr>
 <tr>
@@ -145,7 +146,7 @@ Your TV spends hours waiting. **ChouiTV** turns that waiting into **remembrance,
 
 | | |
 |:-:|---|
-| 🔘 | **Button bar** at the top, and the **«Now playing»** card whenever a Quran recitation or radio plays (OK to pause/play). |
+| 🔘 | **Button bar** at the top, and the **«Now playing»** card whenever a Quran recitation or radio plays (OK: pause/play for a recitation, stop for a radio; a long press: pause, stop and free the memory, or the player). |
 | 👋 | **Greeting in Darija** by the time of day, with the weather, prayer times and the days ahead. |
 | 🗂️ | **Up to three cards** beside the clock, your choice: prayer times, a verse or hadith, the wisdom of the day, dhikr, matches… |
 | ⭐ | **Dock** for your favourite apps, reordered with the arrow keys. |
@@ -220,16 +221,19 @@ It starts by itself when the TV rests, and fills the house with **calm**:
 
 ## 🎧 Listen: Quran, radios and adhan
 
-One screen for everything heard at home: **🎙️ Reciters · 📻 Moroccan radios · 🕋 Live Quran · 🕌 Adhan**.
+One screen for everything heard at home: **🎙️ Reciters · 📻 Radios · 🕋 Live Quran · 🕌 Adhan**.
 
 <table>
 <tr>
 <td width="50%"><img src="docs/media/listen-reciters.png" alt="Reciters"><br>🎙️ <sub><b>Reciters:</b> forty reciters, complete surahs.</sub></td>
-<td width="50%"><img src="docs/media/listen-morocco.png" alt="Moroccan radios"><br>📻 <sub><b>Moroccan radios:</b> 24 radios (Hit Radio, Medina FM, Med Radio, Chada FM…) in alphabetical order.</sub></td>
+<td width="50%"><img src="docs/media/listen-morocco.png" alt="Radios"><br>📻 <sub><b>Radios:</b> 37 Moroccan radios (Hit Radio, Medina FM, Med Radio, Chada FM…) and, if you like, up to <b>3 countries</b>, 4 stations a row. A long press: ★ favourite. A radio <b>stops</b> instead of pausing.</sub></td>
 </tr>
 <tr>
 <td><img src="docs/media/listen-quran.png" alt="Live Quran"><br>🕋 <sub><b>Live Quran:</b> Quran radios with the voices of great reciters.</sub></td>
 <td><img src="docs/media/listen-adhan.png" alt="Adhan"><br>🕌 <sub><b>Adhan:</b> today's times, and the automatic adhan with one of 21 voices.</sub></td>
+</tr>
+<tr>
+<td colspan="2"><img src="docs/media/listen-radio-countries.png" alt="Choosing the radios' countries"><br>🌍 <sub><b>Choosing the countries:</b> three at most (23 offered; Morocco is built into the app), tick boxes, and the «تحديث الإذاعات» button with its progress bar, the state of each country and the date of the last update. The lists (https streams that were tested, adult content left out) are downloaded on request, never in the background.</sub></td>
 </tr>
 </table>
 

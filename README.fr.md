@@ -30,7 +30,7 @@
 <a href="#thanks">💚 Crédits</a>
 </p>
 
-<p align="center"><img src="docs/media/stats.png" alt="12 formules de tasbih · 311 chaînes arabes · 24 radios marocaines · 40 récitants · 90 villes marocaines · 5 onglets" width="100%"></p>
+<p align="center"><img src="docs/media/stats.png" alt="12 formules de tasbih · 311 chaînes arabes · 37 radios marocaines · 40 récitants · 90 villes marocaines · 5 onglets" width="100%"></p>
 
 <a id="new"></a>
 
@@ -49,6 +49,7 @@
 - 📥 **Importer** : l'écran montre **ce qui va changer** avant d'appliquer
 - ↩️ **Annuler** le dernier import
 - 🚚 Idéal pour passer d'une TV à l'autre
+- 📻 Inclut les **radios** : pays choisis, stations masquées et favoris (les listes se retéléchargent seules sur l'autre télé)
 
 </td>
 <td width="50%" valign="top">
@@ -70,7 +71,7 @@
 <img src="docs/media/whatsnew-reciters.png" alt="Récitants">
 
 - 🧱 **Quatre récitants par ligne**, avec le nombre de sourates
-- ↔️ **Gauche/droite** change de section : Récitants, Radios marocaines, Coran en direct, Adhan
+- ↔️ **Gauche/droite** change de section : Récitants, Radios, Coran en direct, Adhan
 
 </td>
 <td valign="top">
@@ -102,7 +103,7 @@ Votre télé passe des heures à attendre. **ChouiTV** transforme cette attente 
 </tr>
 <tr>
 <td align="center">🇲🇦<br><b>Touche marocaine</b><br><sub>Météo des proches, calendrier amazigh, fêtes, Lions de l'Atlas</sub></td>
-<td align="center">🎧<br><b>Coran et radios</b><br><sub>40 récitants, 24 radios marocaines, le Coran en direct</sub></td>
+<td align="center">🎧<br><b>Coran et radios</b><br><sub>40 récitants, 37 radios marocaines et jusqu'à 3 pays au choix, le Coran en direct</sub></td>
 <td align="center">📡<br><b>311 chaînes arabes</b><br><sub>Chaînes marocaines et arabes en direct, classées par groupes</sub></td>
 </tr>
 </table>
@@ -126,7 +127,7 @@ Votre télé passe des heures à attendre. **ChouiTV** transforme cette attente 
 <td width="50%"><img src="docs/media/home.png" alt="Écran d'accueil"><br>🏠 <sub>Accueil et carte « En écoute »</sub></td>
 </tr>
 <tr>
-<td><img src="docs/media/listen-morocco.png" alt="Radios marocaines"><br>📻 <sub>Radios marocaines en cartes, par ordre alphabétique</sub></td>
+<td><img src="docs/media/listen-morocco.png" alt="Radios marocaines"><br>📻 <sub>Radios : les pays en puces, 4 stations par ligne</sub></td>
 <td><img src="docs/media/player-oscilloscope.png" alt="Oscilloscope"><br>〰️ <sub>Lecteur et oscilloscope transparent aux couleurs de l'appli</sub></td>
 </tr>
 <tr>
@@ -145,7 +146,7 @@ Votre télé passe des heures à attendre. **ChouiTV** transforme cette attente 
 
 | | |
 |:-:|---|
-| 🔘 | **Barre de boutons** en haut, et la carte **« En écoute »** dès qu'un Coran ou une radio joue (OK pour pause/lecture). |
+| 🔘 | **Barre de boutons** en haut, et la carte **« En écoute »** dès qu'un Coran ou une radio joue (OK : pause/lecture pour un Coran, arrêt pour une radio ; appui long : pause, arrêt et libération de la mémoire, ou le lecteur). |
 | 👋 | **Salutation en darija** selon l'heure, avec la météo, les horaires de prière et les jours à venir. |
 | 🗂️ | **Jusqu'à trois cartes** à côté de l'horloge, à votre choix : horaires de prière, verset ou hadith, sagesse du jour, dhikr, matchs… |
 | ⭐ | **Dock** de vos applications favorites, réordonnables aux flèches. |
@@ -220,16 +221,19 @@ Il démarre tout seul quand la télé se repose et remplit la maison de **séré
 
 ## 🎧 Écoute : Coran, radios et adhan
 
-Un seul écran pour tout ce qui s'écoute à la maison : **🎙️ Récitants · 📻 Radios marocaines · 🕋 Coran en direct · 🕌 Adhan**.
+Un seul écran pour tout ce qui s'écoute à la maison : **🎙️ Récitants · 📻 Radios · 🕋 Coran en direct · 🕌 Adhan**.
 
 <table>
 <tr>
 <td width="50%"><img src="docs/media/listen-reciters.png" alt="Récitants"><br>🎙️ <sub><b>Récitants :</b> quarante récitants, sourates complètes.</sub></td>
-<td width="50%"><img src="docs/media/listen-morocco.png" alt="Radios marocaines"><br>📻 <sub><b>Radios marocaines :</b> 24 radios (Hit Radio, Medina FM, Med Radio, Chada FM…) par ordre alphabétique.</sub></td>
+<td width="50%"><img src="docs/media/listen-morocco.png" alt="Radios"><br>📻 <sub><b>Radios :</b> 37 radios marocaines (Hit Radio, Medina FM, Med Radio, Chada FM…) et, au choix, jusqu'à <b>3 pays</b>, 4 stations par ligne. Appui long : ★ favori. Une radio <b>s'arrête</b> au lieu de se mettre en pause.</sub></td>
 </tr>
 <tr>
 <td><img src="docs/media/listen-quran.png" alt="Coran en direct"><br>🕋 <sub><b>Coran en direct :</b> radios coraniques des plus grands récitants.</sub></td>
 <td><img src="docs/media/listen-adhan.png" alt="Adhan"><br>🕌 <sub><b>Adhan :</b> horaires du jour et adhan automatique avec l'une des 21 voix.</sub></td>
+</tr>
+<tr>
+<td colspan="2"><img src="docs/media/listen-radio-countries.png" alt="Choisir les pays des radios"><br>🌍 <sub><b>Choisir les pays :</b> trois au maximum (23 pays proposés, le Maroc est intégré à l'appli), cases à cocher, et le bouton « تحديث الإذاعات » avec sa barre de progression, l'état de chaque pays et la date de la dernière mise à jour. Les listes (flux https testés, contenu pour adultes écarté) sont téléchargées à la demande, jamais en arrière-plan.</sub></td>
 </tr>
 </table>
 

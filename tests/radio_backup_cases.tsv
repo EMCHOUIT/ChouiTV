@@ -1,0 +1,10 @@
+# countries, off, fav, answer (OK or the start of the reason)
+ma,fr		https://a.example/x	OK
+ma,fr,sa	fr:1a2b3c4d,fr:ffff0000	https://a.example/x\nhttps://b.example/y	OK
+			OK
+ma,fr,sa,dz			radio countries: 3 at most
+ma,de			radio countries: de is not offered
+ma	fr:1a2b3c4d,bad		radio off: bad is not a station
+ma	FR:1a2b		radio off: FR:1a2b is not a station
+ma		http://plain.example/x	radio fav: not a stream
+ma		https://has space/x	radio fav: not a stream

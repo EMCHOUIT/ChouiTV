@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
 
 /**
  * «تصدير الإعدادات / استيراد الإعدادات» and `saver.sh export | import`: everything the person set, in one JSON file, to move to another TV or to
- * get back after a change. The file holds the screensaver's settings ("settings") and the home app's adhan and dock settings ("home", fetched
+ * get back after a change. The file holds the screensaver's settings ("settings") and the home app's adhan, dock and radio settings ("home", fetched
  * through its BackupProvider). It never holds the person's photos, tasks, update state, TV address or serial. An import is checked whole
  * before anything is written, keeps what was there in settings-before-import.json (`import --undo`), and what the file does not name goes
  * back to its default, so the TV ends up as the file says.
@@ -109,7 +109,7 @@ final class SettingsBackup {
             JSONObject wantHome = file.optJSONObject("home");
             if (wantHome != null && wantHome.length() > 0) {
                 JSONObject nowHome = now.optJSONObject("home");
-                for (String part : new String[] {"adhan", "dock"}) {
+                for (String part : new String[] {"adhan", "dock", "radio"}) {
                     compare(part + ".", nowHome == null || nowHome.optJSONObject(part) == null ? new JSONObject() : nowHome.getJSONObject(part),
                             wantHome.optJSONObject(part) == null ? new JSONObject() : wantHome.getJSONObject(part), out);
                 }
@@ -145,6 +145,7 @@ final class SettingsBackup {
             {"adhan.adhan_on", "الأذان التلقائي"}, {"adhan.adhan_voice", "المؤذن"}, {"adhan.adhan_volume", "صوت الأذان"},
             {"adhan.adhan_p0", "أذان الفجر"}, {"adhan.adhan_p1", "أذان الظهر"}, {"adhan.adhan_p2", "أذان العصر"},
             {"adhan.adhan_p3", "أذان المغرب"}, {"adhan.adhan_p4", "أذان العشاء"},
+            {"radio.countries", "بلدان الإذاعات"}, {"radio.off", "إذاعات مُلغاة"}, {"radio.fav", "مفضلة الإذاعات"},
             {"dock.dock", "ترتيب المفضلة"}, {"dock.hidden", "التطبيقات المخفية"}, {"dock.shown", "التطبيقات المُظهَرة"}, {"dock.names", "أسماء التطبيقات"},
         };
         for (String[] p : l) LABELS.put(p[0], p[1]);
@@ -165,7 +166,7 @@ final class SettingsBackup {
             v.put("json", home.toString());
             int answer;
             try { answer = c.getContentResolver().update(HOME, v, null, null); } catch (RuntimeException e) { answer = -1; }
-            if (answer == 0) throw new IllegalArgumentException("the adhan or dock settings of the file are not valid");
+            if (answer == 0) throw new IllegalArgumentException("the adhan, dock or radio settings of the file are not valid");
             if (answer > 0) n += answer - 1;   // -1: the home app is not there; its half is left out
         }
         JSONObject want = file.getJSONObject("settings"), now = dumpSettings(c);
