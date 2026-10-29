@@ -112,4 +112,4 @@ All three are built identically — small gold label, big value, small sub-line 
 - Agents set everything over ADB through shell-only broadcast receivers (`optimize/saver.sh`, `optimize/dock.sh`).
 - Auto-update: when the screensaver starts, and at most every 6 hours, the app downloads the page from the repo (background thread, one at a time) and uses it if it is newer than the APK.
 - TCL quirk: after a power cut the app may stay frozen until opened once; a boot receiver plus a persisted job (which only starts the process, no network) bring it back on most sets.
-- Built by Gradle in GitHub Actions on every push and published to the `apk-latest` release.
+- Built by Gradle and published by hand as a numbered release `v3.N` (both APKs), with `latest.json` on `main` naming the newest one (see docs/TILAWAH.md, Build and test).

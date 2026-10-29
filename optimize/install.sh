@@ -85,7 +85,7 @@ push_install() {   # $1 apk name, $2 package, $3 release URL (default: the apps'
   if [ -n "${APK_DIR:-}" ] && [ -f "$APK_DIR/$1" ]; then   # APK_DIR=folder: the APKs from there, nothing downloaded
     cp "$APK_DIR/$1" "optimize/$1"
   elif ! curl_get -fsSL -o "optimize/$1" "$base/$1"; then
-    echo "!! Could not download $base/$1 (tag ${APK_TAG:-apk-latest}): no such build, or no internet"; exit 1
+    echo "!! Could not download $base/$1 ($([ -n "${APK_TAG:-}" ] && echo "tag $APK_TAG" || echo "the latest release")): no such build, or no internet"; exit 1
   fi
   "$PY" -I optimize/tv.py --push-b64 "optimize/$1" "/data/local/tmp/$1"
   local out

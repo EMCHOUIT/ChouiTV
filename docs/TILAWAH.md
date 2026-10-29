@@ -202,9 +202,12 @@ gradle -p android :launcher:assembleRelease
 python3 tests/tilawah_test.py
 ```
 
-CI builds the home app with the screensaver, renames it to `chouitv-home.apk`, and publishes it to
-`apk-latest` and the numbered `v3.N` releases. The release key comes from the repository's
-`ANDROID_KEYSTORE` secret; a local build without it uses the debug key.
+Releases are made by hand since 3.175 (the workflow in `.github/workflows/android.yml` only runs on the branches `master` and `next`, and the
+repository is on `main`, so a push builds nothing): build both apps with `GITHUB_RUN_NUMBER=N` (N above the last release), make a release `v3.N` holding
+`chouitv-home.apk` and `chouitv-screensaver.apk` (`gh release create v3.N …`), then put the new version, the two URLs and the two SHA-256 in
+`latest.json` on `main`: that file is what the TVs, `optimize/install.sh` and ChouiTV Installer read. `releases/latest/download/<file>` always gives the
+newest numbered release. The build signs with the key it finds in `ANDROID_KEYSTORE` (a local build without it uses the debug key, which is the key the
+installed apps have: check with `apksigner verify --print-certs` that it is the same one before publishing).
 
 ## Known limits
 

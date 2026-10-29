@@ -1,5 +1,6 @@
 name: Build APKs
 
+# NOTE: releases are made by hand now (docs/TILAWAH.md, Build and test): this workflow only runs on master and next, and the repository is on main.
 on:
   push:
     branches: [master, next]   # next: a test build in apk-next, before anything reaches apk-latest
