@@ -1,16 +1,16 @@
 {
-  "versionCode": 178,
-  "versionName": "3.178",
+  "versionCode": 179,
+  "versionName": "3.179",
   "apks": [
     {
       "package": "ma.chouitv.screensaver",
-      "url": "https://github.com/EMCHOUIT/ChouiTV/releases/download/v3.178/chouitv-screensaver.apk",
-      "sha256": "bdf20b5e8a17223e6533408d7d0e631b18dc0631be6053ce8fafc39e279c4a45"
+      "url": "https://github.com/EMCHOUIT/ChouiTV/releases/download/v3.179/chouitv-screensaver.apk",
+      "sha256": "4b4ebd711973f58655f35e3f44731ce9aa69f87a2dfb6331844301e2a595c80d"
     },
     {
       "package": "ma.chouitv.home",
-      "url": "https://github.com/EMCHOUIT/ChouiTV/releases/download/v3.178/chouitv-home.apk",
-      "sha256": "79ca8a930dbda0671c4ffe80af48c256ca41810442aff9b77e3c81826fc463a7"
+      "url": "https://github.com/EMCHOUIT/ChouiTV/releases/download/v3.179/chouitv-home.apk",
+      "sha256": "747af0859063b3b7fe6bf2ad5eec50260ec0f0b6cb4914c45ecb1191eb2a1198"
     }
   ]
 }
