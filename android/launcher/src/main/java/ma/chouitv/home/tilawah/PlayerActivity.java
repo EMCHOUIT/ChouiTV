@@ -96,7 +96,11 @@ public class PlayerActivity extends Activity {
             return;
         }
 
-        boolean adhan = source == Prefs.SOURCE_ADHAN;
+        if (source == Prefs.SOURCE_ADHAN) {   // the adhan has no player screen: the one that was open lets go and the screen before it comes back; any key stops the adhan
+            finish();
+            return;
+        }
+        boolean adhan = false;
         boolean radio = source == Prefs.SOURCE_RADIO;
         // an adhan is not a track: no skipping and no seeking, only stop/play and the sleep timer
         prev.setVisibility(adhan ? View.GONE : View.VISIBLE);
