@@ -37,7 +37,7 @@ case "$cmd" in
     log "EXPORT-OLD"
     [ "$EXPORT" = ok ] && echo "Broadcast completed: result=0, data=\"{\"city\": \"Rabat\", \"idle\": \"10\"}\"" || echo "Broadcast completed: result=0, data=\"error: unknown action\"" ;;
   *"$NEWPKG/$OLDPKG.SaverReceiver"*GET*)
-    if [ "$RX" = 1 ] && grep -qx "$NEWPKG" "$T/installed"; then echo "Broadcast completed: result=0, data=\"version: 4.0"; echo "city: Rabat\""; else log "GET-NOANSWER"; echo "Error: Broadcast not delivered"; fi ;;
+    if [ "$RX" = 1 ] && grep -qx "$NEWPKG" "$T/installed"; then echo "Broadcast completed: result=0, data=\"version: 4.0"; echo "city: Rabat"; echo "migration: settings 4, tasks 3/3, photos 2/2\""; else log "GET-NOANSWER"; echo "Error: Broadcast not delivered"; fi ;;
   *"$NEWPKG/$OLDPKG.SaverReceiver"*IMPORT*)
     log "IMPORT ${cmd##*SaverReceiver }"
     [ "$IMPORT" = ok ] && echo "Broadcast completed: result=0, data=\"applied: 2 changes\"" || echo "Broadcast completed: result=0, data=\"error: not a ChouiTV settings file\"" ;;

@@ -14,8 +14,9 @@
 #   3. wait for the new settings receiver, then import the settings (action IMPORT, all or nothing)
 #   4. point the TV's screensaver at the new dream (only if it used ours, or none; another screensaver is the person's choice)
 #   5. check the result; only then, after a question (not with --yes), remove ma.chouitv.screensaver
-# What is not carried over: the photos «صوري» and the tasks (they belong to the old app's storage, the export does not hold
-# them); optimize/photos.sh adds the photos again. The TV's own settings (Wi-Fi, accounts, other apps) are not touched.
+# The photos «صوري» and the tasks are not in the export: the 4.0 app brings them over itself on its first start (it reads the old app's
+# storage, which is why the old app must still be installed then). Step 5 waits for that and shows what it did before it asks to remove the old
+# app. The TV's own settings (Wi-Fi, accounts, other apps) are not touched.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 PY="${PY:-optimize/venv/bin/python}"
@@ -129,10 +130,21 @@ if [ "$fail" != 0 ]; then
   exit 1
 fi
 
+# the 4.0 app brings the old one's tasks and photos over by itself on its first start: wait for its report before the old app can go
+echo "Waiting for the 4.0 app to bring the tasks and photos over…"
+moved=""
+for _ in $(seq 1 15); do
+  moved=$(tv "am broadcast -n $RX_NEW -a $OLD.GET" 2> /dev/null | data_of | grep -m1 '^migration:' || true)
+  [ -n "$moved" ] && break
+  sleep 2
+done
+if [ -n "$moved" ]; then echo "   $moved"
+else echo "   (no report yet: open the ChouiTV home screen once on the TV, then run this command again before removing the old app)"; [ "$yes" != 1 ] || exit 1; fi
+
 if [ "$yes" != 1 ]; then
   echo
   echo "Everything works from the 4.0 app. The old screensaver app ($OLD) can go now."
-  echo "Its photos «صوري» and its tasks are in its own storage, and they go with it (the settings are already carried over)."
+  echo "Its settings, tasks and photos «صوري» have been carried over (see the line above); removing it frees its storage."
   read -r -p "Remove $OLD? [y/N] " ans || ans=n
   case "$ans" in y|Y|yes|YES) ;; *) echo "Left installed. Run this command again with --yes (or: tv pm uninstall $OLD) when you are ready."; exit 0 ;; esac
 fi
