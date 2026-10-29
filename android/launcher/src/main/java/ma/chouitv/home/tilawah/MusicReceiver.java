@@ -77,6 +77,33 @@ public class MusicReceiver extends BroadcastReceiver {
             case "ma.chouitv.home.ADHAN_OWN":
                 setResultData(own(context, prefs, intent));
                 return;
+            case "ma.chouitv.home.RADIO_COUNTRIES": {   // optimize/music.sh radio-countries ma,fr: the radios' countries (two at most); no value = show them
+                String csv = intent.getStringExtra("countries");
+                if (csv != null && !csv.trim().isEmpty()) {
+                    java.util.List<String> asked = new java.util.ArrayList<>();
+                    for (String part : csv.split(",")) if (!part.trim().isEmpty()) asked.add(part.trim().toLowerCase(java.util.Locale.ROOT));
+                    if (asked.size() > RadioChoice.MAX) {
+                        setResultData("error: " + RadioChoice.MAX + " countries at most");
+                        return;
+                    }
+                    java.util.List<String> offered = new java.util.ArrayList<>(java.util.Arrays.asList(RadioStore.OFFERED));
+                    offered.add(RadioChoice.HOME);
+                    for (String cc : asked) {
+                        if (!offered.contains(cc)) { setResultData("error: " + cc + " is not offered (" + offered + ")"); return; }
+                    }
+                    RadioStore.setChosen(context, asked);
+                }
+                StringBuilder sb = new StringBuilder("countries=" + RadioChoice.join(RadioStore.chosen(context)));
+                for (String cc : RadioStore.chosen(context)) {
+                    sb.append("\n").append(cc).append(": ").append(RadioChoice.HOME.equals(cc) ? "bundled" : RadioStore.downloaded(context, cc) ? "downloaded" : "not downloaded (radio-update)");
+                }
+                setResultData(sb.toString());
+                return;
+            }
+            case "ma.chouitv.home.RADIO_UPDATE":   // optimize/music.sh radio-update: download the lists of the chosen countries now
+                RadioStore.update(context, null);
+                setResultData("updating the lists of " + RadioChoice.join(RadioStore.chosen(context)));
+                return;
             default:
                 break;
         }

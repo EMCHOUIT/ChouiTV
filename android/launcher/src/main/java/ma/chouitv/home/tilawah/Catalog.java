@@ -25,11 +25,19 @@ final class Catalog {
     static final class Station {
         final String name, url, group;
         final boolean live;
-        Station(String name, String url, boolean live, String group) { this.name = name; this.url = url; this.live = live; this.group = group; }
+        /** Only for the radios of the catalogue the person downloaded: its id, section (news, music…), format and place. */
+        final String id, section, kind, place;
+        Station(String name, String url, boolean live, String group) { this(name, url, live, group, "", "", "", ""); }
+        Station(String name, String url, boolean live, String group, String id, String section, String kind, String place) {
+            this.name = name; this.url = url; this.live = live; this.group = group;
+            this.id = id; this.section = section; this.kind = kind; this.place = place;
+        }
     }
 
     final List<Reciter> reciters = new ArrayList<>();
+    /** The bundled stations first (their index never moves), then the chosen countries' radios. */
     final List<Station> stations = new ArrayList<>();
+    private int bundled;
     final String[] surahNames = new String[115];
 
     private static Catalog cached;
@@ -53,6 +61,8 @@ final class Catalog {
                 JSONObject s = stations.getJSONObject(i);
                 catalog.stations.add(new Station(s.getString("name"), s.getString("url"), s.optBoolean("live", true), s.optString("group", "quran")));
             }
+            catalog.bundled = catalog.stations.size();
+            RadioStore.appendTo(catalog, c);
             JSONArray surahs = new JSONObject(read(c, "quran/surahs.json")).getJSONArray("surahs");
             for (int i = 0; i < surahs.length(); i++) {
                 JSONObject s = surahs.getJSONObject(i);
@@ -74,6 +84,14 @@ final class Catalog {
             return new String(out.toByteArray(), StandardCharsets.UTF_8);
         }
     }
+
+    /** After the person changed the countries or the lists were updated: the downloaded radios are read again, the bundled ones stay as they are. */
+    synchronized void reloadRadios(Context c) {
+        stations.subList(bundled, stations.size()).clear();
+        RadioStore.appendTo(this, c.getApplicationContext());
+    }
+
+    int bundledCount() { return bundled; }
 
     String surahName(int n) {
         return n >= 1 && n <= 114 && surahNames[n] != null ? surahNames[n] : String.valueOf(n);

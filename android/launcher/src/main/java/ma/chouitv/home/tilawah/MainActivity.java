@@ -48,6 +48,7 @@ public class MainActivity extends Activity {
     private RowsAdapter adapter;
     private View lastSelected;
     private boolean focusedOnce;
+    private RadioPane radioPane;   // the «الإذاعات» tab: countries beside stations, its own two lists
 
     @Override protected void onCreate(Bundle state) {
         super.onCreate(state);
@@ -63,6 +64,16 @@ public class MainActivity extends Activity {
         listView = findViewById(R.id.list);
         gridView = findViewById(R.id.grid);
         list = listView;
+        radioPane = new RadioPane(this, new RadioPane.Host() {
+            @Override public void openPlayer() { MainActivity.this.openPlayer(); }
+            @Override public void openSettings() { startActivity(new Intent(MainActivity.this, RadioSettingsActivity.class)); }
+            @Override public void focusTabs() { tabViews[tab].requestFocus(); }
+        });
+        radioPane.setVisibility(View.GONE);
+        ViewGroup column = (ViewGroup) gridView.getParent();
+        android.widget.LinearLayout.LayoutParams paneParams = new android.widget.LinearLayout.LayoutParams(-1, 0, 1f);
+        paneParams.topMargin = (int) (16 * getResources().getDisplayMetrics().density);
+        column.addView(radioPane, column.indexOfChild(gridView) + 1, paneParams);
         adapter = new RowsAdapter();
         listView.setAdapter(adapter);
         gridView.setAdapter(adapter);
@@ -130,7 +141,7 @@ public class MainActivity extends Activity {
             tabViews[i].setTextSize(19);
             tabViews[i].setOnClickListener(v -> {
                 selectTab(which);
-                focusList(firstSelectable());
+                if (radioTab()) radioPane.focusFirst(); else focusList(firstSelectable());
             });
         }
         selectTab(TAB_RECITERS);
@@ -147,8 +158,16 @@ public class MainActivity extends Activity {
         AdhanScheduler.schedule(this);
     }
 
+    private boolean radioTab() { return tab == TAB_MA; }
+
     @Override protected void onResume() {
         super.onResume();
+        if (radioTab()) {   // back from the player or the settings: the lists are read again, the focus stays where it was
+            boolean had = radioPane.hasListFocus();
+            radioPane.refresh();
+            if (!had) radioPane.focusFirst();
+            return;
+        }
         adapter.rebuild();
         int target;
         if (!focusedOnce) {
@@ -167,7 +186,7 @@ public class MainActivity extends Activity {
 
     @Override public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        if (hasFocus && list != null) {
+        if (hasFocus && list != null && !radioTab()) {
             focusList(Math.max(0, list.getSelectedItemPosition()));
         }
     }
@@ -176,11 +195,18 @@ public class MainActivity extends Activity {
     private void selectTab(int which) {
         tab = Math.max(TAB_RECITERS, Math.min(TAB_ADHAN, which));
         boolean cards = isCards();
+        boolean radio = radioTab();
         list = cards ? gridView : listView;
-        listView.setVisibility(cards ? View.GONE : View.VISIBLE);
-        gridView.setVisibility(cards ? View.VISIBLE : View.GONE);
+        listView.setVisibility(cards || radio ? View.GONE : View.VISIBLE);
+        gridView.setVisibility(cards && !radio ? View.VISIBLE : View.GONE);
+        if (radioPane != null) radioPane.setVisibility(radio ? View.VISIBLE : View.GONE);
+        ((TextView) findViewById(R.id.hint)).setText(radio ? R.string.hint_radio : R.string.hint_main);
         lastSelected = null;
         for (int i = 0; i < tabViews.length; i++) tabViews[i].setSelected(i == tab);
+        if (radio) {
+            if (radioPane != null) { radioPane.refresh(); radioPane.selectPlayingCountry(); }
+            return;
+        }
         if (adapter != null) adapter.rebuild();
         if (list != null) select(firstSelectable());
     }
@@ -229,6 +255,12 @@ public class MainActivity extends Activity {
 
     @Override public boolean dispatchKeyEvent(KeyEvent event) {
         if (AdhanStop.onKey(this, event)) return true;   // any key ends a ringing adhan
+        if (event.getAction() == KeyEvent.ACTION_DOWN && event.getRepeatCount() == 0
+                && event.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP
+                && radioTab() && radioPane.hasListFocus() && radioPane.atTop()) {
+            tabViews[tab].requestFocus();
+            return true;
+        }
         // the list swallows «up» even on its first row, so the jump back to the tabs happens here
         if (event.getAction() == KeyEvent.ACTION_DOWN && event.getRepeatCount() == 0
                 && event.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP
@@ -240,7 +272,20 @@ public class MainActivity extends Activity {
         return super.dispatchKeyEvent(event);
     }
 
+    @Override public void onBackPressed() {
+        if (radioTab() && radioPane.stationsFocused()) {   // stations → countries → out
+            radioPane.focusCountries();
+            return;
+        }
+        super.onBackPressed();
+    }
+
     @Override public boolean onKeyDown(int keyCode, KeyEvent event) {
+        // in the radios the two lists own ◀ ▶ (the tab bar is reached with ▲); at the edge nothing moves
+        if (radioTab() && radioPane.hasListFocus()
+                && (keyCode == KeyEvent.KEYCODE_DPAD_LEFT || keyCode == KeyEvent.KEYCODE_DPAD_RIGHT)) {
+            return super.onKeyDown(keyCode, event);
+        }
         // on «صوت الأذان» left/right are the volume: left louder, right quieter (the bar fills from the right, like the page)
         if ((keyCode == KeyEvent.KEYCODE_DPAD_LEFT || keyCode == KeyEvent.KEYCODE_DPAD_RIGHT) && list.hasFocus()
                 && tab == TAB_ADHAN && selectedKind() == KIND_VOLUME) {
@@ -267,7 +312,7 @@ public class MainActivity extends Activity {
         if (tabs.hasFocus()) {
             if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN || keyCode == KeyEvent.KEYCODE_DPAD_CENTER
                     || keyCode == KeyEvent.KEYCODE_ENTER || keyCode == KeyEvent.KEYCODE_NUMPAD_ENTER) {
-                focusList(firstSelectable());
+                if (radioTab()) radioPane.focusFirst(); else focusList(firstSelectable());
                 return true;
             }
             if (keyCode == KeyEvent.KEYCODE_DPAD_UP) return true;
@@ -399,8 +444,10 @@ public class MainActivity extends Activity {
                     rows.add(new Row(false, KIND_RECITER, reciter.name,
                             getString(R.string.surah_count, Ui.arabic(reciter.surahs)), i));
                 }
-            } else if (tab == TAB_MA || tab == TAB_QURAN) {
-                String group = tab == TAB_MA ? "ma" : "quran";
+            } else if (tab == TAB_MA) {
+                // the radios have their own two lists (RadioPane)
+            } else if (tab == TAB_QURAN) {
+                String group = "quran";
                 if (prefs.source() == Prefs.SOURCE_RADIO && prefs.station() < cat.stations.size()
                         && group.equals(cat.stations.get(prefs.station()).group)) {
                     rows.add(new Row(false, KIND_RESUME, cat.stations.get(prefs.station()).name,

@@ -1,0 +1,12 @@
+# parse CSV -> kept ; toggle CSV CC -> after. expected output is the last column (a comment is ignored by the runner: it is not read)
+parse	ma,fr	ma,fr
+parse	ma, fr ,de	ma,fr
+parse	fr,fr	fr
+parse		ma
+parse	xyz,	ma
+parse	MA,FR	ma,fr
+toggle	ma	fr	ma,fr
+toggle	ma,fr	de	REFUSED
+toggle	ma,fr	fr	ma
+toggle	ma	ma	REFUSED
+toggle	fr,sa	sa	fr

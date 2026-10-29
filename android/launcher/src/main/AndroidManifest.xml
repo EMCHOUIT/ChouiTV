@@ -170,6 +170,13 @@
             android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize|screenLayout|uiMode|density" />
 
         <activity
+            android:name=".tilawah.RadioSettingsActivity"
+            android:exported="false"
+            android:screenOrientation="landscape"
+            android:theme="@style/App"
+            android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize|screenLayout|uiMode|density" />
+
+        <activity
             android:name=".tilawah.PlayerActivity"
             android:exported="false"
             android:launchMode="singleTop"
@@ -220,6 +227,8 @@
                 <action android:name="ma.chouitv.home.ADHAN_OFF" />
                 <action android:name="ma.chouitv.home.VOICE" />
                 <action android:name="ma.chouitv.home.ADHAN_OWN" />
+                <action android:name="ma.chouitv.home.RADIO_COUNTRIES" />
+                <action android:name="ma.chouitv.home.RADIO_UPDATE" />
             </intent-filter>
         </receiver>
 
