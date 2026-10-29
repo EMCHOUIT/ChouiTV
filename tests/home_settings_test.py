@@ -32,4 +32,7 @@ check("hidden/shown and the given names follow too", dock.count("current(c, ") >
 check("the «شاشة التوقف» pill is always shown (no check of another package)", "row.add(saver);" in main and "isInstalled(SAVER_PKG)" not in main)
 check("its long press opens the settings of this app", "openSaverSettings()" in main and "Dock.SETTINGS_ACTIVITY" in main)
 check("no leftover reference to the old package in the home screen code", "SAVER_PKG" not in main)
+settings_block = manifest.split('ma.chouitv.screensaver.SettingsActivity"')[1].split(">")[0]
+check("the settings live in their own task (the home task has clearTaskOnLaunch: a launcher intent would reset it and drop the settings at once)",
+      'android:taskAffinity="ma.chouitv.home.settings"' in settings_block)
 sys.exit(1 if failed else 0)

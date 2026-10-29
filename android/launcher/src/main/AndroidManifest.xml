@@ -302,11 +302,13 @@
 
         <!-- ===== the screensaver and its settings (they were a separate app until 4.0) ===== -->
 
-        <!-- opening the app shows its settings -->
+        <!-- opening the app shows its settings. Its own task on purpose: the home screen is the root of this app's main task with clearTaskOnLaunch, and a launcher
+             intent (the tile in the apps grid, the app list of Android) would reset that task and throw the settings away the moment they open -->
         <activity
             android:name="ma.chouitv.screensaver.SettingsActivity"
             android:exported="true"
             android:label="@string/saver_name"
+            android:taskAffinity="ma.chouitv.home.settings"
             android:theme="@android:style/Theme.Material.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -320,6 +322,7 @@
             android:name="ma.chouitv.screensaver.MainActivity"
             android:exported="true"
             android:label="@string/saver_name"
+            android:taskAffinity="ma.chouitv.home.settings"
             android:screenOrientation="landscape"
             android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" />
 
