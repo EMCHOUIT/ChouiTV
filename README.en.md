@@ -34,59 +34,60 @@
 
 <a id="new"></a>
 
-## 🆕 What's new in 3.175
+## 🆕 What's new in 4.0 · one app
 
-> This release gathers **everything added since 3.173**.
+> **ChouiTV is now one app.** The home screen, the screensaver, its settings and the listening screens are in a single package (`ma.chouitv.home`), where there used to be two. Your settings come with you, and two steps are left for you to do by hand.
 
 <table>
 <tr>
 <td width="50%" valign="top">
 
-### 📻 Radios from several countries
-<img src="docs/media/whatsnew-radios.png" alt="Radios">
+### 📦 One app instead of two
+<img src="docs/media/whatsnew-one-app.png" alt="From two apps to one: from 6.7 to 3.5 MB">
 
-- 🌍 **Up to 3 countries**, shown as chips, **4 stations a row**
-- 🇲🇦 **37 Moroccan radios** built in (13 new)
-- 🛰️ France, Algeria, Saudi Arabia and 20 other countries, downloaded on request
-- ⭐ **Favourites** with a long press on OK
+- 🏠 Home, listening, screensaver and settings in **one app**: `ma.chouitv.home`
+- 🪶 One file of about **3.5 MB** instead of **6.7 MB** for the pair
+- 🔄 One install, one update, one version number: no more TV left half-updated
 
 </td>
 <td width="50%" valign="top">
 
-### ✅ Choose your countries, update
-<img src="docs/media/whatsnew-radio-countries.png" alt="Choose the countries">
+### 🧳 Your settings come with you
+<img src="docs/media/whatsnew-settings-move.png" alt="Settings, tasks and photos move to the new app, then two last steps">
 
-- 🔲 A grid of **four** with tick boxes
-- 🔄 **«تحديث الإذاعات»** button with a **progress bar**
-- 🧭 The state of **each country** while it loads
-- 🗓️ The **date of the last update** under it
+- 📥 On first start, 4.0 takes the old screensaver's **settings, tasks and photos**
+- 👆 A row at the top of the settings then walks you through **two steps**: pick the screensaver «شاشة تلفزيونك» that is **not ticked** in Android's list, then remove the old app
+- 📱 From your phone, **ChouiTV Installer 1.6** does all of it for you
 
 </td>
 </tr>
 <tr>
 <td valign="top">
 
-### ⏹️ A radio stops
-<img src="docs/media/whatsnew-radio-stop.png" alt="Stop">
+### 🪶 Lighter on memory
+<img src="docs/media/whatsnew-lighter.png" alt="Graphics memory steady at about 55 MB instead of swinging between 55 and 155 MB">
 
-- 🛑 OK **stops** the radio and frees the memory (no pause)
-- ⏸️ A recitation keeps its **pause** and gains a **stop**
-- 🎛️ Long press on the **«Now playing»** card: pause, stop, the player
-- 🧹 The **«المهام»** button is no longer on the home screen
+- 📉 While the screensaver runs, graphics memory stays **steady at about 55 MB** instead of swinging between **55 and 155 MB**
+- ➖ **About 50 MB less** in total
+- 💤 The home card is **released** when another app is in front
 
 </td>
 <td valign="top">
 
-### 💾 Settings include the radios
-<img src="docs/media/whatsnew-radio-backup.png" alt="Backup">
+### 🔐 Signed updates
+<img src="docs/media/whatsnew-signed.png" alt="The owner signs the version file and the TV checks it; a badly signed file changes nothing">
 
-- 📤 Countries, stations left out and favourites in the file
-- 📥 The lists **download again by themselves** on the other TV
-- 📱 Works with **ChouiTV Installer** too
+- ✍️ The owner signs the version file (`latest.json`), and the TV accepts only a valid signature
+- 🛡️ Someone who breaks into GitHub cannot **send your TV to another file**
+- 🚫 A file with no signature, or a wrong one, means **no update**, nothing more
 
 </td>
 </tr>
 </table>
+
+> ↩️ **No way back to 3.x without ADB.** If 4.0 gives you trouble, the safety net is a 4.0.x fix. Details in the [FAQ](#faq).
+
+**📻 In 3.175:** radios from several countries (up to 3) · 37 Moroccan radios · a radio stops instead of pausing · favourites · settings include the radios.
 
 **🧾 Also since 3.173:** settings backup · adhan per prayer · reciters in a grid · signature with build date.
 
@@ -282,6 +283,8 @@ The **Channels** app sits beside ChouiTV in the dock and shows **live** Moroccan
 
 🧭 Always open on **«Basics»** · ↔️ **Left/right** switches tab from any row · ↕️ **Up/down** moves between rows · 🆗 **OK** opens the choice · ▶️ a permanent **«Preview»** button.
 
+🧳 On a TV that came from 3.x, a row **«إكمال الانتقال إلى النسخة الجديدة»** shows at the top until the two steps are done.
+
 <table>
 <tr>
 <td width="50%"><img src="docs/media/settings-1-basics.png" alt="Basics"><br>📍 <sub><b>Basics:</b> the city (90 Moroccan cities by region, search, or «my location»), digits, screensaver start.</sub></td>
@@ -305,7 +308,7 @@ The **Channels** app sits beside ChouiTV in the dock and shows **live** Moroccan
 <p align="center"><img src="docs/media/guide-choose-en.png" alt="Three ways to install ChouiTV: from your phone, with an AI, by hand with ADB" width="100%"></p>
 
 > [!NOTE]
-> 📺 **Works on Android TV and Google TV sets** (tested on a Xiaomi TV running Android 11). Both apps come from the [ChouiTV releases](https://github.com/EMCHOUIT/ChouiTV/releases/latest), and updates arrive with a press of **OK**.
+> 📺 **Works on Android TV and Google TV sets** (tested on a Xiaomi TV running Android 11). The app comes from the [ChouiTV releases](https://github.com/EMCHOUIT/ChouiTV/releases/latest), and updates arrive with a press of **OK**, from a version file signed by the owner.
 
 There are **three ways** to install ChouiTV. The simplest goes through your phone, and it has its own repository: [**ChouiTV Installer**](https://github.com/EMCHOUIT/ChouiTV-Installer).
 
@@ -321,13 +324,15 @@ There are **three ways** to install ChouiTV. The simplest goes through your phon
 
 Go to the **[ChouiTV Installer](https://github.com/EMCHOUIT/ChouiTV-Installer)** repository and download the app on an Android phone. It:
 
-- finds your TV on the Wi-Fi, always downloads the **latest version** of ChouiTV, installs and sets it up in about two minutes;
+- finds your TV on the Wi-Fi, always downloads the **latest version** of ChouiTV (one app), installs and sets it up in about two minutes;
 - **guides you step by step** (or lets you choose yourself) and speaks **Arabic, French and English**, with a progress bar and a safety net if the home screen does not open;
 - offers an optional **TV cleanup** with one box per app: you see the list first, you choose, and you can put everything back;
 - **copies one TV's settings to another**, now or later;
+- on a TV that is still on 3.x, **does the move itself**: it keeps the old screensaver's settings, installs 4.0, hands the settings over, picks the new screensaver, then offers to remove the old app, never without your yes;
+- accepts only a version file signed by the owner;
 - asks for no account and shows no ads.
 
-<p align="center"><a href="https://github.com/EMCHOUIT/ChouiTV-Installer/releases/download/v1.3/ChouiTV-Installer-1.3.apk"><img src="https://img.shields.io/badge/%E2%AC%87%20ChouiTV%20Installer-D6AF6B?style=for-the-badge&labelColor=0A1D14" alt="ChouiTV Installer"></a></p>
+<p align="center"><a href="https://github.com/EMCHOUIT/ChouiTV-Installer/releases/latest/download/ChouiTV-Installer.apk"><img src="https://img.shields.io/badge/%E2%AC%87%20ChouiTV%20Installer-D6AF6B?style=for-the-badge&labelColor=0A1D14" alt="ChouiTV Installer"></a></p>
 
 [Details, screenshots and FAQ](https://github.com/EMCHOUIT/ChouiTV-Installer)
 
@@ -408,7 +413,7 @@ optimize/migrate-to-v4.sh                # a 3.x TV: this TV's own settings
 optimize/migrate-to-v4.sh settings.json   # or from another TV's export file
 ```
 
-The photos «صوري» and the tasks live in the old app's storage and are not carried over (`optimize/photos.sh` adds the photos again). A TV still on the very old names (`sa.urtv.*`) uses `optimize/migrate-to-chouitv.sh`, which goes straight to 4.0.
+The **tasks and the photos** (10 photos at most) are brought over by 4.0 itself on its first start, as long as the old app is installed. **So open the home screen once** before you answer `y` to the removal question, otherwise they leave with the old app (`optimize/photos.sh` adds the photos again). A TV still on the very old names (`sa.urtv.*`) uses `optimize/migrate-to-chouitv.sh`, which goes straight to 4.0.
 
 </details>
 
@@ -439,8 +444,10 @@ git clone --depth 1 https://github.com/EMCHOUIT/ChouiTV
 cd ChouiTV
 optimize/setup.sh          # prepares Python and the tools
 optimize/find-tv.sh        # finds the TV on the network
-optimize/install.sh all    # downloads the latest release, installs and sets up the app (launcher and screensaver)
+optimize/install.sh all    # downloads the latest release, installs and sets up the app (launcher and screensaver) and Channels
 ```
+
+On a TV that is still on 3.x, use `optimize/migrate-to-v4.sh` instead of `all` (step 3 above): `all` would leave the old screensaver app beside the new one.
 
 Note: **cleaning the TV** (removing tracking, ads and trial apps) is an important step for better performance: it frees 85 to 215 MB of memory. The assistant asks before starting: if you agree it cleans, if you decline it installs only what our apps need (`SKIP_CLEANUP=1`), and you can ask for the cleanup later. From your phone, [ChouiTV Installer](https://github.com/EMCHOUIT/ChouiTV-Installer) offers the same cleanup as an option: it shows the plan first, turns off only what you choose and lets you undo everything.
 
@@ -465,6 +472,21 @@ adb install -r channels/out/channels-release.apk
 <a id="faq"></a>
 
 ## ❓ FAQ
+
+<details><summary>⬆️ <b>My TV is on 3.x. How do I get to 4.0?</b></summary>
+
+The update arrives as usual, with a press of **OK**. On first start 4.0 takes the old screensaver's **settings, tasks and photos** (up to 10 photos), then a row at the top of the settings, «إكمال الانتقال إلى النسخة الجديدة», walks you through the last two steps: pick the new screensaver, then remove the old app. The old screensaver keeps working until you pick the new one. From your phone, **ChouiTV Installer 1.6** does it all; for the experienced, there is [the script](#install-adb).
+</details>
+
+<details><summary>🔀 <b>«شاشة تلفزيونك» shows twice in Android's list?</b></summary>
+
+That is normal during the move: one is the old app (ticked), the other is the new one. Pick the one that is **not** ticked (TV settings → Device Preferences → Screen saver), then remove the old app. If you try to remove it first, the app warns you, so the TV is never left without a screensaver.
+</details>
+
+<details><summary>⏪ <b>Can I go back to 3.x?</b></summary>
+
+No: there is no way back to 3.x without ADB. If 4.0 gives you trouble, the safety net is a fix released as 4.0.x. Putting the TV back to how it was before ChouiTV is the last question.
+</details>
 
 <details><summary>🙈 <b>Why is a card not showing?</b></summary>
 

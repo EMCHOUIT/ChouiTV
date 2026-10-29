@@ -34,59 +34,60 @@
 
 <a id="new"></a>
 
-## 🆕 Nouveautés de la 3.175
+## 🆕 Nouveautés de la 4.0 · une seule appli
 
-> Cette version réunit **tout ce qui a été ajouté depuis la 3.173**.
+> **ChouiTV devient une seule appli.** L'accueil, l'écran de veille, ses réglages et l'écoute tiennent dans un seul paquet (`ma.chouitv.home`), là où il y en avait deux. Vos réglages vous suivent, et il reste deux étapes à faire à la main.
 
 <table>
 <tr>
 <td width="50%" valign="top">
 
-### 📻 Des radios de plusieurs pays
-<img src="docs/media/whatsnew-radios.png" alt="Radios">
+### 📦 Une appli au lieu de deux
+<img src="docs/media/whatsnew-one-app.png" alt="De deux applis à une seule : de 6,7 à 3,5 Mo">
 
-- 🌍 **Jusqu'à 3 pays**, les pays en puces et **4 stations par ligne**
-- 🇲🇦 **37 radios marocaines** intégrées (13 nouvelles)
-- 🛰️ France, Algérie, Arabie saoudite et 20 autres pays, téléchargés à la demande
-- ⭐ **Favoris** par un appui long sur OK
+- 🏠 L'accueil, l'écoute, l'écran de veille et les réglages dans **une seule appli** : `ma.chouitv.home`
+- 🪶 Un seul fichier d'environ **3,5 Mo** au lieu de **6,7 Mo** pour les deux
+- 🔄 Une installation, une mise à jour, un numéro de version : plus de télé à moitié mise à jour
 
 </td>
 <td width="50%" valign="top">
 
-### ✅ Choisir ses pays, mettre à jour
-<img src="docs/media/whatsnew-radio-countries.png" alt="Choisir les pays">
+### 🧳 Vos réglages vous suivent
+<img src="docs/media/whatsnew-settings-move.png" alt="Réglages, tâches et photos passent dans la nouvelle appli, puis deux dernières étapes">
 
-- 🔲 Une grille de **quatre** avec cases à cocher
-- 🔄 Bouton **« تحديث الإذاعات »** avec **barre de progression**
-- 🧭 L'état de **chaque pays** pendant le chargement
-- 🗓️ La **date de la dernière mise à jour** dessous
+- 📥 Au premier démarrage, la 4.0 reprend de l'ancien écran de veille les **réglages, les tâches et les photos**
+- 👆 Une ligne en haut des réglages vous guide ensuite pour **deux étapes** : choisir l'écran de veille « شاشة تلفزيونك » **qui n'est pas coché** dans la liste d'Android, puis retirer l'ancienne appli
+- 📱 Depuis le téléphone, **ChouiTV Installer 1.6** fait tout cela pour vous
 
 </td>
 </tr>
 <tr>
 <td valign="top">
 
-### ⏹️ Une radio s'arrête
-<img src="docs/media/whatsnew-radio-stop.png" alt="Arrêt">
+### 🪶 Plus léger pour la mémoire
+<img src="docs/media/whatsnew-lighter.png" alt="Mémoire graphique stable autour de 55 Mo au lieu de varier entre 55 et 155 Mo">
 
-- 🛑 OK **arrête** la radio et libère la mémoire (pas de pause)
-- ⏸️ Un Coran garde sa **pause** et gagne un **arrêt**
-- 🎛️ Appui long sur la carte **« En écoute »** : pause, arrêt, lecteur
-- 🧹 Le bouton **« المهام »** n'est plus sur l'accueil
+- 📉 Pendant l'écran de veille, la mémoire graphique reste **stable, autour de 55 Mo**, au lieu de varier entre **55 et 155 Mo**
+- ➖ **Environ 50 Mo de moins** au total
+- 💤 La carte de l'accueil est **libérée** quand une autre appli est au premier plan
 
 </td>
 <td valign="top">
 
-### 💾 Les réglages incluent les radios
-<img src="docs/media/whatsnew-radio-backup.png" alt="Sauvegarde">
+### 🔐 Mises à jour signées
+<img src="docs/media/whatsnew-signed.png" alt="Le propriétaire signe le fichier de version, la télé le vérifie ; un fichier mal signé ne change rien">
 
-- 📤 Pays, stations écartées et favoris dans le fichier
-- 📥 Les listes se **retéléchargent seules** sur l'autre télé
-- 📱 Fonctionne aussi avec **ChouiTV Installer**
+- ✍️ Le propriétaire signe le fichier de version (`latest.json`) et la télé n'accepte qu'une signature valide
+- 🛡️ Qui s'introduit dans GitHub ne peut pas **envoyer votre télé vers un autre fichier**
+- 🚫 Un fichier sans signature, ou mal signé, veut dire **pas de mise à jour**, rien de plus
 
 </td>
 </tr>
 </table>
+
+> ↩️ **Pas de retour à la 3.x sans ADB.** Si la 4.0 vous pose problème, le filet de sécurité est un correctif 4.0.x. Détails dans la [FAQ](#faq).
+
+**📻 Dans la 3.175 :** radios de plusieurs pays (jusqu'à 3) · 37 radios marocaines · une radio s'arrête au lieu de se mettre en pause · favoris · les réglages incluent les radios.
 
 **🧾 Et aussi depuis la 3.173 :** sauvegarde des réglages · adhan par prière · récitants en grille · signature avec date de build.
 
@@ -282,6 +283,8 @@ L'application **Channels** accompagne ChouiTV dans le dock et diffuse **en direc
 
 🧭 S'ouvrent toujours sur **« Essentiel »** · ↔️ **Gauche/droite** change d'onglet depuis n'importe quelle ligne · ↕️ **Haut/bas** change de ligne · 🆗 **OK** ouvre le choix · ▶️ un bouton **« Aperçu »** toujours présent.
 
+🧳 Sur une télé venue de la 3.x, une ligne **« إكمال الانتقال إلى النسخة الجديدة »** s'affiche en haut tant que les deux étapes ne sont pas finies.
+
 <table>
 <tr>
 <td width="50%"><img src="docs/media/settings-1-basics.png" alt="Essentiel"><br>📍 <sub><b>Essentiel :</b> la ville (90 villes marocaines par région, recherche ou « ma position »), les chiffres, le démarrage de l'écran de veille.</sub></td>
@@ -305,7 +308,7 @@ L'application **Channels** accompagne ChouiTV dans le dock et diffuse **en direc
 <p align="center"><img src="docs/media/guide-choose-fr.png" alt="Trois façons d'installer ChouiTV : depuis votre téléphone, avec une IA, à la main avec ADB" width="100%"></p>
 
 > [!NOTE]
-> 📺 **Fonctionne sur les télés Android TV et Google TV** (testé sur une télé Xiaomi sous Android 11). L'appli vient des [versions de ChouiTV](https://github.com/EMCHOUIT/ChouiTV/releases/latest) et les mises à jour arrivent d'une pression sur **OK**.
+> 📺 **Fonctionne sur les télés Android TV et Google TV** (testé sur une télé Xiaomi sous Android 11). L'appli vient des [versions de ChouiTV](https://github.com/EMCHOUIT/ChouiTV/releases/latest) et les mises à jour arrivent d'une pression sur **OK**, depuis un fichier de version signé par le propriétaire.
 
 Il y a **trois façons** d'installer ChouiTV. La plus simple passe par votre téléphone, et elle a son propre dépôt : [**ChouiTV Installer**](https://github.com/EMCHOUIT/ChouiTV-Installer).
 
@@ -321,13 +324,15 @@ Il y a **trois façons** d'installer ChouiTV. La plus simple passe par votre té
 
 Rendez-vous sur le dépôt **[ChouiTV Installer](https://github.com/EMCHOUIT/ChouiTV-Installer)** et téléchargez l'appli sur un téléphone Android. Elle :
 
-- trouve votre télé sur le Wi-Fi, télécharge toujours la **dernière version** de ChouiTV, l'installe et la règle en environ deux minutes ;
+- trouve votre télé sur le Wi-Fi, télécharge toujours la **dernière version** de ChouiTV (une seule appli), l'installe et la règle en environ deux minutes ;
 - **vous guide pas à pas** (ou vous laisse choisir vous-même) et parle **arabe, français et anglais**, avec une barre de progression et un filet de sécurité si l'accueil ne s'ouvre pas ;
 - propose, en option, un **nettoyage de la télé** avec une case par appli : vous voyez la liste avant, vous choisissez, et vous pouvez tout remettre ;
 - **copie les réglages d'une télé sur une autre**, maintenant ou plus tard ;
+- sur une télé encore en 3.x, **fait la migration elle-même** : elle garde les réglages de l'ancien écran de veille, installe la 4.0, les lui transmet, choisit le nouvel écran de veille, puis propose de retirer l'ancienne appli, jamais sans votre accord ;
+- n'accepte qu'un fichier de version signé par le propriétaire ;
 - ne demande ni compte, ni publicité.
 
-<p align="center"><a href="https://github.com/EMCHOUIT/ChouiTV-Installer/releases/download/v1.3/ChouiTV-Installer-1.3.apk"><img src="https://img.shields.io/badge/%E2%AC%87%20ChouiTV%20Installer-D6AF6B?style=for-the-badge&labelColor=0A1D14" alt="ChouiTV Installer"></a></p>
+<p align="center"><a href="https://github.com/EMCHOUIT/ChouiTV-Installer/releases/latest/download/ChouiTV-Installer.apk"><img src="https://img.shields.io/badge/%E2%AC%87%20ChouiTV%20Installer-D6AF6B?style=for-the-badge&labelColor=0A1D14" alt="ChouiTV Installer"></a></p>
 
 [Détails, captures et FAQ](https://github.com/EMCHOUIT/ChouiTV-Installer)
 
@@ -408,7 +413,7 @@ optimize/migrate-to-v4.sh                # une télé en 3.x : les réglages de 
 optimize/migrate-to-v4.sh settings.json   # ou depuis un export d'une autre télé
 ```
 
-Les photos «صوري» et les tâches sont dans le stockage de l'ancienne appli et ne sont pas reprises (`optimize/photos.sh` remet les photos). Une télé encore sous les tout anciens noms (`sa.urtv.*`) utilise `optimize/migrate-to-chouitv.sh`, qui va directement à la 4.0.
+Les **tâches et les photos** (10 photos au plus) sont reprises par la 4.0 elle-même à son premier démarrage, tant que l'ancienne appli est installée. **Ouvrez donc l'accueil une fois** avant de répondre `y` à la question de suppression, sinon elles partent avec l'ancienne appli (`optimize/photos.sh` remet les photos). Une télé encore sous les tout anciens noms (`sa.urtv.*`) utilise `optimize/migrate-to-chouitv.sh`, qui va directement à la 4.0.
 
 </details>
 
@@ -422,7 +427,7 @@ adb shell settings put secure screensaver_components ma.chouitv.home/ma.chouitv.
 adb shell settings put secure screensaver_default_component ma.chouitv.home/ma.chouitv.screensaver.ScreenDream
 ```
 
-Puis appuyez sur **Home** et choisissez le nouvel écran d'accueil si la télé le demande. (Certaines télés gardent l'accueil du constructeur : la l'option 2, ou les scripts du projet ci-dessous, s'en chargent en toute sécurité.)
+Puis appuyez sur **Home** et choisissez le nouvel écran d'accueil si la télé le demande. (Certaines télés gardent l'accueil du constructeur : l'option 2, ou les scripts du projet ci-dessous, s'en chargent en toute sécurité.)
 </details>
 
 <details>
@@ -439,8 +444,10 @@ git clone --depth 1 https://github.com/EMCHOUIT/ChouiTV
 cd ChouiTV
 optimize/setup.sh          # prépare Python et les outils
 optimize/find-tv.sh        # trouve la télé sur le réseau
-optimize/install.sh all    # télécharge la dernière version, installe l'accueil et l'écran de veille, et les règle
+optimize/install.sh all    # télécharge la dernière version, installe l'appli (accueil et écran de veille) et Channels, et les règle
 ```
+
+Sur une télé encore en 3.x, utilisez `optimize/migrate-to-v4.sh` plutôt que `all` (étape 3 ci-dessus) : `all` laisserait l'ancienne appli d'écran de veille à côté de la nouvelle.
 
 Remarque : le **nettoyage de la télé** (suppression du pistage, des publicités et des applis d'essai) est une étape importante pour de meilleures performances : il libère de 85 à 215 Mo de mémoire. L'assistant vous demande avant de commencer : si vous acceptez, il nettoie ; sinon, il installe seulement ce dont nos applis ont besoin (`SKIP_CLEANUP=1`), et vous pouvez demander le nettoyage plus tard. Depuis le téléphone, [ChouiTV Installer](https://github.com/EMCHOUIT/ChouiTV-Installer) propose le même nettoyage en option : il montre d'abord le plan, ne coupe que ce que vous choisissez et permet de tout annuler.
 
@@ -465,6 +472,21 @@ adb install -r channels/out/channels-release.apk
 <a id="faq"></a>
 
 ## ❓ Questions fréquentes
+
+<details><summary>⬆️ <b>Ma télé est en 3.x : comment passer à la 4.0 ?</b></summary>
+
+La mise à jour arrive comme d'habitude, d'une pression sur **OK**. Au premier démarrage, la 4.0 reprend de l'ancienne appli d'écran de veille les **réglages, les tâches et les photos** (10 photos au plus), puis une ligne « إكمال الانتقال إلى النسخة الجديدة » en haut des réglages vous guide pour les deux dernières étapes : choisir le nouvel écran de veille, puis retirer l'ancienne appli. L'ancien écran de veille continue de fonctionner jusqu'à ce que vous choisissiez le nouveau. Depuis le téléphone, **ChouiTV Installer 1.6** fait tout cela pour vous ; pour les initiés, il y a [le script](#install-adb).
+</details>
+
+<details><summary>🔀 <b>« شاشة تلفزيونك » apparaît deux fois dans la liste d'Android ?</b></summary>
+
+C'est normal pendant la migration : l'une est l'ancienne appli (cochée), l'autre est la nouvelle. Choisissez celle qui **n'est pas** cochée (Paramètres de la télé → Préférences de l'appareil → Écran de veille), puis retirez l'ancienne appli. Si vous essayez de la retirer avant, l'appli vous prévient, pour que la télé ne reste jamais sans écran de veille.
+</details>
+
+<details><summary>⏪ <b>Puis-je revenir à la 3.x ?</b></summary>
+
+Non : il n'y a pas de retour à la 3.x sans ADB. Si la 4.0 vous pose problème, le filet de sécurité est un correctif publié en 4.0.x. Remettre la télé comme avant ChouiTV, c'est la dernière question.
+</details>
 
 <details><summary>🙈 <b>Pourquoi une carte n'apparaît-elle pas ?</b></summary>
 

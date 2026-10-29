@@ -1,4 +1,7 @@
-"""Builds the README pictures of ChouiTV from real TV screenshots (full size PNGs in RAW) and open-licence fonts (Noto Kufi Arabic, OFL)."""
+"""Builds the README pictures of ChouiTV from real TV screenshots (full size PNGs in RAW) and open-licence fonts (Noto Kufi Arabic, OFL).
+Run: python make_media.py RAW OUT      (Pillow with raqm is needed for the Arabic shaping)
+One group only: ONLY=hero|guide|misc|shots python make_media.py RAW OUT   (several: ONLY=hero,guide)
+The release-notes pictures are made by whatsnew.py."""
 import os, sys
 from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageChops
 
@@ -25,7 +28,9 @@ def icon_mask():
     """The mute icon is in the same place on every capture: its shape (grown by 5 px for the soft edge) comes from one plain corner."""
     global _MASK
     if _MASK is None:
-        ref = Image.open(os.path.join(RAW, "l_ma.png")).convert("RGB")
+        # l_ma_old.png is a capture that has the icon; a newer l_ma.png may not have it (then the mask would be empty)
+        ref_name = "l_ma_old" if os.path.exists(os.path.join(RAW, "l_ma_old.png")) else "l_ma"
+        ref = Image.open(os.path.join(RAW, ref_name + ".png")).convert("RGB")
         px = ref.load()
         box = (1780, 940, 1910, 1050)
         m = {(x, y) for x in range(box[0], box[2]) for y in range(box[1], box[3]) if min(px[x, y]) > 175}
@@ -231,7 +236,7 @@ def hero():
     # the words
     R = W - 90
     d = ImageDraw.Draw(bg)
-    pill = "جديد · الإصدار 3.173"
+    pill = "جديد · الإصدار 4.0"
     pw = int(d.textlength(pill, font=font(28, 600), direction="rtl", language="ar")) + 120
     d.rounded_rectangle((R - pw, 92, R, 146), 27, fill=(28, 52, 38, 230), outline=GOLD + (220,), width=2)
     text(d, (R - 45, 119), pill, 28, GOLD, 600, anchor="rm")
@@ -400,6 +405,11 @@ def icon2(canvas, kind, cx, cy, r=60):
             d.arc((cx - rr, cy - rr, cx + rr, cy + rr), 135, 225, fill=g, width=w)
         d.line((cx, cy, cx - r * 0.35, cy + r * 0.85), fill=g, width=w)
         d.line((cx, cy, cx + r * 0.35, cy + r * 0.85), fill=g, width=w)
+    elif kind == "phone":
+        d.rounded_rectangle((cx - r * 0.42, cy - r * 0.95, cx + r * 0.42, cy + r * 0.95), 12, outline=g, width=w)
+        d.line((cx - r * 0.12, cy - r * 0.78, cx + r * 0.12, cy - r * 0.78), fill=g, width=w)
+        khatam(d, cx, cy - r * 0.05, r * 0.2, outline=g, width=w - 1)
+        d.ellipse((cx - 4, cy + r * 0.68, cx + 4, cy + r * 0.68 + 8), fill=g)
 
 def panel(size, radius=30):
     p = lin_grad(size, (20, 44, 31), (9, 24, 16)).convert("RGBA")
@@ -448,31 +458,80 @@ def steps_image(steps, out, title, subtitle):
             d.line((ax + 12, ay - 16, ax - 6, ay, ax + 12, ay + 16), fill=GOLD + (230,), width=5, joint="curve")
     im.save(os.path.join(OUT, out), optimize=True)
 
-def choose_image():
-    W, H = 1600, 520
-    im = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    cards = [("laptop", "تلقائيًا بالذكاء الاصطناعي", ["الأسهل: تلصق جملة واحدة", "Claude أو ChatGPT يتكفّل بالباقي", "نحو 40 دقيقة دون أوامر"], True),
-             ("plug", "يدويًا بـ ADB", ["تثبيت التطبيقين فقط", "خمس دقائق وبضعة أوامر", "لمن يحب التحكم الكامل"], False)]
-    cw, gap = 740, 60
-    for i, (kind, t, lines, rec) in enumerate(cards):
-        x2 = W - 30 - i * (cw + gap); x1 = x2 - cw
-        if rec:
-            gl = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-            ImageDraw.Draw(gl).rounded_rectangle((x1, 40, x2, H - 20), 34, fill=GOLD + (120,))
-            im.alpha_composite(gl.filter(ImageFilter.GaussianBlur(26)))
-        im.alpha_composite(panel((cw, H - 70), 34), (x1, 40))
-        d = ImageDraw.Draw(im)
-        if rec:
-            d.rounded_rectangle((x1 + 30, 18, x1 + 240, 70), 26, fill=GOLD + (255,))
-            text(d, (x1 + 135, 44), "موصى به", 28, DARK, 800, anchor="mm")
-        icon2(im, kind, x2 - 110, 160, 62)
-        metal(im, (x2 - 210, 128), t, font(40, 800), rtl=True, glow_amount=0.35)
-        d = ImageDraw.Draw(im)
-        for k, l in enumerate(lines):
-            y = 280 + k * 62
-            khatam(d, x2 - 60, y, 9, fill=GOLD + (255,))
-            text(d, (x2 - 86, y), l, 31, SAND, 500, anchor="rm")
-    im.save(os.path.join(OUT, "guide-choose.png"), optimize=True)
+CHOOSE = {
+    "ar": dict(badge="موصى به", cards=[
+        ("phone", "من هاتفك", ["بلا كمبيوتر", "نحو دقيقتين، بثلاث لغات", "تنظيف اختياري قابل للتراجع"]),
+        ("laptop", "بالذكاء الاصطناعي", ["تلصق جملة واحدة في Claude أو Codex", "يتكفّل بالباقي من حاسوبك", "نحو 40 دقيقة دون أوامر"]),
+        ("plug", "يدويًا بـ ADB", ["تثبيت التطبيق فقط", "خمس دقائق وبضعة أوامر", "لمن يحب التحكم الكامل"])]),
+    "fr": dict(badge="Recommandé", cards=[
+        ("phone", "Depuis votre téléphone", ["Sans ordinateur", "Environ 2 minutes, en 3 langues", "Nettoyage facultatif, annulable"]),
+        ("laptop", "Avec une IA", ["Collez une phrase dans Claude ou Codex", "Il fait le reste depuis votre PC", "Environ 40 minutes sans commande"]),
+        ("plug", "À la main (ADB)", ["Installe seulement l'appli", "Cinq minutes et quelques commandes", "Pour garder le contrôle total"])]),
+    "en": dict(badge="Recommended", cards=[
+        ("phone", "From your phone", ["No computer", "About 2 minutes, in 3 languages", "Optional cleanup, with undo"]),
+        ("laptop", "With an AI", ["Paste one sentence into Claude or Codex", "It does the rest from your PC", "About 40 minutes, no commands"]),
+        ("plug", "By hand (ADB)", ["Installs just the app", "Five minutes and a few commands", "For full control"])]),
+}
+
+def _lines(s, size, weight, maxw, rtl):
+    """Words into lines that fit maxw; fails loudly instead of letting text run out of its card."""
+    f = font(size, weight)
+    kw = dict(direction="rtl", language="ar") if rtl else dict(language="fr")
+    d = ImageDraw.Draw(Image.new("L", (4, 4)))
+    out, cur = [], ""
+    for w in s.split(" "):
+        t = (cur + " " + w).strip()
+        if cur and d.textlength(t, font=f, **kw) > maxw:
+            out.append(cur); cur = w
+        else:
+            cur = t
+    out.append(cur)
+    for l in out:
+        assert d.textlength(l, font=f, **kw) <= maxw + 1, "does not fit: " + l
+    return out
+
+def choose_images():
+    """The three ways to install, one picture per language (guide-choose-ar/fr/en.png), 1800 x 580, transparent around the cards."""
+    W, H, cw, gap = 1800, 580, 558, 63
+    for lang, spec in CHOOSE.items():
+        rtl = lang == "ar"
+        kw = dict(direction="rtl", language="ar", features=["kern", "liga"]) if rtl else dict(language=lang)
+        im = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        for i, (kind, title, bullets) in enumerate(spec["cards"]):
+            x1 = (W - cw - i * (cw + gap)) if rtl else i * (cw + gap)
+            x2 = x1 + cw
+            if i == 0:
+                gl = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+                ImageDraw.Draw(gl).rounded_rectangle((x1, 52, x2, 565), 34, fill=GOLD + (120,))
+                im.alpha_composite(gl.filter(ImageFilter.GaussianBlur(26)))
+            im.alpha_composite(panel((cw, 513), 34), (x1, 52))
+            d = ImageDraw.Draw(im)
+            if i == 0:
+                bw = int(d.textlength(spec["badge"], font=font(26, 800), **kw)) + 56
+                bx = (x2 - 28 - bw) if rtl else x1 + 28
+                d.rounded_rectangle((bx, 24, bx + bw, 76), 26, fill=GOLD + (255,))
+                d.text((bx + bw / 2, 50), spec["badge"], font=font(26, 800), fill=DARK, anchor="mm", **kw)
+            ix = x2 - 80 if rtl else x1 + 80
+            icon2(im, kind, ix, 168, 58)
+            tx = ix - 78 if rtl else ix + 78
+            tlines = _lines(title, 38, 800, cw - 220, rtl)
+            for k, l in enumerate(tlines):
+                y = 168 + (k - (len(tlines) - 1) / 2) * 50
+                d = ImageDraw.Draw(im)
+                d.text((tx, y), l, font=font(38, 800), fill=SAND, anchor=("rm" if rtl else "lm"), **kw)
+            bs = 30 if rtl else 27
+            lh = round(bs * 1.25)
+            y = 292
+            for b in bullets:
+                bl = _lines(b, bs, 500, cw - 110, rtl)
+                bx = x2 - 50 if rtl else x1 + 50
+                d = ImageDraw.Draw(im)
+                khatam(d, bx, y + (len(bl) - 1) * lh / 2, 9, fill=GOLD + (255,))
+                for k, l in enumerate(bl):
+                    d.text((bx - 26 if rtl else bx + 26, y + k * lh), l, font=font(bs, 500), fill=SAND, anchor=("rm" if rtl else "lm"), **kw)
+                y += lh * len(bl) + 46
+            assert y - 46 - lh / 2 < 545, "the bullets run out of the card"
+        im.save(os.path.join(OUT, "guide-choose-%s.png" % lang), optimize=True)
 
 def channels_card():
     W, H = 1600, 560
@@ -503,26 +562,32 @@ def channels_card():
 
 
 if __name__ == "__main__":
-    hero(); divider(); stats(); button(); choose_image(); channels_card()
-    steps_image([("tv", "فعّل وضع المطوّر", ["Build سبع مرات", "ثم USB debugging"]),
-                 ("laptop", "افتح المساعد", ["Claude Code أو Codex", "على كمبيوتر في بيتك"]),
-                 ("clip", "الصق الجملة", ["جملة واحدة تجدها أسفله", "وأجب عن ثلاثة أسئلة"]),
-                 ("cup", "استرح", ["نحو 40 دقيقة", "والتلفزيون جاهز"])],
-                "guide-auto.png", "التثبيت التلقائي في أربع خطوات", "مساعد ذكاء اصطناعي يشغّل الأوامر على كمبيوترك، وأنت تجيب فقط")
-    steps_image([("plug", "اتصل بالتلفزيون", ["adb connect", "ثم Allow على الشاشة"]),
-                 ("down", "نزّل التطبيق", ["chouitv-home.apk"]),
-                 ("trash", "انقل النسخة القديمة", ["إن كانت مثبتة فقط", "والسكربت ينقل إعداداتك"]),
-                 ("tv", "ثبّت واضبط", ["adb install", "واختر شاشة التوقف"]),
-                 ("check", "استمتع", ["والتحديثات القادمة", "تصلك تلقائيًا"])],
-                "guide-manual.png", "التثبيت اليدوي في خمس خطوات", "لمن يحب أن يرى كل أمر بنفسه")
-    annotated("tb_8", [(1, (440, 150)), (2, (1255, 80)), (3, (1886, 268)), (4, (1012, 460)), (5, (1012, 628)), (6, (1886, 800))], "screensaver-annotated.png")
-    for name, out in [("home", "home.png"), ("l_ma", "listen-morocco.png"), ("l_quran", "listen-quran.png"), ("l_adhan", "listen-adhan.png"),
-                      ("l_reciters", "listen-reciters.png"), ("player", "player-oscilloscope.png"), ("sleep", "sleep-timer.png"),
-                      ("set1", "settings-1-basics.png"), ("set2", "settings-2-screen.png"), ("set3", "settings-3-content.png"),
-                      ("set4", "settings-4-prayer.png"), ("set5", "settings-5-home.png")]:
-        save_bezel(name, out)
-    corner = [load(n).crop((20, 20, 680, 250)) for n in ("ss_6", "ss_8", "ss_2", "ss_5")]
-    gif([c.convert("P", palette=Image.ADAPTIVE) for c in corner], "corner.gif", 2200)
-    band = [load("tb_%d" % i).crop((60, 730, 1860, 860)).resize((1200, 87), Image.LANCZOS) for i in range(1, 15)]
-    gif([b.convert("P", palette=Image.ADAPTIVE) for b in band], "tasbih.gif", 700)
+    only = set(filter(None, os.environ.get("ONLY", "").split(",")))
+    def want(g): return not only or g in only
+    if want("hero"): hero()
+    if want("misc"): divider(); stats(); button(); channels_card()
+    if want("guide"):
+        choose_images()
+        steps_image([("tv", "فعّل وضع المطوّر", ["Build سبع مرات", "ثم USB debugging"]),
+                     ("laptop", "افتح المساعد", ["Claude Code أو Codex", "على كمبيوتر في بيتك"]),
+                     ("clip", "الصق الجملة", ["جملة واحدة تجدها أسفله", "وأجب عن ثلاثة أسئلة"]),
+                     ("cup", "استرح", ["نحو 40 دقيقة", "والتلفزيون جاهز"])],
+                    "guide-auto.png", "التثبيت التلقائي في أربع خطوات", "مساعد ذكاء اصطناعي يشغّل الأوامر على كمبيوترك، وأنت تجيب فقط")
+        steps_image([("plug", "اتصل بالتلفزيون", ["adb connect", "ثم Allow على الشاشة"]),
+                     ("down", "نزّل التطبيق", ["chouitv-home.apk"]),
+                     ("trash", "انقل النسخة القديمة", ["إن كانت مثبتة فقط", "والسكربت ينقل إعداداتك"]),
+                     ("tv", "ثبّت واضبط", ["adb install", "واختر شاشة التوقف"]),
+                     ("check", "استمتع", ["والتحديثات القادمة", "تصلك تلقائيًا"])],
+                    "guide-manual.png", "التثبيت اليدوي في خمس خطوات", "لمن يحب أن يرى كل أمر بنفسه")
+    if want("shots"):
+        annotated("tb_8", [(1, (440, 150)), (2, (1255, 80)), (3, (1886, 268)), (4, (1012, 460)), (5, (1012, 628)), (6, (1886, 800))], "screensaver-annotated.png")
+        for name, out in [("home", "home.png"), ("l_ma", "listen-morocco.png"), ("l_quran", "listen-quran.png"), ("l_adhan", "listen-adhan.png"),
+                          ("l_reciters", "listen-reciters.png"), ("player", "player-oscilloscope.png"), ("sleep", "sleep-timer.png"),
+                          ("set1", "settings-1-basics.png"), ("set2", "settings-2-screen.png"), ("set3", "settings-3-content.png"),
+                          ("set4", "settings-4-prayer.png"), ("set5", "settings-5-home.png")]:
+            save_bezel(name, out)
+        corner = [load(n).crop((20, 20, 680, 250)) for n in ("ss_6", "ss_8", "ss_2", "ss_5")]
+        gif([c.convert("P", palette=Image.ADAPTIVE) for c in corner], "corner.gif", 2200)
+        band = [load("tb_%d" % i).crop((60, 730, 1860, 860)).resize((1200, 87), Image.LANCZOS) for i in range(1, 15)]
+        gif([b.convert("P", palette=Image.ADAPTIVE) for b in band], "tasbih.gif", 700)
     print("done")
