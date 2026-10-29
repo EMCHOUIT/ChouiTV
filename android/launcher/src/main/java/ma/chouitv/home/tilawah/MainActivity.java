@@ -141,7 +141,7 @@ public class MainActivity extends Activity {
             tabViews[i].setTextSize(19);
             tabViews[i].setOnClickListener(v -> {
                 selectTab(which);
-                if (radioTab()) radioPane.focusFirst(); else focusList(firstSelectable());
+                if (radioTab()) radioPane.focusCountries(); else focusList(firstSelectable());   // radios: the chips row first
             });
         }
         selectTab(TAB_RECITERS);
@@ -312,7 +312,7 @@ public class MainActivity extends Activity {
         if (tabs.hasFocus()) {
             if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN || keyCode == KeyEvent.KEYCODE_DPAD_CENTER
                     || keyCode == KeyEvent.KEYCODE_ENTER || keyCode == KeyEvent.KEYCODE_NUMPAD_ENTER) {
-                if (radioTab()) radioPane.focusFirst(); else focusList(firstSelectable());
+                if (radioTab()) radioPane.focusCountries(); else focusList(firstSelectable());   // radios: the chips row first
                 return true;
             }
             if (keyCode == KeyEvent.KEYCODE_DPAD_UP) return true;
