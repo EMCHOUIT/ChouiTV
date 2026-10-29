@@ -18,10 +18,24 @@ final class Prefs {
     int surah() { return sp.getInt("surah", 1); }
     int station() { return sp.getInt("station", 0); }
     int position() { return sp.getInt("position", 0); }
+    /** The stream of the last radio ("" before 3.178, then the saved index is for a bundled station and still right). */
+    String stationUrl() { return sp.getString("station_url", ""); }
 
-    void save(int source, String reciter, int surah, int station, int position) {
-        sp.edit().putInt("source", source).putString("reciter", reciter).putInt("surah", surah)
-                .putInt("station", station).putInt("position", position).apply();
+    /** The place of the last radio in the list now: found by its stream, so a change of countries cannot make it another radio. */
+    int stationIn(Catalog cat) {
+        String url = stationUrl();
+        if (url.isEmpty()) { int i = station(); return i >= 0 && i < cat.bundledCount() ? i : -1; }
+        return cat.stationIndexByUrl(url);
+    }
+
+    void save(int source, String reciter, int surah, int station, int position) { save(source, reciter, surah, station, position, null); }
+
+    /** `stationUrl` null keeps the one saved (a surah being saved does not forget the radio). */
+    void save(int source, String reciter, int surah, int station, int position, String stationUrl) {
+        SharedPreferences.Editor e = sp.edit().putInt("source", source).putString("reciter", reciter).putInt("surah", surah)
+                .putInt("station", station).putInt("position", position);
+        if (stationUrl != null) e.putString("station_url", stationUrl);
+        e.apply();
     }
 
     // ---- the adhan ----

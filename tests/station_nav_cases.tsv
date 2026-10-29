@@ -1,0 +1,16 @@
+# kind, list, argument, expected (the last column). See StationNavRun.java
+# groups: quran quran ma ma ma fr fr
+next	quran,quran,ma,ma,ma,fr,fr	0	1
+next	quran,quran,ma,ma,ma,fr,fr	1	0
+next	quran,quran,ma,ma,ma,fr,fr	4	2
+next	quran,quran,ma,ma,ma,fr,fr	6	5
+prev	quran,quran,ma,ma,ma,fr,fr	2	4
+prev	quran,quran,ma,ma,ma,fr,fr	5	6
+prev	quran,quran,ma,ma,ma,fr,fr	3	2
+next	quran,ma,fr	1	1
+prev	quran,ma,fr	2	2
+next	quran,ma	9	-1
+next	quran,ma	-1	-1
+url	https://a,https://b,https://c	https://b	1
+url	https://a,https://b,https://c	https://z	-1
+url	https://a,https://b,https://c		-1

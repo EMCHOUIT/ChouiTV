@@ -9,6 +9,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /** The reciters, the live streams and the 114 surah names, read once from the bundled JSON. */
@@ -35,8 +36,11 @@ final class Catalog {
     }
 
     final List<Reciter> reciters = new ArrayList<>();
-    /** The bundled stations first (their index never moves), then the chosen countries' radios. */
-    final List<Station> stations = new ArrayList<>();
+    /**
+     * The bundled stations first (their index never moves), then the chosen countries' radios. The list is never changed in place: a new one
+     * replaces it in one step (reloadRadios), so a screen reading it never sees a half-built list.
+     */
+    volatile List<Station> stations = new ArrayList<>();
     private int bundled;
     final String[] surahNames = new String[115];
 
@@ -57,12 +61,14 @@ final class Catalog {
                         r.getString("server"), r.getInt("surahs")));
             }
             JSONArray stations = new JSONObject(read(c, "quran/stations.json")).getJSONArray("stations");
+            List<Station> all = new ArrayList<>();
             for (int i = 0; i < stations.length(); i++) {
                 JSONObject s = stations.getJSONObject(i);
-                catalog.stations.add(new Station(s.getString("name"), s.getString("url"), s.optBoolean("live", true), s.optString("group", "quran")));
+                all.add(new Station(s.getString("name"), s.getString("url"), s.optBoolean("live", true), s.optString("group", "quran")));
             }
-            catalog.bundled = catalog.stations.size();
-            RadioStore.appendTo(catalog, c);
+            catalog.bundled = all.size();
+            RadioStore.appendTo(all, c);
+            catalog.stations = Collections.unmodifiableList(all);
             JSONArray surahs = new JSONObject(read(c, "quran/surahs.json")).getJSONArray("surahs");
             for (int i = 0; i < surahs.length(); i++) {
                 JSONObject s = surahs.getJSONObject(i);
@@ -87,8 +93,9 @@ final class Catalog {
 
     /** After the person changed the countries or the lists were updated: the downloaded radios are read again, the bundled ones stay as they are. */
     synchronized void reloadRadios(Context c) {
-        stations.subList(bundled, stations.size()).clear();
-        RadioStore.appendTo(this, c.getApplicationContext());
+        List<Station> all = new ArrayList<>(stations.subList(0, bundled));
+        RadioStore.appendTo(all, c.getApplicationContext());
+        stations = Collections.unmodifiableList(all);
     }
 
     int bundledCount() { return bundled; }
@@ -100,6 +107,13 @@ final class Catalog {
     int reciterIndex(String id) {
         for (int i = 0; i < reciters.size(); i++) if (reciters.get(i).id.equals(id)) return i;
         return -1;
+    }
+
+    /** Where a stream is in the list now, or -1: a station is remembered by its stream, because its place moves when the countries change. */
+    int stationIndexByUrl(String url) {
+        List<String> urls = new ArrayList<>();
+        for (Station s : stations) urls.add(s.url);
+        return StationNav.indexOfUrl(urls, url);
     }
 
     int stationIndex(String name) {

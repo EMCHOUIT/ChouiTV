@@ -21,6 +21,7 @@ MAX_PER_COUNTRY = 120
 FETCH_LIMIT = 400          # asked per country, so that enough survive the test
 TEST_TIMEOUT = 6
 MIN_BYTES = 1024
+MIN_STATIONS = 15          # fewer than this alive means the directory or the network had a bad day, not that the country has no radio
 
 # the countries the app offers (Arabic name, then French and English are in the app); order = order of the list
 COUNTRIES = ["DZ", "TN", "EG", "SA", "AE", "QA", "KW", "JO", "LB", "IQ", "LY", "SD",
@@ -116,28 +117,49 @@ def build_country(cc, tester=plays, fetch=None):
     return {"v": 1, "cc": cc, "stations": alive}
 
 
+def acceptable(data):
+    """A country's list is only published when enough of its radios answered: a thin list would replace a good one on every TV."""
+    return len(data.get("stations", [])) >= MIN_STATIONS
+
+
+def write_json(path, data):
+    """Written whole or not at all: the file is never seen half-written."""
+    tmp = path + ".part"
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, separators=(",", ":"))
+    os.replace(tmp, path)
+
+
 def main(argv):
     out = argv[1]
     countries = argv[2:] or COUNTRIES
     os.makedirs(out, exist_ok=True)
     now = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%MZ")
     index = {"v": 1, "updated": now, "countries": []}
+    bad = []
     for cc in countries:
         try:
             data = build_country(cc)
         except Exception as e:
             print(cc, "failed:", e)
+            bad.append(cc)
+            continue
+        if not acceptable(data):   # the list already in OUT_DIR (the last good one) is left as it is
+            print(cc, "only", len(data["stations"]), "stations alive, not published")
+            bad.append(cc)
             continue
         data["updated"] = now
-        with open(os.path.join(out, cc.lower() + ".json"), "w", encoding="utf-8") as f:
-            json.dump(data, f, ensure_ascii=False, separators=(",", ":"))
+        write_json(os.path.join(out, cc.lower() + ".json"), data)
         index["countries"].append({"cc": cc, "n": len(data["stations"])})
         print(cc, len(data["stations"]), "stations")
-    with open(os.path.join(out, "index.json"), "w", encoding="utf-8") as f:
-        json.dump(index, f, ensure_ascii=False, separators=(",", ":"))
+    write_json(os.path.join(out, "index.json"), index)
+    if bad:   # the workflow shows red, and what was published stays what it was for those countries
+        print("not refreshed:", " ".join(bad))
+        return 1
+    return 0
 
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         sys.exit(__doc__)
-    main(sys.argv)
+    sys.exit(main(sys.argv))

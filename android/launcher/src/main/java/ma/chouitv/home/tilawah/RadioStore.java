@@ -32,7 +32,17 @@ final class RadioStore {
     static final String[] OFFERED = {"dz", "tn", "eg", "sa", "ae", "qa", "kw", "jo", "lb", "iq", "ly", "sd",
             "fr", "be", "es", "de", "gb", "us", "ca", "tr", "it", "nl", "sn"};
 
+    /** A list file is a few dozen KB (120 stations at most); anything bigger is not one of ours. */
+    private static final int MAX_LIST_BYTES = 512 * 1024;
+
     private RadioStore() {}
+
+    /** Only the countries this app offers have a list to download or to read: a country code is never turned into a file name or a URL otherwise. */
+    static boolean offered(String cc) {
+        if (cc == null) return false;
+        for (String o : OFFERED) if (o.equals(cc)) return true;
+        return false;
+    }
 
     private static SharedPreferences sp(Context c) {
         return c.getApplicationContext().getSharedPreferences("radio", Context.MODE_PRIVATE);
@@ -83,17 +93,31 @@ final class RadioStore {
         List<Catalog.Station> out = new ArrayList<>();
         File f = file(c, cc);
         if (!f.exists()) return out;
+        byte[] body;
         try (InputStream in = new java.io.FileInputStream(f)) {
-            JSONArray a = new JSONObject(new String(readAll(in), StandardCharsets.UTF_8)).getJSONArray("stations");
-            for (int i = 0; i < a.length(); i++) {
-                JSONObject s = a.getJSONObject(i);
-                out.add(new Catalog.Station(s.getString("n"), s.getString("u"), true, cc,
-                        s.optString("i"), s.optString("c", "music"), s.optString("f"), s.optString("t")));
-            }
-        } catch (Exception broken) {
+            body = readAll(in, MAX_LIST_BYTES);
+        } catch (java.io.IOException unreadable) {
+            return out;   // the disk said no this time: the file may be fine, it is kept
+        }
+        try {
+            out.addAll(parse(new String(body, StandardCharsets.UTF_8), cc));
+        } catch (org.json.JSONException broken) {
             //noinspection ResultOfMethodCallIgnored
-            f.delete();   // a half-written file is never kept: the list is asked for again
-            out.clear();
+            f.delete();   // a file that is not a list is never kept: the list is asked for again
+        }
+        return out;
+    }
+
+    /** The stations of a list file's text; a record without a name or without an https stream is left out, the others stay. */
+    static List<Catalog.Station> parse(String text, String cc) throws org.json.JSONException {
+        List<Catalog.Station> out = new ArrayList<>();
+        JSONArray a = new JSONObject(text).getJSONArray("stations");
+        for (int i = 0; i < a.length(); i++) {
+            JSONObject s = a.optJSONObject(i);
+            if (s == null) continue;
+            String name = s.optString("n").trim(), url = s.optString("u").trim();
+            if (name.isEmpty() || !url.startsWith("https://")) continue;
+            out.add(new Catalog.Station(name, url, true, cc, s.optString("i"), s.optString("c", "music"), s.optString("f"), s.optString("t")));
         }
         return out;
     }
@@ -101,11 +125,12 @@ final class RadioStore {
     static boolean downloaded(Context c, String cc) { return file(c, cc).exists(); }
 
     /** Adds the ticked stations of the chosen countries (not Morocco: its radios are the bundled ones) to the catalogue. */
-    static void appendTo(Catalog catalog, Context c) {
+    static void appendTo(List<Catalog.Station> into, Context c) {
         for (String cc : chosen(c)) {
             if (cc.equals(RadioChoice.HOME)) continue;
+            if (!offered(cc)) continue;
             for (Catalog.Station s : read(c, cc)) {
-                if (!off(c, cc, s.id)) catalog.stations.add(s);
+                if (!off(c, cc, s.id)) into.add(s);
             }
         }
     }
@@ -115,7 +140,8 @@ final class RadioStore {
         Catalog cat = Catalog.get(c);
         cat.reloadRadios(c);
         Prefs prefs = new Prefs(c);
-        if (prefs.source() == Prefs.SOURCE_RADIO && prefs.station() >= cat.bundledCount()) prefs.save(Prefs.SOURCE_NONE, "", 1, 0, 0);
+        if (prefs.source() == Prefs.SOURCE_RADIO && prefs.stationIn(cat) < 0) prefs.save(Prefs.SOURCE_NONE, "", 1, 0, 0, "");
+        MusicService.stationsChanged(c, cat);
     }
 
     // ---- download ----
@@ -147,22 +173,29 @@ final class RadioStore {
         new Thread(() -> {
             final List<String> failed = new ArrayList<>();
             int finished = 0;
-            for (final String cc : targets) {
-                final int before = finished;
-                ui.post(() -> progress.step(cc, Progress.LOADING, before, targets.size()));
-                boolean ok = fetch(c, cc);
-                finished++;
-                if (!ok) failed.add(cc);
-                final int after = finished;
-                final boolean good = ok;
-                ui.post(() -> progress.step(cc, good ? Progress.DONE : Progress.FAILED, after, targets.size()));
+            try {
+                for (final String cc : targets) {
+                    final int before = finished;
+                    ui.post(() -> progress.step(cc, Progress.LOADING, before, targets.size()));
+                    boolean ok;
+                    try { ok = fetch(c, cc); } catch (RuntimeException e) { ok = false; }
+                    finished++;
+                    if (!ok) failed.add(cc);
+                    final int after = finished;
+                    final boolean good = ok;
+                    ui.post(() -> progress.step(cc, good ? Progress.DONE : Progress.FAILED, after, targets.size()));
+                }
+            } finally {
+                // whatever happened, the screen is told the end: a bar that never finishes is worse than a failure
+                final int got = targets.size() - failed.size();
+                // «last update» is the day every list is fresh; one list that failed keeps the date of the last time they all were
+                if (got == targets.size() && got > 0) sp(c).edit().putLong("updated", System.currentTimeMillis()).apply();
+                final boolean any = got > 0;
+                ui.post(() -> {
+                    if (any) changed(c);
+                    progress.done(got, failed, targets.size());
+                });
             }
-            final int got = targets.size() - failed.size();
-            if (got > 0) sp(c).edit().putLong("updated", System.currentTimeMillis()).apply();
-            ui.post(() -> {
-                if (got > 0) changed(c);
-                progress.done(got, failed, targets.size());
-            });
         }, "radio-update").start();
     }
 
@@ -170,7 +203,7 @@ final class RadioStore {
     static void update(final Context context, final Done done) {
         update(context, new Progress() {
             @Override public void step(String cc, int state, int finished, int total) { }
-            @Override public void done(int got, List<String> failed, int total) { if (done != null) done.done(failed.isEmpty() && total > 0, got); }
+            @Override public void done(int got, List<String> failed, int total) { if (done != null) done.done(failed.isEmpty(), got); }   // nothing to download (only Morocco) is not a failure
         });
     }
 
@@ -195,7 +228,9 @@ final class RadioStore {
     }
 
     private static boolean fetch(Context c, String cc) {
+        if (!offered(cc)) return false;
         HttpURLConnection conn = null;
+        File tmp = new File(file(c, cc).getPath() + ".part");
         try {
             conn = (HttpURLConnection) new URL(BASE + cc + ".json").openConnection();
             conn.setConnectTimeout(8000);
@@ -203,23 +238,31 @@ final class RadioStore {
             conn.setInstanceFollowRedirects(true);
             if (conn.getResponseCode() != 200) return false;
             byte[] body;
-            try (InputStream in = conn.getInputStream()) { body = readAll(in); }
-            new JSONObject(new String(body, StandardCharsets.UTF_8)).getJSONArray("stations");   // it must be a list before it replaces the old one
-            File tmp = new File(file(c, cc).getPath() + ".part");
-            try (FileOutputStream out = new FileOutputStream(tmp)) { out.write(body); }
-            return tmp.renameTo(file(c, cc)) || (file(c, cc).delete() && tmp.renameTo(file(c, cc)));
+            try (InputStream in = conn.getInputStream()) { body = readAll(in, MAX_LIST_BYTES); }
+            // it must be a list of this country with radios in it before it replaces the old one
+            String text = new String(body, StandardCharsets.UTF_8);
+            if (!cc.equalsIgnoreCase(new JSONObject(text).optString("cc", cc)) || parse(text, cc).isEmpty()) return false;
+            try (FileOutputStream out = new FileOutputStream(tmp)) { out.write(body); out.getFD().sync(); }
+            java.nio.file.Files.move(tmp.toPath(), file(c, cc).toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING, java.nio.file.StandardCopyOption.ATOMIC_MOVE);
+            return true;
         } catch (Exception e) {
             return false;
         } finally {
             if (conn != null) conn.disconnect();
+            //noinspection ResultOfMethodCallIgnored
+            if (tmp.exists()) tmp.delete();
         }
     }
 
-    private static byte[] readAll(InputStream in) throws java.io.IOException {
+    /** All of a stream, or an IOException when it is longer than `max` bytes (a wrong file in place of a list). */
+    private static byte[] readAll(InputStream in, int max) throws java.io.IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         byte[] buffer = new byte[8192];
         int n;
-        while ((n = in.read(buffer)) > 0) out.write(buffer, 0, n);
+        while ((n = in.read(buffer)) > 0) {
+            out.write(buffer, 0, n);
+            if (out.size() > max) throw new java.io.IOException("too long");
+        }
         return out.toByteArray();
     }
 

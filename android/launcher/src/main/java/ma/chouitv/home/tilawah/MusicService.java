@@ -25,6 +25,8 @@ import android.util.Log;
 
 import ma.chouitv.home.R;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -63,6 +65,8 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
     private static volatile int source = Prefs.SOURCE_NONE;
     private static volatile boolean playing, buffering, prepared;
     private static volatile int reciter = -1, surah = 1, station = -1;
+    /** The stream being played (a station's place in the list moves when the countries change, its stream does not). */
+    private static volatile String stationUrl = "";
     private static volatile int position, duration;
     private static volatile String error;
     private static volatile long sleepUntil;
@@ -164,6 +168,18 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
     static int reciterIndex() { return reciter; }
     static int currentSurah() { return surah; }
     static int currentStation() { return station; }
+
+    /**
+     * The list of radios was read again (countries, ticks, an update): the station playing keeps playing at its new place, and is stopped when
+     * it is not in the list any more (its country was unchecked, the station unticked or dropped by the catalogue).
+     */
+    static void stationsChanged(Context c, Catalog cat) {
+        if (source != Prefs.SOURCE_RADIO || stationUrl.isEmpty()) return;
+        int now = cat.stationIndexByUrl(stationUrl);
+        if (now >= 0) station = now;
+        else if (playing || buffering) stopAction(c);
+        else { station = -1; stationUrl = ""; }
+    }
     static int audioSession() { return audioSession; }
     private static volatile int audioSession = -1;
     static int currentPosition() { return position; }
@@ -314,8 +330,9 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
         surah = 1;
         retries = 0;
         pendingSeek = 0;
-        prefs.save(source, "", surah, station, 0);
-        startUrl(cat.stations.get(index).url);
+        stationUrl = cat.stations.get(index).url;
+        prefs.save(source, "", surah, station, 0, stationUrl);
+        startUrl(stationUrl);
     }
 
     // ---- the adhan: pause whatever is on, play it, then bring the surah back ----
@@ -507,10 +524,17 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
             int total = cat.reciters.get(reciter).surahs;
             playSurahAgain(reciter, surah >= total ? 1 : surah + 1);
         } else if (source == Prefs.SOURCE_RADIO && station >= 0) {
-            playRadio((station + 1) % cat.stations.size());
+            playRadio(neighbour(1));
         } else {
             resumeLastInternal();
         }
+    }
+
+    /** The radio after or before the one playing, among the radios of its own country (or of the Quran radios). */
+    private int neighbour(int step) {
+        List<String> groups = new ArrayList<>();
+        for (Catalog.Station s : cat.stations) groups.add(s.group);
+        return StationNav.neighbour(groups, station, step);
     }
 
     void prev() {
@@ -520,7 +544,7 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
             int total = cat.reciters.get(reciter).surahs;
             playSurahAgain(reciter, surah <= 1 ? total : surah - 1);
         } else if (source == Prefs.SOURCE_RADIO && station >= 0) {
-            playRadio((station - 1 + cat.stations.size()) % cat.stations.size());
+            playRadio(neighbour(-1));
         }
     }
 
@@ -580,7 +604,7 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
         if (last == Prefs.SOURCE_SURAH) {
             playSurahById(prefs.reciter(), prefs.surah(), prefs.position());
         } else if (last == Prefs.SOURCE_RADIO) {
-            playRadio(prefs.station());
+            playRadio(prefs.stationIn(cat));
         } else if (!cat.reciters.isEmpty()) {
             playSurah(0, 1, 0);
         }

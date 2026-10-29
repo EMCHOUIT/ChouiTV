@@ -189,7 +189,7 @@ public class MusicReceiver extends BroadcastReceiver {
         if (source == Prefs.SOURCE_NONE) {
             source = prefs.source();
             surah = prefs.surah();
-            station = prefs.station();
+            station = prefs.stationIn(cat);
             position = prefs.position();
             reciter = cat.reciterIndex(prefs.reciter());
             duration = 0;

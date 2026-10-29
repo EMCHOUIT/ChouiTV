@@ -54,5 +54,29 @@ class Build(unittest.TestCase):
         self.assertEqual(len(out["stations"]), rc.MAX_PER_COUNTRY)
 
 
+class PublishGuards(unittest.TestCase):
+    def test_a_thin_list_is_not_published(self):
+        self.assertFalse(rc.acceptable({"stations": [{}] * (rc.MIN_STATIONS - 1)}))
+        self.assertTrue(rc.acceptable({"stations": [{}] * rc.MIN_STATIONS}))
+        self.assertFalse(rc.acceptable({}))
+
+    def test_a_failed_country_keeps_the_last_good_file_and_fails_the_run(self):
+        import json
+        import tempfile
+        with tempfile.TemporaryDirectory() as out:
+            good = os.path.join(out, "fr.json")
+            with open(good, "w", encoding="utf-8") as f:
+                f.write('{"v":1,"cc":"FR","stations":[1]}')
+            real = rc.build_country
+            rc.build_country = lambda cc, **k: {"v": 1, "cc": cc, "stations": [{}]}   # a bad day: one radio alive
+            try:
+                code = rc.main(["x", out, "FR"])
+            finally:
+                rc.build_country = real
+            self.assertEqual(code, 1)
+            self.assertEqual(json.load(open(good, encoding="utf-8"))["stations"], [1])
+            self.assertFalse(os.path.exists(good + ".part"))
+
+
 if __name__ == "__main__":
     unittest.main()

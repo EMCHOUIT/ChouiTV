@@ -448,9 +448,10 @@ public class MainActivity extends Activity {
                 // the radios have their own two lists (RadioPane)
             } else if (tab == TAB_QURAN) {
                 String group = "quran";
-                if (prefs.source() == Prefs.SOURCE_RADIO && prefs.station() < cat.stations.size()
-                        && group.equals(cat.stations.get(prefs.station()).group)) {
-                    rows.add(new Row(false, KIND_RESUME, cat.stations.get(prefs.station()).name,
+                int saved = prefs.stationIn(cat);
+                if (prefs.source() == Prefs.SOURCE_RADIO && saved >= 0 && saved < cat.stations.size()
+                        && group.equals(cat.stations.get(saved).group)) {
+                    rows.add(new Row(false, KIND_RESUME, cat.stations.get(saved).name,
                             getString(R.string.continue_listening), -1, true));
                 }
                 boolean radioOn = MusicService.currentSource() == Prefs.SOURCE_RADIO && MusicService.isPlaying();
