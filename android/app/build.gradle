@@ -55,6 +55,9 @@ android {
         main { assets.srcDirs = ['../../dist', '../launcher/src/main/assets', '../../assets'] }   // page, Thmanyah fonts, backgrounds/, shared/ (the club lists)
     }
 
+    // dist/ also holds urtv.html (the stand-alone page for a browser, 3.5 MB) and the launcher's assets hold the Quran lists: this app uses neither
+    androidResources { ignoreAssetsPattern '!urtv.html:!quran' }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
