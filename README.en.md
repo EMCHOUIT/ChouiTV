@@ -34,6 +34,13 @@
 
 <a id="new"></a>
 
+## 🆕 What's new in 4.1 · listening, prayer and Hijri
+
+- 🎧 **New listening screen**: tab «القرآن الكريم» (reciters, live, ★ favourite reciters, **named surah lists** you build by ticking) and tab «الإذاعات»
+- 🕌 **Adhan** moved to the settings: tab «الصلاة», group «أذان الصلوات»
+- 🔢 **Hijri date adjustment** from −2 to +2 days to suit your country
+- 📱 **ChouiTV Installer QR** in «الرئيسية والنظام», with a popup explaining it goes on your guest's phone, which installs ChouiTV on their TV
+
 ## 🆕 What's new in 4.0 · one app
 
 > **ChouiTV is now one app.** The home screen, the screensaver, its settings and the listening screens are in a single package (`ma.chouitv.home`), where there used to be two. Your settings come with you, and two steps are left for you to do by hand.

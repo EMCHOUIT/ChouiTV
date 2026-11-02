@@ -34,6 +34,13 @@
 
 <a id="new"></a>
 
+## 🆕 Nouveautés de la 4.1 · écoute, prière et hégire
+
+- 🎧 **Nouvel écran d'écoute** : onglet «القرآن الكريم» (récitants, direct, ★ récitants favoris, **listes de sourates nommées** créées en cochant) et onglet «الإذاعات»
+- 🕌 **L'adhan** passe dans les réglages : onglet «الصلاة», groupe «أذان الصلوات»
+- 🔢 **Date hégirienne ajustable** de −2 à +2 jours selon votre pays
+- 📱 **QR de ChouiTV Installer** dans «الرئيسية والنظام», avec une fenêtre qui explique qu'il s'installe sur le téléphone de l'invité, lequel installe ChouiTV sur sa télé
+
 ## 🆕 Nouveautés de la 4.0 · une seule appli
 
 > **ChouiTV devient une seule appli.** L'accueil, l'écran de veille, ses réglages et l'écoute tiennent dans un seul paquet (`ma.chouitv.home`), là où il y en avait deux. Vos réglages vous suivent, et il reste deux étapes à faire à la main.
