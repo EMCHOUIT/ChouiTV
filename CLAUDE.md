@@ -45,3 +45,8 @@ GITHUB_RUN_NUMBER=<n> $G -p . :launcher:assembleDebug --offline -q
 - `pm disable-user`, `uninstall --user 0` et `appops` sont remis à zéro à chaque démarrage pour Netflix et Prime Video sur MiTV-MSSP3 ; seul `am kill` après démarrage tient.
 - Ne jamais désactiver `mitv.service` (protégé dans `optimize/lists/keep.txt`).
 - Un test `adb install` d'un APK de debug de code supérieur impose `-r -d` pour revenir à la version publiée.
+
+## Téléphone de test (Installer / Companion)
+- Débogage sans fil : l'IP, le port de connexion et le port d'appairage **changent à chaque activation** (dernière adresse vue : 192.168.1.60, 2026-11-02, auparavant .49 puis .54). Ne jamais écrire le code d'appairage dans le dépôt : il expire en quelques dizaines de secondes.
+- Procédure : l'utilisateur ouvre « Associer un appareil avec un code d'association » et envoie IP:port d'appairage + code, puis le port affiché sur l'écran principal ; lancer tout de suite `adb pair IP:portAppairage CODE` puis `adb connect IP:portConnexion`. Si `Connection refused`, le port principal a changé après l'appairage : demander le port actuel. `adb install -r` suffit (même clé de signature).
+- Piloter l'app depuis adb : `uiautomator dump` + `tap.py` (dans le dossier de scratchpad de la session) ; l'écran est en 1080x2400.
