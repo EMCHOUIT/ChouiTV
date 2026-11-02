@@ -9,7 +9,7 @@ Updated at the end of the session of 2026-11-02. Branch: `v4`. Published: ChouiT
 - [x] Listening: ▼ from the tab bar lands on the chips row (`MainActivity.dispatchKeyEvent`), focused chip is solid gold with a cream ring (`QuranPane.paintChips`), «متابعة الاستماع» card removed.
 - [x] README «what is new in 4.1» (ar/fr/en) and a Play Protect note in the three READMEs of ChouiTV and of the Installer.
 - [x] Installer 1.6.1 published (back button, bottom action, skip up-to-date apps) then 1.6.2 (cleanup plan keeps `mitv.service` and `com.xiaomi.mitv.tvmanager`).
-- [x] `optimize/lists/keep.txt` protects `mitv.service` and `com.xiaomi.mitv.tvmanager`; `optimize/lists/cleanup.json` regenerated (commit f061a3f).
+- [x] `optimize/lists/keep.txt` protects `mitv.service` only (the Mi TV Manager is not needed for the picture menu: TV1 has it off and the menu opens); `optimize/lists/cleanup.json` regenerated.
 - [x] Download counts read from GitHub (assets `download_count`): approximate, not a count of TVs.
 
 ## In progress
