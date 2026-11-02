@@ -1,6 +1,6 @@
 # TODO
 
-Updated at the end of the session of 2026-11-02. Branch: `v4`. Published: ChouiTV 4.1 (v4.1), ChouiTV Installer 1.6.2 (v1.6.2).
+Updated at the end of the sessions of 2026-11-02 (two closures). Branch: `v4`. Published: ChouiTV 4.1 (v4.1), ChouiTV Installer 1.6.2 (v1.6.2).
 
 ## Done
 
@@ -12,11 +12,16 @@ Updated at the end of the session of 2026-11-02. Branch: `v4`. Published: ChouiT
 - [x] `optimize/lists/keep.txt` protects `mitv.service` only (the Mi TV Manager is not needed for the picture menu: TV1 has it off and the menu opens); `optimize/lists/cleanup.json` regenerated.
 - [x] Download counts read from GitHub (assets `download_count`): approximate, not a count of TVs.
 
+- [x] Netflix/Prime on Xiaomi MiTV-MSSP3: tested disable-user, uninstall --user 0 and appops: the ROM resets all three at every boot (both TVs); `am kill` keeps them stopped. TV1 and TV2 left with both disabled and stopped (resets at next reboot).
+- [x] Audit of Tellyscope, CleanYourTV and our cleanup engine with three agents; reports in /home/elmehdi/audit/ (report-*.md) and plan in /home/elmehdi/audit/PLAN-installer-1.7.md (lots A-J, releases 1.7 safety, 1.8 remote + rename, 1.9 speed/models, 2.0 pairing).
+- [x] Decision: Installer renamed «ChouiTV Companion» in 1.8 (memory note installer-rename-companion).
+- [x] Token savings: ~/.claude/settings.json now has model sonnet, effort medium, subagent model sonnet, cost warnings off (backup settings.json.bak-tokens); effective in new sessions.
+
 ## In progress
 
 Nothing half-done in the code. One commit is local only:
 
-- `f061a3f` (keep.txt + cleanup.json) is **not pushed** to `main`; the Installer 1.6.2 already ships the same plan. Push it with the next ChouiTV release (4.2).
+- `f061a3f`, `0cfcccb` (keep.txt: only mitv.service; cleanup.json) and the docs commits are **not pushed** to `main`; the Installer 1.6.2 already ships the same plan. Push it with the next ChouiTV release (4.2).
 
 Open, not verified:
 
@@ -28,10 +33,14 @@ Blocking errors: none (builds and tests green; `tests/check.py` needs the `fontT
 
 ## Next session: first step
 
-1. Reconnect to TV2 (`adb connect 192.168.1.51:5555`, or the new address/port shown in its developer options) and run `pm list packages -d | grep -i "netflix\|amazonvideo\|mitv.service\|tvmanager"` then check whether Netflix / Prime came back after the reboot.
-2. Then: put TV1 on the published 4.1 (`adb install -r -d` of the release APK, or let it self-update) and check the update path from 4.0.
+1. Start Installer 1.7 (safety): first the mockup of the restore history and of the «the TV turns it back on» flag (lots D and E of PLAN-installer-1.7.md), tests first on FakeTv, then lots A, B, C. Nothing is coded yet.
+2. Also: put TV1 on the published 4.1 (`adb install -r -d` of the release APK, or let it self-update) and check the update path from 4.0.
 
 ## Next
+
+- [ ] Installer 1.7 then 1.8 (Companion: remote with Arabic text, to be spiked first with clipboard + KEYCODE_PASTE on TV1/TV2), see the plan file.
+- [ ] ChouiTV 4.2: option to stop Netflix/Prime after boot (KILL_BACKGROUND_PROCESSES) and the update summary shown before updating.
+- [ ] Check the Companion name on the Play Store.
 
 - [ ] 4.2: short summary of the news shown before an update (idea: a `notes` field in the signed `latest.json`, 3 bullets, shown in `UpdateActivity` before OK). Mockup first, code only after «Oui, code». 4.0 TVs do not know the field: it appears from 4.1 to 4.2.
 - [ ] Push f061a3f with 4.2.
