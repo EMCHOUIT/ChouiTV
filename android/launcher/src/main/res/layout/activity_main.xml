@@ -64,7 +64,7 @@
                 android:gravity="center"
                 android:paddingStart="30dp"
                 android:paddingEnd="30dp"
-                android:text="@string/reciters"
+                android:text="@string/tab_quran"
                 android:textColor="@color/tab_text"
                 android:textSize="19sp" />
 
@@ -82,70 +82,7 @@
                 android:text="@string/tab_ma"
                 android:textColor="@color/tab_text"
                 android:textSize="19sp" />
-
-              <TextView
-                android:id="@+id/tab_quran"
-                android:layout_width="wrap_content"
-                android:layout_height="46dp"
-                android:layout_marginStart="10dp"
-                android:background="@drawable/tab_bg"
-                android:clickable="true"
-                android:focusable="true"
-                android:gravity="center"
-                android:paddingStart="30dp"
-                android:paddingEnd="30dp"
-                android:text="@string/tab_quran"
-                android:textColor="@color/tab_text"
-                android:textSize="19sp" />
-
-          <TextView
-                android:id="@+id/tab_adhan"
-                android:layout_width="wrap_content"
-                android:layout_height="46dp"
-                android:layout_marginStart="10dp"
-                android:background="@drawable/tab_bg"
-                android:clickable="true"
-                android:focusable="true"
-                android:gravity="center"
-                android:paddingStart="30dp"
-                android:paddingEnd="30dp"
-                android:text="@string/adhan"
-                android:textColor="@color/tab_text"
-                android:textSize="19sp" />
         </LinearLayout>
-
-        <ListView
-            android:id="@+id/list"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginTop="16dp"
-            android:layout_weight="1"
-            android:clipToPadding="false"
-            android:divider="@android:color/transparent"
-            android:dividerHeight="9dp"
-            android:fadingEdge="none"
-            android:listSelector="@android:color/transparent"
-            android:paddingBottom="8dp"
-            android:scrollbars="none" />
-
-        <GridView
-            android:id="@+id/grid"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginTop="16dp"
-            android:layout_weight="1"
-            android:clipToPadding="false"
-            android:columnWidth="180dp"
-            android:fadingEdge="none"
-            android:horizontalSpacing="12dp"
-            android:layoutDirection="rtl"
-            android:listSelector="@android:color/transparent"
-            android:numColumns="4"
-            android:padding="4dp"
-            android:scrollbars="none"
-            android:stretchMode="columnWidth"
-            android:verticalSpacing="12dp"
-            android:visibility="gone" />
 
         <TextView
             android:id="@+id/hint"
@@ -153,7 +90,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:gravity="center"
-            android:text="@string/hint_main"
+            android:text="@string/hint_quran_fav"
             android:textColor="@color/dim"
             android:textSize="13sp" />
     </LinearLayout>

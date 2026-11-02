@@ -215,12 +215,13 @@ check("every voice is named", "عبدالملك الملا" in adhan and "عبد
 check("the adhan is cached on the TV", "getCacheDir()" in adhan)
 
 main = text(TILAWAH / "MainActivity.java")
-check("the screen has four sections: reciters, Moroccan radios, live Quran, adhan",
-      all(t in main for t in ("TAB_RECITERS", "TAB_MA", "TAB_QURAN", "TAB_ADHAN")))
+check("the screen has two sections: «القرآن الكريم» and the radios; the adhan tab is gone from it",
+      all(t in main for t in ("TAB_QURAN", "TAB_RADIO")) and "TAB_ADHAN" not in main and "TAB_MA" not in main)
 check("left/right switches the section", "KEYCODE_DPAD_LEFT" in main and "selectTab(" in main)
 check("the sections are drawn as a tab bar",
       'android:id="@+id/tabs"' in text(APP / "res/layout/activity_main.xml")
-      and "@+id/tab_adhan" in text(APP / "res/layout/activity_main.xml"))
+      and "@+id/tab_stations" in text(APP / "res/layout/activity_main.xml")
+      and "@+id/tab_adhan" not in text(APP / "res/layout/activity_main.xml"))
 check("the adhan tab names the muezzin", labels.get("adhan_voice") == "المؤذن")
 
 player = text(TILAWAH / "PlayerActivity.java")
@@ -307,12 +308,16 @@ check("a preview gives way to the real adhan, a real one to no second", "adhanPr
 adhan_src = text(TILAWAH / "Adhan.java")
 check("a download is kept only when it is whole (Content-Length)", "getContentLength()" in adhan_src and "tmp.length() != expected" in adhan_src)
 check("the prefetch skips a failed voice and runs once a day", "prefetchDay" in adhan_src and "download(c, voice);   // a failure" in adhan_src)
-check("the volume row: left and right in steps of 10, OK does nothing",
-      "changeVolume(" in main and "KIND_VOLUME" in main and "prefs.setAdhanVolume(prefs.adhanVolume() >= 100" not in main)
+check("the adhan volume is the adhan's own, in percent, and the TV's volume comes back (the row that sets it is in the settings now)",
+      "int adhanVolume()" in text(TILAWAH / "Prefs.java") and "adhanVolumeUp()" in service_src and "adhanVolumeBack()" in service_src)
 check("music.sh sets the adhan volume", "adhan volume" in music and "ma.chouitv.home.ADHAN_VOLUME" in music and "adhan_volume=" in music)
 check("MusicReceiver takes the volume", "ma.chouitv.home.ADHAN_VOLUME" in text(TILAWAH / "MusicReceiver.java") and "ADHAN_VOLUME" in manifest)
-check("the settings row warns when the alarm may be late", "KIND_EXACT" in main and "adhan_exact_title" in main
-      and "ACTION_REQUEST_SCHEDULE_EXACT_ALARM" in main and "قد يتأخر الأذان دقائق" in text(APP / "res/values/strings.xml"))
+check("the alarm's lateness can be fixed from the system screen (ExactAlarmSettings, for the settings)",
+      "static boolean exactAllowed" in text(TILAWAH / "AdhanScheduler.java")
+      and "ACTION_REQUEST_SCHEDULE_EXACT_ALARM" in text(TILAWAH / "ExactAlarmSettings.java")
+      and "قد يتأخر الأذان دقائق" in text(APP / "res/values/strings.xml"))
+check("the adhan still rings with the tab gone: the screen keeps asking for today's times and sets the alarm",
+      "PrayerTimes.refresh(" in main and "AdhanScheduler.schedule(this)" in main and "Adhan.prefetchAll(this)" in main)
 
 # ---- power and the main thread
 check("the position tick runs only while something plays", "startTick()" in service_src and "stopTick()" in service_src

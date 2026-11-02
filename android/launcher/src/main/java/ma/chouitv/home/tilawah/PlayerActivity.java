@@ -123,7 +123,11 @@ public class PlayerActivity extends Activity {
             title.setText("سورة " + cat.surahName(MusicService.currentSurah()));
             int index = MusicService.reciterIndex();
             if (index >= 0 && index < cat.reciters.size()) artist.setText(cat.reciters.get(index).name);
-            kind.setText(R.string.now_playing);
+            // a list playing: «تستمع الآن  ·  ٢ من ٥»
+            int inList = MusicService.queueSize();
+            kind.setText(inList > 0 ? getString(R.string.now_playing) + "  ·  "
+                    + getString(R.string.queue_position, Ui.arabic(MusicService.queuePosition()), Ui.arabic(inList))
+                    : getString(R.string.now_playing));
             kind.setVisibility(View.VISIBLE);
             live.setVisibility(View.GONE);
             progressBlock.setVisibility(View.VISIBLE);

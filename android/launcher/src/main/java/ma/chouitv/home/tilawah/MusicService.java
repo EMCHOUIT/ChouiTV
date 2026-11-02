@@ -56,6 +56,8 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
 
     static final String EXTRA_RECITER = "reciter";
     static final String EXTRA_SURAH = "surah";
+    /** the surahs of a list as «3,5,9»: absent = one surah alone, as always */
+    static final String EXTRA_QUEUE = "queue";
     static final String EXTRA_STATION = "station";
     static final String EXTRA_VOICE = "voice";
     static final String EXTRA_SECONDS = "seconds";
@@ -65,6 +67,11 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
     private static volatile int source = Prefs.SOURCE_NONE;
     private static volatile boolean playing, buffering, prepared;
     private static volatile int reciter = -1, surah = 1, station = -1;
+    /**
+     * The list of surahs playing one after the other (the current reciter's, in surah order); empty when one surah plays alone. Next and
+     * previous move inside it and go round; when the last one ends the first begins again, so a list plays until it is stopped.
+     */
+    private static volatile int[] queue = new int[0];
     /** The stream being played (a station's place in the list moves when the countries change, its stream does not). */
     private static volatile String stationUrl = "";
     private static volatile int position, duration;
@@ -168,6 +175,10 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
     static int reciterIndex() { return reciter; }
     static int currentSurah() { return surah; }
     static int currentStation() { return station; }
+    /** How many surahs the list playing holds (0: one surah alone) and the place of the current one in it (1-based, 0 when none). */
+    static int queueSize() { return source == Prefs.SOURCE_SURAH ? queue.length : 0; }
+    static int[] queueSnapshot() { return queue.clone(); }
+    static int queuePosition() { return queueSize() == 0 ? 0 : SurahQueue.indexOf(queue, surah) + 1; }
 
     /**
      * The list of radios was read again (countries, ticks, an update): the station playing keeps playing at its new place, and is stopped when
@@ -201,6 +212,14 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
 
     static void playSurah(Context c, String reciterId, int surah) {
         start(c, intent(c, ACTION_PLAY_SURAH).putExtra(EXTRA_RECITER, reciterId).putExtra(EXTRA_SURAH, surah));
+    }
+
+    /** Plays these surahs of a reciter one after the other, from the one at `startAt` of the queue (surah order); round to the first at the end. */
+    static void playQueue(Context c, String reciterId, int[] surahs, int startAt) {
+        if (surahs.length == 0) return;
+        int at = Math.max(0, Math.min(surahs.length - 1, startAt));
+        start(c, intent(c, ACTION_PLAY_SURAH).putExtra(EXTRA_RECITER, reciterId).putExtra(EXTRA_SURAH, surahs[at])
+                .putExtra(EXTRA_QUEUE, SurahQueue.csv(surahs)));
     }
 
     static void playRadio(Context c, int index) {
@@ -256,9 +275,13 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
         foreground();
 
         switch (action) {
-            case ACTION_PLAY_SURAH:
+            case ACTION_PLAY_SURAH: {
+                // a list comes with the surah; none means one surah alone (the queue of a list before is dropped)
+                int index = cat.reciterIndex(intent.getStringExtra(EXTRA_RECITER));
+                queue = index < 0 ? new int[0] : queueFor(index, intent.getStringExtra(EXTRA_QUEUE));
                 playSurahById(intent.getStringExtra(EXTRA_RECITER), intent.getIntExtra(EXTRA_SURAH, 1), 0);
                 break;
+            }
             case ACTION_PLAY_RADIO:
                 playRadio(intent.getIntExtra(EXTRA_STATION, 0));
                 break;
@@ -307,11 +330,19 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
         playSurah(index, n, startAt);
     }
 
+    /** A list as the reciter has it (surah order, only surahs the reciter has); empty for none. */
+    private int[] queueFor(int reciterIndex, String csv) {
+        return SurahQueue.parse(csv, cat.reciters.get(reciterIndex).surahs);
+    }
+
     private void playSurah(int index, int n, int startAt) {
         if (index < 0 || index >= cat.reciters.size()) return;
         Catalog.Reciter r = cat.reciters.get(index);
         if (n < 1) n = 1;
         if (n > r.surahs) n = r.surahs;
+        // the list is set by whoever starts it (the intent, «متابعة»); the steps inside it and the return from the adhan keep it, a surah that
+        // is not in it ends it
+        if (queue.length > 0 && SurahQueue.indexOf(queue, n) < 0) queue = new int[0];
         source = Prefs.SOURCE_SURAH;
         reciter = index;
         surah = n;
@@ -319,12 +350,14 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
         retries = 0;
         pendingSeek = Math.max(0, startAt);
         prefs.save(source, r.id, surah, station, pendingSeek);
+        prefs.setQueue(SurahQueue.csv(queue));
         startUrl(r.server + String.format(Locale.US, "%03d", n) + ".mp3");
     }
 
     private void playRadio(int index) {
         if (index < 0 || index >= cat.stations.size()) return;
         source = Prefs.SOURCE_RADIO;
+        queue = new int[0];
         station = index;
         reciter = -1;
         surah = 1;
@@ -521,6 +554,10 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
     void next() {
         if (source == Prefs.SOURCE_ADHAN) return;
         if (source == Prefs.SOURCE_SURAH && reciter >= 0) {
+            if (queue.length > 0) {   // a list: the next one of it, the first after the last
+                playSurahAgain(reciter, queue[SurahQueue.step(queue, SurahQueue.indexOf(queue, surah), 1)]);
+                return;
+            }
             int total = cat.reciters.get(reciter).surahs;
             playSurahAgain(reciter, surah >= total ? 1 : surah + 1);
         } else if (source == Prefs.SOURCE_RADIO && station >= 0) {
@@ -541,6 +578,10 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
         if (source == Prefs.SOURCE_ADHAN) return;
         if (source == Prefs.SOURCE_SURAH && reciter >= 0) {
             if (position > 5000) { seekTo(0); return; }
+            if (queue.length > 0) {   // a list: the one before in it, the last one before the first
+                playSurahAgain(reciter, queue[SurahQueue.step(queue, SurahQueue.indexOf(queue, surah), -1)]);
+                return;
+            }
             int total = cat.reciters.get(reciter).surahs;
             playSurahAgain(reciter, surah <= 1 ? total : surah - 1);
         } else if (source == Prefs.SOURCE_RADIO && station >= 0) {
@@ -602,6 +643,10 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
     private void resumeLastInternal() {
         int last = prefs.source();
         if (last == Prefs.SOURCE_SURAH) {
+            // the list that was playing comes back with the surah (it only counts when the surah is one of its own)
+            int index = cat.reciterIndex(prefs.reciter());
+            int[] saved = index < 0 ? new int[0] : queueFor(index, prefs.queue());
+            queue = SurahQueue.indexOf(saved, prefs.surah()) >= 0 ? saved : new int[0];
             playSurahById(prefs.reciter(), prefs.surah(), prefs.position());
         } else if (last == Prefs.SOURCE_RADIO) {
             playRadio(prefs.stationIn(cat));
@@ -623,6 +668,7 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
         duration = 0;
         error = null;
         source = Prefs.SOURCE_NONE;
+        queue = new int[0];   // (the list is kept in the prefs by save() above, for «متابعة»)
         adhanName = null;
         handler.removeCallbacks(sleepStart);
         handler.removeCallbacks(fade);
@@ -654,6 +700,7 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
         if (source == Prefs.SOURCE_ADHAN) return;   // «متابعة» must still point at the surah, not the adhan
         String id = reciter >= 0 && reciter < cat.reciters.size() ? cat.reciters.get(reciter).id : "";
         prefs.save(source, id, surah, station, position);
+        if (source == Prefs.SOURCE_SURAH) prefs.setQueue(SurahQueue.csv(queue));
     }
 
     // ---- sleep timer: a 15-second gentle fade, then stop ----
@@ -734,13 +781,19 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
         sendBroadcast(new Intent(NowPlaying.CHANGED).setPackage(getPackageName()));
     }
 
+    /** «  ·  ٢ من ٥» while a list plays, else nothing */
+    private String queueSuffix() {
+        int n = queueSize();
+        return n > 0 ? "  ·  " + getString(R.string.queue_position, Ui.arabic(queuePosition()), Ui.arabic(n)) : "";
+    }
+
     private void updateSession() {
         announce();
         if (session == null) return;
         String title = "الاستماع", artist = "";
         if (source == Prefs.SOURCE_SURAH && reciter >= 0 && reciter < cat.reciters.size()) {
             title = "سورة " + cat.surahName(surah);
-            artist = cat.reciters.get(reciter).name;
+            artist = cat.reciters.get(reciter).name + queueSuffix();
         } else if (source == Prefs.SOURCE_RADIO && station >= 0 && station < cat.stations.size()) {
             title = cat.stations.get(station).name;
             artist = getString(R.string.live);
@@ -799,7 +852,7 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
         String title = "الاستماع", text = "";
         if (source == Prefs.SOURCE_SURAH && reciter >= 0 && reciter < cat.reciters.size()) {
             title = "سورة " + cat.surahName(surah);
-            text = cat.reciters.get(reciter).name;
+            text = cat.reciters.get(reciter).name + queueSuffix();
         } else if (source == Prefs.SOURCE_RADIO && station >= 0 && station < cat.stations.size()) {
             title = cat.stations.get(station).name;
             text = getString(R.string.live);

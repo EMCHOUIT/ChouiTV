@@ -41,4 +41,10 @@ check("the radios are written with the adhan and the dock", "RadioBackup.apply(c
 check("a country of the file with no list here is downloaded after the import", "downloadMissing(c)" in backup and "RadioStore.changed(c)" in backup)
 check("the file does not carry the downloaded lists, only the choices", "countries" in backup and "fav" in backup and "downloaded" not in backup.split("export(")[1].split("private static String join")[0])
 check("the screensaver compares the radios and names them", '"adhan", "dock", "radio"' in saver and "radio.countries" in saver)
+# the favourite reciters and the saved lists travel in the radios' part of the file (so the screensaver's preview lists them without a change of its own)
+check("the file carries the favourite reciters («rfav») and the saved lists («plists») in the radios' part",
+      '"rfav"' in backup and '"plists"' in backup and "ReciterStore.favourites(c)" in backup and "Playlists.serialize(" in backup)
+check("a file with a bad list is refused before anything is written", "Playlists.check(want.optString(\"rfav\"), want.optString(\"plists\"))" in backup)
+check("a file from before 4.1 (neither key) empties the favourite reciters and the lists, like the other settings it does not name",
+      "applyReciters(c, want)" in backup and "Playlists.splitFavourites(want.optString(\"rfav\"), fav)" in backup)
 sys.exit(1 if failed else 0)
