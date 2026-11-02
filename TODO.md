@@ -51,3 +51,10 @@ Blocking errors: none (builds and tests green; `tests/check.py` needs the `fontT
 - [ ] Optional distinct label for the new screensaver entry «(الجديدة)».
 
 Rule kept: nothing is pushed or published without an explicit «Oui, publie».
+
+## Companion 1.8 (branch v18 in /home/elmehdi/wt-installer161, built, tested on the phone with TV1, NOT pushed, NOT published)
+- Done: Remote space (pad, keys, "Ouvrir sur la tele": Accueil, Ecran de veille, Listening, Channels), text sending through the TV clipboard + Paste key (helper/Clip.java -> assets/helper/clip.jar, pushed with Adb.pushShell because the TV refuses sync:), "not installed" -> offer to install, "cannot open" -> toast + home, new name ChouiTV Companion (label only). 140 JVM tests. APK in /home/elmehdi/relinst18.
+- Tested on the phone (USB, Windows adb at C:\platform-tools\adb.exe, serial 5cf83c33) with TV1: Channels opens, Screensaver starts (DreamActivity), Listening opens with the dev ChouiTV (tilawah.MainActivity exported, commit c2da9e4 on v4 = needed for ChouiTV 4.2), text typed on the phone appears in a real TV text field (settings > city search).
+- Not tested: Arabic typed from the phone (same code path, proven with the helper alone), the pad keys on a real navigation, Channels missing -> install offer, README/images, QR popup text that still says "ChouiTV Installer".
+- TV1 runs a DEBUG ChouiTV "4.2-dev" (code 221) installed with -r -d: reinstall the published APK to go back.
+- PowerShell script files with accents are read as ANSI: use ASCII substrings or a BOM.
