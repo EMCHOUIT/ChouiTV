@@ -43,3 +43,7 @@ com.tcl.keycustomfunctionservice       # provides a fallback home on some sets
 # Accessibility and sound
 com.tcl.hearaid
 com.google.android.marvin.talkback
+
+# Xiaomi / MediaTek sets: with these off the Settings > TV > Picture menu does not open (seen on a Mi TV, Android 11, after a community list had turned them off)
+mitv.service                           # the TV service behind the picture and sound settings and the live TV panel
+com.xiaomi.mitv.tvmanager              # Mi TV Manager, turned off together with the service above; kept on to be safe
