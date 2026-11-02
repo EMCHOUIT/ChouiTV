@@ -81,7 +81,25 @@ public final class TilawahListsRun {
                     break;
                 }
                 case "count": out.append(Playlists.surahCount(Integer.parseInt(f[1]))); break;
-                case "chip": out.append(Playlists.defaultChip(f[1].equals("1"), f[2].equals("1")) == Playlists.CHIP_FAV ? "fav" : "reciters"); break;
+                case "chip": {
+                    int c = Playlists.defaultChip(f[1].equals("1"), f[2].equals("1"));
+                    out.append(c == Playlists.CHIP_LISTS ? "lists" : c == Playlists.CHIP_FAV ? "fav" : "reciters");
+                    break;
+                }
+                case "clean": out.append(Playlists.cleanName(f[1])); break;
+                case "uniq": out.append(Playlists.uniqueName(Playlists.parse(nl(arg(f, 3))), f[1], f[2], arg(f, 4))); break;
+                case "addnamed": {
+                    List<Playlists.Item> items = Playlists.parse(nl(arg(f, 4)));
+                    Playlists.addNamed(items, f[1], queue(f[2]), f[3]);
+                    out.append(out(items));
+                    break;
+                }
+                case "rename": {
+                    List<Playlists.Item> items = Playlists.parse(nl(arg(f, 4)));
+                    Playlists.rename(items, f[1], f[2], f[3]);
+                    out.append(out(items));
+                    break;
+                }
                 case "check": {
                     String bad = Playlists.check(arg(f, 1), nl(arg(f, 2)));
                     out.append(bad == null ? "OK" : bad);

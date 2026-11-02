@@ -52,7 +52,7 @@ Not carried over: the photos «صوري» and the tasks (the export does not hol
 | | |
 |---|---|
 | <img src="screenshots/02-tilawah-reciters.jpg" alt="The reciters tab" width="320"> | <img src="screenshots/03-adhan-times.jpg" alt="The adhan tab" width="320"> |
-| The **«القرآن الكريم»** tab — chips «★ المفضلة · القرّاء · مباشر»: forty reciters, 114 surahs each, and «متابعة التلاوة» when a surah is paused | The adhan is in the **settings**, tab «الصلاة», group «أذان الصلوات» (4.1): today's five times, the voice, the volume, which prayers ring |
+| The **«القرآن الكريم»** tab — chips «★ القرّاء المفضلون · قوائم السور · القرّاء · مباشر»: forty reciters, 114 surahs each, and «متابعة التلاوة» when a surah is paused | The adhan is in the **settings**, tab «الصلاة», group «أذان الصلوات» (4.1): today's five times, the voice, the volume, which prayers ring |
 | <img src="screenshots/05-muezzins.jpg" alt="The muezzins" width="320"> | <img src="screenshots/07-surah-grid.jpg" alt="The surah grid" width="320"> |
 | The **«المؤذن»** list — 21 named recordings; the chosen one in gold with its city | The **«سورة»** grid — the 114 surahs of a reciter, six columns, right to left |
 | <img src="screenshots/06-adhan-player.jpg" alt="The adhan in the player" width="320"> | <img src="screenshots/08-player.jpg" alt="A surah in the player" width="320"> |
@@ -69,17 +69,20 @@ Not carried over: the photos «صوري» and the tasks (the export does not hol
 
 - **The screen** (4.1): a tab bar under the title with two tabs, read from the right: «القرآن الكريم» (the default) and «الإذاعات». Left/Right switches
   section from anywhere on the screen; Down (or OK on the tab) enters the chips/list and Up from the first row goes back to the tabs.
-  «القرآن الكريم» has three chips (Left/Right between them, Down into the cards): «★ المفضلة» (your favourite reciters first, then your saved
-  lists of surahs; the default chip when there is anything in it), «القرّاء» (the forty reciters, with «متابعة التلاوة» first when a surah is
-  paused) and «مباشر» (the live Quran stations). A long OK on a reciter makes it a favourite (a gold ★); a long OK on a saved list opens its
-  menu (edit, delete after a confirmation). «الإذاعات» is the radios, country chips and stations, as before. The adhan is not here any more:
+  «القرآن الكريم» has four chips (Left/Right between them, Down into the cards): «★ القرّاء المفضلون» (your favourite reciters only),
+  «قوائم السور» (your saved lists of surahs only; the default chip when there are lists, else the favourite reciters when there are some, else
+  «القرّاء»), «القرّاء» (the forty reciters, with «متابعة التلاوة» first when a surah is paused) and «مباشر» (the live Quran stations). An empty
+  favourites or lists chip shows a one-line invitation. A long OK on a reciter makes it a favourite (a gold ★); a long OK on a saved list opens its
+  menu (edit, rename, delete after a confirmation). «الإذاعات» is the radios, country chips and stations, as before. The adhan is not here any more:
   it moved to the settings, tab «الصلاة», group «أذان الصلوات» (automatic adhan, muezzin, volume in steps of 10, which prayers ring, today's
   five times; the «قد يتأخر الأذان دقائق» warning when exact alarms are not allowed). The selected card has a solid dark fill, a thick gold
   frame and a gold chevron at the end, so it is visible from the couch.
 - **Lists of surahs** (4.1): in a reciter's surah screen a long OK ticks or unticks a surah (a gold box); OK alone plays that surah as before.
   As soon as one is ticked a bar offers «▶ تشغيل المحدد (N)» (plays the ticked surahs in order, one after the other, and loops to the first
   at the end until stopped), «تحديد الكل», «مسح» and «حفظ كقائمة». Several lists can be saved, each for one reciter (automatic names «قائمة ١»,
-  «قائمة ٢»…); a list opened from «★ المفضلة» arrives ticked and the bar says «حفظ التعديلات». Next/previous (notification, media keys, the home
+  «قائمة ٢»…). «حفظ كقائمة» asks for the name with the TV keyboard, prefilled with the automatic one (OK keeps it); «إعادة التسمية» in a list's
+  long-OK menu asks again. A name is cut to 40 characters, an empty one is refused, and a name that this reciter already has gets « ٢», « ٣»…
+  (`NameDialog`, `Playlists.uniqueName`; the settings file refuses two lists of the same name for one reciter). A list opened from «قوائم السور» arrives ticked and the bar says «حفظ التعديلات». Next/previous (notification, media keys, the home
   card) move inside the list. Favourites and lists are in the exported settings (`radio.rfav`, `radio.plists`).
 - **Surah grid**: the 114 surahs in reading order, right to left; OK opens the player.
 - **Player**: title, reciter/station, progress, and a transport row. The transport controls stay

@@ -198,14 +198,16 @@ public class SurahActivity extends Activity {
             Toast.makeText(this, getString(R.string.list_updated, Ui.digits(listName)), Toast.LENGTH_SHORT).show();
             return;
         }
-        int before = ReciterStore.lists(this).size();
-        Playlists.Item made = ReciterStore.addList(this, reciter.id, q);
-        if (made == null) return;
-        boolean isNew = ReciterStore.lists(this).size() > before;
-        Toast.makeText(this, getString(isNew ? R.string.list_saved : R.string.list_exists, Ui.digits(made.name)), Toast.LENGTH_SHORT).show();
-        listName = made.name;   // saving again updates this list instead of making another
-        showListName();
-        updateBar();
+        // the name is asked for, prefilled with the automatic one («قائمة ٢»): OK keeps it
+        String suggested = Playlists.nextName(ReciterStore.lists(this), reciter.id);
+        NameDialog.ask(this, getString(R.string.name_title), suggested, name -> {
+            Playlists.Item made = ReciterStore.addNamedList(this, reciter.id, queue(), name);
+            if (made == null) return;
+            Toast.makeText(this, getString(R.string.list_saved, Ui.digits(made.name)), Toast.LENGTH_SHORT).show();
+            listName = made.name;   // saving again updates this list instead of making another
+            showListName();
+            updateBar();
+        });
     }
 
     // ---- keys ----

@@ -103,13 +103,20 @@
     <string name="radio_untick_all">إلغاء تحديد الكل</string>
 
     <!-- «القرآن الكريم»: the chips, the favourites, the lists of surahs -->
-    <string name="quran_fav">المفضلة</string>
+    <string name="quran_fav">القرّاء المفضلون</string>
+    <string name="quran_lists">قوائم السور</string>
     <string name="quran_reciters">القرّاء</string>
     <string name="quran_live">مباشر</string>
-    <string name="hint_quran_fav">اختيار للفتح أو التشغيل  •  مطوّلًا: مفضّل أو خيارات القائمة  •  أعلى: الأقسام  •  رجوع</string>
-    <string name="hint_quran_reciters">اختيار للفتح  •  مطوّلًا: مفضّل  •  أعلى: الأقسام  •  رجوع</string>
+    <string name="hint_quran_lists">اختيار للتشغيل  •  مطوّلًا: تعديل أو إعادة تسمية أو حذف  •  أعلى: الأقسام  •  رجوع</string>
+    <string name="hint_quran_reciters">اختيار للفتح  •  مطوّلًا: إضافة إلى المفضلين أو إزالة  •  أعلى: الأقسام  •  رجوع</string>
     <string name="hint_quran_live">اختيار للاستماع  •  أعلى: الأقسام  •  رجوع</string>
-    <string name="quran_no_favourites">لا مفضلات بعد. اضغط مطوّلًا على «اختيار» فوق قارئ لإضافته، أو احفظ قائمة من صفحة القارئ.</string>
+    <string name="quran_no_favourites">لا قرّاء مفضلون بعد: اضغط مطوّلًا على قارئ</string>
+    <string name="quran_no_lists">لا قوائم بعد: حدّد سورًا في صفحة قارئ ثم «حفظ كقائمة»</string>
+    <string name="list_menu_rename">إعادة التسمية</string>
+    <string name="name_title">اسم القائمة</string>
+    <string name="name_save">حفظ</string>
+    <string name="name_cancel">إلغاء</string>
+    <string name="name_empty">اكتب اسمًا للقائمة</string>
     <string name="fav_reciter_on">★  مفضّل</string>
     <string name="fav_reciter_off">☆  أضف إلى المفضلة</string>
     <string name="hint_surah">اختيار: تشغيل السورة  •  مطوّلًا: تحديد للقائمة  •  رجوع</string>
@@ -121,7 +128,6 @@
     <string name="save_list_changes">حفظ التعديلات</string>
     <string name="list_saved">حُفظت «%1$s»</string>
     <string name="list_updated">حُدِّثت «%1$s»</string>
-    <string name="list_exists">هذه السور محفوظة في «%1$s»</string>
     <string name="list_menu_edit">تعديل القائمة</string>
     <string name="list_menu_delete">حذف القائمة</string>
     <string name="list_menu_close">رجوع</string>
