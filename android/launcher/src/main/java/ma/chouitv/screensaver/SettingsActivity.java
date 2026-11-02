@@ -1286,7 +1286,7 @@ public class SettingsActivity extends Activity {
         title.setGravity(Gravity.CENTER);
         box.addView(title, new LinearLayout.LayoutParams(-1, -2));
         TextView intro = new TextView(this);
-        intro.setText("ChouiTV Installer تطبيق يُثبَّت على هاتف ضيفك، ثم يثبّت الهاتفُ ChouiTV على تلفزيونه.");
+        intro.setText("ChouiTV Installer تطبيق يُثبَّت على هاتف ضيفك، ثم يثبّت الهاتفُ ChouiTV على تلفزيونه. لا يُثبَّت شيء على هذا التلفزيون.");
         intro.setTextColor(0xFFF6EFE0);
         intro.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         intro.setGravity(Gravity.CENTER);
@@ -1310,29 +1310,23 @@ public class SettingsActivity extends Activity {
             LinearLayout cell = new LinearLayout(this);
             cell.setOrientation(LinearLayout.VERTICAL);
             cell.setGravity(Gravity.CENTER_HORIZONTAL);
-            cell.addView(new StepGlyph(this, k), new LinearLayout.LayoutParams(dp(110), dp(76)));
+            cell.addView(new StepGlyph(this, k), new LinearLayout.LayoutParams(dp(100), dp(68)));
             TextView t = new TextView(this);
             t.setText(words[k]);
             t.setTextColor(0xFFF6EFE0);
-            t.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+            t.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
             t.setGravity(Gravity.CENTER);
             t.setPadding(dp(4), dp(6), dp(4), 0);
             cell.addView(t, new LinearLayout.LayoutParams(-1, -2));
-            steps.addView(cell, new LinearLayout.LayoutParams(dp(176), -2));
+            steps.addView(cell, new LinearLayout.LayoutParams(dp(170), -2));
         }
         box.addView(steps, new LinearLayout.LayoutParams(-2, -2));
 
-        TextView note = new TextView(this);
-        note.setText("لا يُثبَّت شيء على هذا التلفزيون");
-        note.setTextColor(0xFFC6BBA4);
-        note.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-        note.setGravity(Gravity.CENTER);
-        note.setPadding(0, dp(14), 0, dp(4));
-        box.addView(note, new LinearLayout.LayoutParams(-1, -2));
         ScrollView scroll = new ScrollView(this);   // a 1080p screen is short: the steps scroll, the button stays
         scroll.addView(box);
         AlertDialog d = new Dlg(this).setView(scroll).setPositiveButton("عرض الرمز", (x, w) -> showInstallerQr()).create();
         d.show();
+        if (d.getWindow() != null) d.getWindow().setBackgroundDrawableResource(R.drawable.glass_dialog_solid);
         android.widget.Button go = d.getButton(AlertDialog.BUTTON_POSITIVE);
         if (go != null) go.requestFocus();   // OK shows the code at once
     }
