@@ -38,6 +38,9 @@ GITHUB_RUN_NUMBER=<n> $G -p . :launcher:assembleDebug --offline -q
 - Garder `ChouiTV-Installer.apk` comme alias stable du lien (le QR de ChouiTV 4.1 pointe dessus).
 - Économie de tokens : pas d'agents sans demande, lectures ciblées (offset/limit, grep), captures réduites, `/compact` entre deux lots.
 
+## Listes de nettoyage
+- Après toute modification de  : wrote /home/elmehdi/urtv-patch/optimize/lists/cleanup.json: 114861 bytes, 1223 packages (ads 86, optional 31, preinstalled 1080, tracking 26), 254 lists, consensus 39, sha256 01384e947026, puis OK   optimize/lists/cleanup.json signed (optimize/lists/cleanup.json.sig) (écrit ), puis copier  dans  de l'Installer.  (avec ) vérifie la signature et la copie.
+
 ## Pièges connus
 - `pm disable-user`, `uninstall --user 0` et `appops` sont remis à zéro à chaque démarrage pour Netflix et Prime Video sur MiTV-MSSP3 ; seul `am kill` après démarrage tient.
 - Ne jamais désactiver `mitv.service` (protégé dans `optimize/lists/keep.txt`).
