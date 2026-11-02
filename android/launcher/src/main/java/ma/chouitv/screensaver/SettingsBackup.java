@@ -146,7 +146,7 @@ final class SettingsBackup {
             {"adhan.adhan_on", "الأذان التلقائي"}, {"adhan.adhan_voice", "المؤذن"}, {"adhan.adhan_volume", "صوت الأذان"},
             {"adhan.adhan_p0", "أذان الفجر"}, {"adhan.adhan_p1", "أذان الظهر"}, {"adhan.adhan_p2", "أذان العصر"},
             {"adhan.adhan_p3", "أذان المغرب"}, {"adhan.adhan_p4", "أذان العشاء"},
-            {"radio.countries", "بلدان الإذاعات"}, {"radio.off", "إذاعات مُلغاة"}, {"radio.fav", "مفضلة الإذاعات"},
+            {"radio.countries", "بلدان الإذاعات"}, {"radio.off", "إذاعات مُلغاة"}, {"radio.fav", "مفضلة الإذاعات"}, {"radio.rfav", "القرّاء المفضلون"}, {"radio.plists", "قوائم السور"},
             {"dock.dock", "ترتيب المفضلة"}, {"dock.hidden", "التطبيقات المخفية"}, {"dock.shown", "التطبيقات المُظهَرة"}, {"dock.names", "أسماء التطبيقات"},
         };
         for (String[] p : l) LABELS.put(p[0], p[1]);

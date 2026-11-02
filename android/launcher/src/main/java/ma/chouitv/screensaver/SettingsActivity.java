@@ -1203,7 +1203,7 @@ public class SettingsActivity extends Activity {
 
     private void adhanRows() {
         header("أذان الصلوات");
-        row("الأذان التلقائي", AdhanSettings.stateLine(this), R.drawable.ic_listen, new Runnable() { public void run() {
+        row("الأذان التلقائي", AdhanSettings.stateLine(this), R.drawable.ic_bell, new Runnable() { public void run() {
             AdhanSettings.setOn(SettingsActivity.this, !AdhanSettings.on(SettingsActivity.this));
             render();
         } });
@@ -1215,7 +1215,7 @@ public class SettingsActivity extends Activity {
         row("صوت المؤذّن", AdhanSettings.voiceLine(this), R.drawable.ic_mic, new Runnable() { public void run() {
             startActivity(AdhanSettings.voiceScreen(SettingsActivity.this));   // back (or a choice) returns here; onResume shows the new voice
         } });
-        volumeRow = row("مستوى الصوت", AdhanSettings.volumeLine(this) + VOLUME_HINT, R.drawable.ic_listen, null);
+        volumeRow = row("مستوى الصوت", AdhanSettings.volumeLine(this) + VOLUME_HINT, R.drawable.ic_volume, null);
         row("الصلوات", AdhanSettings.prayersLine(this), R.drawable.ic_eye, new Runnable() { public void run() { pickAdhanPrayer(); } });
         row("الصلوات اليوم", todayLine(), R.drawable.ic_eye, new Runnable() { public void run() {
             new Dlg(SettingsActivity.this).setTitle("الصلوات اليوم").setItems(AdhanSettings.todayLines(SettingsActivity.this), null).show();
@@ -1249,7 +1249,7 @@ public class SettingsActivity extends Activity {
     private static final String INSTALLER_LINK = "https://github.com/EMCHOUIT/ChouiTV-Installer/releases/latest/download/ChouiTV-Installer.apk";
 
     private View qrInstallerRow() {
-        return row("تحميل ChouiTV Installer لتلفزيون آخر", "اعرض الرمز على ضيوفك ليثبّتوا ChouiTV على تلفزيونهم", R.drawable.ic_sync,
+        return row("تحميل ChouiTV Installer لتلفزيون آخر", "اعرض الرمز على ضيوفك ليثبّتوا ChouiTV على تلفزيونهم", R.drawable.ic_qr,
             new Runnable() { public void run() { showInstallerQr(); } });
     }
 
