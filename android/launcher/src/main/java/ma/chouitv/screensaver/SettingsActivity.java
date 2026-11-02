@@ -258,6 +258,8 @@ public class SettingsActivity extends Activity {
         choiceRow("المنطقة الزمنية", "tz_choice", "", Prefs.TZ_CHOICES);
         row("طريقة حساب الصلاة", prefs.prayerMethodLabel(), R.drawable.ic_eye, new Runnable() { public void run() {
             pickChoice("طريقة حساب الصلاة", "pm_choice", "auto", Prefs.PM_CHOICES); } });
+        row("تعديل التاريخ الهجري", hijriRowValue(), R.drawable.ic_language, new Runnable() { public void run() {
+            pickChoice("تعديل التاريخ الهجري (لا يغيّر مواقيت الصلاة)", "hijri", "0", ma.chouitv.home.HijriShift.CHOICES); } });
 
         header("العرض");
         noConv = true;
@@ -1243,6 +1245,20 @@ public class SettingsActivity extends Activity {
         if (value instanceof TextView) ((TextView) value).setText(noConv ? text : conv(text));
     }
 
+    /** «بلا تعديل · ٣ ذو الحجة ١٤٤٧ هـ»: the adjustment and the Hijri date it gives today (the city's zone). */
+    private String hijriRowValue() {
+        int shift = prefs.hijriShift();
+        String label = ma.chouitv.home.HijriShift.label(shift);
+        try {
+            android.icu.text.SimpleDateFormat f = new android.icu.text.SimpleDateFormat("d MMMM y", new android.icu.util.ULocale("ar_SA@calendar=islamic-umalqura"));
+            f.setTimeZone(android.icu.util.TimeZone.getTimeZone(prefs.effectiveTz()));
+            String date = f.format(new java.util.Date(System.currentTimeMillis() + ma.chouitv.home.HijriShift.millis(shift))).replaceAll("\\s*هـ\\s*$", "");
+            return label + " · " + date + " هـ";
+        } catch (Exception | LinkageError e) {
+            return label;
+        }
+    }
+
     // ---- «تحميل ChouiTV Installer لتلفزيون آخر»: a big QR for the phone of a guest ----
 
     private static final int QR_DP = 360;   // the code on a white card: a phone reads it from the sofa
@@ -1250,7 +1266,126 @@ public class SettingsActivity extends Activity {
 
     private View qrInstallerRow() {
         return row("تحميل ChouiTV Installer لتلفزيون آخر", "اعرض الرمز على ضيوفك ليثبّتوا ChouiTV على تلفزيونهم", R.drawable.ic_qr,
-            new Runnable() { public void run() { showInstallerQr(); } });
+            new Runnable() { public void run() { showInstallerHelp(); } });
+    }
+
+    /**
+     * First, what this is: ChouiTV Installer goes on the GUEST'S PHONE and the phone installs ChouiTV on their TV; nothing is installed on this one.
+     * Three steps drawn with views (a phone, a TV, arrows: no image), one button «عرض الرمز» that opens the code. Back closes.
+     */
+    private void showInstallerHelp() {
+        LinearLayout box = new LinearLayout(this);
+        box.setOrientation(LinearLayout.VERTICAL);
+        box.setGravity(Gravity.CENTER_HORIZONTAL);
+        box.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+        box.setPadding(dp(20), dp(16), dp(20), dp(8));
+        TextView title = new TextView(this);
+        title.setText("تحميل ChouiTV Installer لتلفزيون آخر");
+        title.setTextColor(0xFFD6AF6B);
+        title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
+        title.setGravity(Gravity.CENTER);
+        box.addView(title, new LinearLayout.LayoutParams(-1, -2));
+        TextView intro = new TextView(this);
+        intro.setText("ChouiTV Installer تطبيق يُثبَّت على هاتف ضيفك، ثم يثبّت الهاتفُ ChouiTV على تلفزيونه.");
+        intro.setTextColor(0xFFF6EFE0);
+        intro.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+        intro.setGravity(Gravity.CENTER);
+        intro.setPadding(0, dp(8), 0, dp(14));
+        box.addView(intro, new LinearLayout.LayoutParams(-1, -2));
+
+        LinearLayout steps = new LinearLayout(this);   // the first step on the right, like the reading
+        steps.setOrientation(LinearLayout.HORIZONTAL);
+        steps.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+        steps.setGravity(Gravity.CENTER);
+        String[] words = {"١  امسح الرمز بهاتفك", "٢  ثبّت ChouiTV Installer على هاتفك", "٣  من الهاتف، ثبّت ChouiTV على تلفزيونك (على نفس شبكة الواي فاي)"};
+        for (int k = 0; k < 3; k++) {
+            if (k > 0) {
+                TextView arrow = new TextView(this);
+                arrow.setText("‹");   // points left: the next step is on the left
+                arrow.setTextColor(0xFFD6AF6B);
+                arrow.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30);
+                arrow.setPadding(dp(4), 0, dp(4), dp(40));
+                steps.addView(arrow, new LinearLayout.LayoutParams(-2, -2));
+            }
+            LinearLayout cell = new LinearLayout(this);
+            cell.setOrientation(LinearLayout.VERTICAL);
+            cell.setGravity(Gravity.CENTER_HORIZONTAL);
+            cell.addView(new StepGlyph(this, k), new LinearLayout.LayoutParams(dp(110), dp(76)));
+            TextView t = new TextView(this);
+            t.setText(words[k]);
+            t.setTextColor(0xFFF6EFE0);
+            t.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+            t.setGravity(Gravity.CENTER);
+            t.setPadding(dp(4), dp(6), dp(4), 0);
+            cell.addView(t, new LinearLayout.LayoutParams(-1, -2));
+            steps.addView(cell, new LinearLayout.LayoutParams(dp(176), -2));
+        }
+        box.addView(steps, new LinearLayout.LayoutParams(-2, -2));
+
+        TextView note = new TextView(this);
+        note.setText("لا يُثبَّت شيء على هذا التلفزيون");
+        note.setTextColor(0xFFC6BBA4);
+        note.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+        note.setGravity(Gravity.CENTER);
+        note.setPadding(0, dp(14), 0, dp(4));
+        box.addView(note, new LinearLayout.LayoutParams(-1, -2));
+        ScrollView scroll = new ScrollView(this);   // a 1080p screen is short: the steps scroll, the button stays
+        scroll.addView(box);
+        AlertDialog d = new Dlg(this).setView(scroll).setPositiveButton("عرض الرمز", (x, w) -> showInstallerQr()).create();
+        d.show();
+        android.widget.Button go = d.getButton(AlertDialog.BUTTON_POSITIVE);
+        if (go != null) go.requestFocus();   // OK shows the code at once
+    }
+
+    /** The picture of one step, drawn in gold lines: 0 a phone scanning, 1 a phone with the app coming down, 2 the phone and the TV with an arrow. */
+    private static final class StepGlyph extends View {
+        private final int kind;
+        private final android.graphics.Paint line = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+
+        StepGlyph(android.content.Context c, int kind) {
+            super(c);
+            this.kind = kind;
+            line.setColor(0xFFD6AF6B);
+            line.setStyle(android.graphics.Paint.Style.STROKE);
+            line.setStrokeCap(android.graphics.Paint.Cap.ROUND);
+            line.setStrokeJoin(android.graphics.Paint.Join.ROUND);
+        }
+
+        private void phone(android.graphics.Canvas cv, float cx, float cy, float w, float h) {
+            cv.drawRoundRect(cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2, w / 5, w / 5, line);
+            cv.drawLine(cx - w / 6, cy + h / 2 - h / 12, cx + w / 6, cy + h / 2 - h / 12, line);   // the bar under the screen
+        }
+
+        @Override protected void onDraw(android.graphics.Canvas cv) {
+            float w = getWidth(), h = getHeight(), u = h / 76f;
+            line.setStrokeWidth(3 * u);
+            if (kind < 2) {
+                float cx = w / 2, cy = h / 2;
+                phone(cv, cx, cy, 44 * u, 72 * u);
+                if (kind == 0) {   // the finder squares of a code
+                    float s = 9 * u;
+                    cv.drawRect(cx - 14 * u, cy - 22 * u, cx - 14 * u + s, cy - 22 * u + s, line);
+                    cv.drawRect(cx + 5 * u, cy - 22 * u, cx + 5 * u + s, cy - 22 * u + s, line);
+                    cv.drawRect(cx - 14 * u, cy - 3 * u, cx - 14 * u + s, cy - 3 * u + s, line);
+                    cv.drawRect(cx + 5 * u, cy - 3 * u, cx + 5 * u + 2 * u, cy - 3 * u + 2 * u, line);
+                } else {   // an arrow down into a tray
+                    cv.drawLine(cx, cy - 22 * u, cx, cy + 4 * u, line);
+                    cv.drawLine(cx - 9 * u, cy - 6 * u, cx, cy + 4 * u, line);
+                    cv.drawLine(cx + 9 * u, cy - 6 * u, cx, cy + 4 * u, line);
+                    cv.drawLine(cx - 12 * u, cy + 14 * u, cx + 12 * u, cy + 14 * u, line);
+                }
+            } else {   // the phone on the right sends to the TV on the left
+                phone(cv, w - 24 * u, h / 2, 34 * u, 58 * u);
+                float tx = 6 * u, ty = h / 2 - 22 * u, tw = 54 * u, th = 38 * u;
+                cv.drawRoundRect(tx, ty, tx + tw, ty + th, 4 * u, 4 * u, line);
+                cv.drawLine(tx + tw / 2, ty + th, tx + tw / 2, ty + th + 8 * u, line);
+                cv.drawLine(tx + tw / 2 - 12 * u, ty + th + 8 * u, tx + tw / 2 + 12 * u, ty + th + 8 * u, line);
+                float ay = h / 2 - 3 * u;   // the arrow between them, pointing at the TV
+                cv.drawLine(w - 52 * u, ay, tx + tw + 8 * u, ay, line);
+                cv.drawLine(tx + tw + 8 * u, ay, tx + tw + 15 * u, ay - 6 * u, line);
+                cv.drawLine(tx + tw + 8 * u, ay, tx + tw + 15 * u, ay + 6 * u, line);
+            }
+        }
     }
 
     /** The picture is made at development time (optimize/make_qr.py): the app has no QR library. Back (or OK) closes it. */
@@ -1269,7 +1404,7 @@ public class SettingsActivity extends Activity {
         card.addView(qr, new FrameLayout.LayoutParams(dp(QR_DP), dp(QR_DP)));
         box.addView(card, new LinearLayout.LayoutParams(-2, -2));
         TextView line = new TextView(this);
-        line.setText("امسح الرمز بهاتفك لتنزيل ChouiTV Installer");
+        line.setText("امسح الرمز بهاتفك: يُنزَّل ChouiTV Installer على هاتفك");
         line.setTextColor(0xFFF6EFE0);
         line.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
         line.setGravity(Gravity.CENTER);

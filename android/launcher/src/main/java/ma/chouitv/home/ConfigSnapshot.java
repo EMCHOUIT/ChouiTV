@@ -43,5 +43,8 @@ final class ConfigSnapshot {
     /** {city, zone id}; null when the screensaver gave nothing: the TV's own zone then */
     String[] cityZone() { return fragment == null ? null : ClockZone.parse(fragment); }
 
+    /** «تعديل التاريخ الهجري»: days to add to the Hijri date (-2..+2); 0 from an older screensaver */
+    int hijriShift() { return HijriShift.fromFragment(fragment); }
+
     boolean latin() { return fragment != null && (fragment.contains("&digits=latin") || fragment.startsWith("digits=latin")); }
 }

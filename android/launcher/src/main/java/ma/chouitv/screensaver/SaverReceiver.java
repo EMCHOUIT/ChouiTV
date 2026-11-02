@@ -27,6 +27,7 @@ import java.util.Locale;
  *       [--es markets tasi,gold,btc] [--es corner family,amazigh,occasions,lions,markets] [--es family 'الدار البيضاء,فاس'] [--es mkstyle arrows|prices] [--es stocks 2222,1120,AAPL]
  *       [--es leagues 'Saudi-Arabian Pro League,NBA']
  *       [--es tzchoice city|Africa/Abidjan|Asia/Riyadh|…] [--es pmchoice auto|21|19|18|5|4|16|10|9|8|23|3|12|2|0]   («المنطقة الزمنية», «طريقة حساب الصلاة»)
+ *       [--es hijri -2|-1|0|+1|+2]   («تعديل التاريخ الهجري»: days added to the displayed Hijri date; never the prayer times)
  *       [--es prayeradj on|off] [--es adj_fajr +2 --es adj_dhuhr 0 --es adj_asr 0 --es adj_maghrib -1 --es adj_isha 0]   («تعديل وقت الصلاة», minutes -20..20)
  *       [--es slot matches|weather|fasting|countdown|markets|none] [--es countdown 2026-12-01|clear --es cdname 'رحلة الصيف']
  *   am broadcast -n ma.chouitv.screensaver/.SaverReceiver -a ma.chouitv.screensaver.UPDATE
@@ -180,6 +181,9 @@ public class SaverReceiver extends BroadcastReceiver {
         String pmChoice = i.getStringExtra("pmchoice");   // «طريقة حساب الصلاة»: auto or an Aladhan id of Prefs.PM_CHOICES
         if (pmChoice != null && !"auto".equals(pmChoice) && !Prefs.isMethodChoice(pmChoice))
             return "error: pmchoice is auto or one of " + pmIds();
+        String hijri = i.getStringExtra("hijri");   // «تعديل التاريخ الهجري»: whole days -2..+2
+        if (hijri != null && !hijri.trim().matches("[+-]?[0-2]"))
+            return "error: hijri is one of -2 -1 0 +1 +2";
         String adhanBar = i.getStringExtra("adhanbar");
         if (adhanBar != null && !"on".equals(adhanBar) && !"off".equals(adhanBar))
             return "error: adhanbar is one of on off";
@@ -307,6 +311,7 @@ public class SaverReceiver extends BroadcastReceiver {
         if (autoUpdate != null) p.setAutoUpdate("on".equals(autoUpdate));
         if (tzChoice != null) p.setChoice("tz_choice", "city".equals(tzChoice) ? "" : Prefs.fixTz(tzChoice));
         if (pmChoice != null) p.setChoice("pm_choice", pmChoice);
+        if (hijri != null) p.setChoice("hijri", String.valueOf(ma.chouitv.home.HijriShift.parse(hijri)));
         if (adj != null) p.setPrayerAdj(adj);
         if (prayerAdj != null) p.setPrayerAdjOn("on".equals(prayerAdj));
         if (rating != null) p.setMinRating(rating);
@@ -457,6 +462,7 @@ public class SaverReceiver extends BroadcastReceiver {
             + "\ncity: " + city[0] + " (" + city[1] + ", " + city[2] + ")"
             + "\ntimezone: " + p.effectiveTz() + (p.choice("tz_choice", "").isEmpty() ? " (the city's)" : " (your pick)")
             + "\nprayermethod: " + p.prayerMethodId() + " · " + p.prayerMethodLabel()
+            + "\nhijri: " + p.hijriShift() + " · " + ma.chouitv.home.HijriShift.label(p.hijriShift())
             + "\nteams: " + Prefs.join(p.teams(), ", ")
             + "\npanel: " + p.panel() + "\nhome_panel: " + p.homePanel()
             + "\ngreeting: " + (p.greeting() ? "on" : "off")

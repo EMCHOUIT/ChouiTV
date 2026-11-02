@@ -996,7 +996,7 @@ public class MainActivity extends Activity {
     // ---------------------------------------------------------------- status
 
     // The two date formats are made once and given the city's zone when it changes: the tick runs every minute.
-    private android.icu.text.SimpleDateFormat hijriFormat;
+    private android.icu.text.SimpleDateFormat hijriFormat, weekdayFormat;
     private SimpleDateFormat gregFormat;
     private String formatZone = "";
 
@@ -1020,17 +1020,21 @@ public class MainActivity extends Activity {
         if (gregFormat == null) {
             gregFormat = new SimpleDateFormat("d MMMM", new Locale("ar"));
             try {
-                hijriFormat = new android.icu.text.SimpleDateFormat("EEEE، d MMMM y", new android.icu.util.ULocale("ar_SA@calendar=islamic-umalqura"));
+                hijriFormat = new android.icu.text.SimpleDateFormat("d MMMM y", new android.icu.util.ULocale("ar_SA@calendar=islamic-umalqura"));
+                weekdayFormat = new android.icu.text.SimpleDateFormat("EEEE", new android.icu.util.ULocale("ar_SA@calendar=islamic-umalqura"));
             } catch (Exception ignored) { }
         }
         if (!tz.equals(formatZone)) {
             gregFormat.setTimeZone(java.util.TimeZone.getTimeZone(tz));
             if (hijriFormat != null) hijriFormat.setTimeZone(android.icu.util.TimeZone.getTimeZone(tz));
+            if (weekdayFormat != null) weekdayFormat.setTimeZone(android.icu.util.TimeZone.getTimeZone(tz));
             formatZone = tz;
         }
         String hijri = "";
         try {
-            if (hijriFormat != null) hijri = hijriFormat.format(now.getTime()).replaceAll("\\s*هـ\\s*$", "") + " هـ";
+            // «تعديل التاريخ الهجري»: the day, month and year move by whole days, the weekday is today's own
+            if (hijriFormat != null && weekdayFormat != null) hijri = weekdayFormat.format(now.getTime()) + "، "
+                + hijriFormat.format(new java.util.Date(now.getTimeInMillis() + HijriShift.millis(cfg.hijriShift()))).replaceAll("\\s*هـ\\s*$", "") + " هـ";
         } catch (Exception ignored) { }
         String greg = gregFormat.format(now.getTime());
         date.setText(arabicDigits(hijri.isEmpty() ? greg : hijri + "  –  " + greg));

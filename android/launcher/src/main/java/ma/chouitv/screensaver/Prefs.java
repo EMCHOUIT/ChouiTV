@@ -291,6 +291,9 @@ final class Prefs {
         return own.isEmpty() || !java.util.Arrays.asList(java.util.TimeZone.getAvailableIDs()).contains(own) ? cityTz() : own;
     }
 
+    /** «تعديل التاريخ الهجري»: whole days, -2..+2, 0 by default. Moves the displayed Hijri date everywhere, never a prayer time. */
+    int hijriShift() { return ma.chouitv.home.HijriShift.parse(choice("hijri", "0")); }
+
     /** The calculation, as Aladhan's id: the person's pick, or the zone's own. */
     int prayerMethodId() {
         String c = choice("pm_choice", "auto");
@@ -583,6 +586,7 @@ final class Prefs {
             + "&tz=" + Uri.encode(effectiveTz())
             + "&pm=" + prayerMethodId()
             + "&pml=" + Uri.encode(prayerMethodLabel())
+            + ma.chouitv.home.HijriShift.fragment(hijriShift())
             + "&teams=" + join(teamIds(), ",")
             + "&events=" + join(list("events"), ",")
             + "&leagues=" + Uri.encode(join(leagues(), ","))

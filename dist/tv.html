@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <!-- the build: UTC time (YYYYMMDDHHMMSS) of the newest commit of the page's sources, put in by src/build.py. The app loads the page with the newer stamp (its own
      copy or a downloaded one), never by file time, and does not keep a download whose stamp is older than its own (Updater, PageStamp). -->
-<meta name="urtv-build" content="20261027221027">
+<meta name="urtv-build" content="20261029204209">
 <title>شاشة تلفزيونك</title>
 <style>
   @font-face{font-family:'Thmanyah';font-weight:300;font-style:normal;font-display:block;src:url("https://raw.githubusercontent.com/EMCHOUIT/ChouiTV/main/assets/fonts/Thmanyah-Light.woff2") format("woff2")}
@@ -650,6 +650,10 @@ const _Q = new URLSearchParams((location.hash || '').replace(/^#/, ''));
 const _list = k => (_Q.get(k) || '').split(',').map(x=>x.trim()).filter(Boolean);
 const _num = (k, d) => { const v = parseFloat(_Q.get(k)); return isNaN(v) ? d : v; };
 // the city's time zone, #tz=: the clock, prayers, matches and dates all go by it; one this browser does not know is Riyadh
+// «تعديل التاريخ الهجري» (#hijri=, whole days from -2 to +2): the Hijri date everywhere is the one of the day moved by this much
+// (the moon is sighted on another day in another country). The prayer times never move.
+const HIJRI_SHIFT = Math.max(-2, Math.min(2, Math.round(_num('hijri', 0))));
+const hijriDate = d => new Date(+d + HIJRI_SHIFT * 86400000);
 const _tzOk = z => { try{ new Intl.DateTimeFormat('en',{timeZone:z}); return true; }catch(e){ return false; } };
 // the cards a slot can show (Prefs.PANELS in the app is the same list); «none» is the absence of one
 const CARD_KINDS = ['shows','prayers','forecast','hourly','prayerrow','matches','verse','wisdom','adhkar','stocks','tasks','year','smart','today'];
@@ -862,9 +866,11 @@ function tickDates(){
   nl.hidden = !nat;
   if(nat) setText(nl, nat.name + ' ' + ar(nat.n) + nat.unit);
   try{
-    let h = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura-nu-' + NU,{
-      timeZone: CONFIG.timezone, weekday:'long', day:'numeric', month:'long', year:'numeric'
-    }).format(now);
+    const hf = o => new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura-nu-' + NU, Object.assign({timeZone: CONFIG.timezone}, o));
+    // «تعديل التاريخ الهجري»: the day, month and year move by whole days; the weekday is today's own
+    let h = HIJRI_SHIFT === 0
+      ? hf({weekday:'long', day:'numeric', month:'long', year:'numeric'}).format(now)
+      : hf({weekday:'long'}).format(now) + '، ' + hf({day:'numeric', month:'long', year:'numeric'}).format(hijriDate(now));
     h = h.replace(/\s*هـ\s*$/,'').replace(/،\s*$/,'');
     setText(document.getElementById('hijri'), h + ' هـ');
   }catch(e){}
@@ -952,7 +958,7 @@ function computePrayers(){
   const fajr = adj(angleTime(M.fajr, 5, true)), dhuhr = adj(noon(12)) + m60(tDhr), asr = adj(asrTime(13)) + m60(tAsr);
   const sunrise = adj(angleTime(.833, 6, true)) + m60(tSun);
   const maghrib = adj(angleTime(.833, 18, false)) + m60(tMag);
-  const isha = M.ishaMin ? maghrib + (M.ishaMin + (CONFIG.prayerMethod === 4 && hijriMonthNow() === 9 ? 30 : 0))/60
+  const isha = M.ishaMin ? maghrib + (M.ishaMin + (CONFIG.prayerMethod === 4 && hijriMonthNow(true) === 9 ? 30 : 0))/60
                          : Math.max(maghrib, adj(angleTime(M.isha, 18, false)));
   const hm = h => { const m = Math.round(fix(h, 24)*60) % 1440; return pad(Math.floor(m/60)) + ':' + pad(m%60); };
   // Isha is Maghrib plus its delay and stays an absolute time: past midnight (a late Maghrib at a high latitude) it reads «24:30», not an
@@ -1096,7 +1102,7 @@ function occasionNow(){
   const base = Date.now();
   let val = null, found = {};
   for(let i = 0; i < 400 && !val; i++){
-    const d = new Date(base + i*86400000), h = hijri(d);
+    const d = new Date(base + i*86400000), h = hijri(hijriDate(d));
     if(i === 0){
       const o = OCCASIONS.find(o => h.month === o.hm && h.day >= o.hd && h.day < o.hd + o.days);
       if(o){ val = {o, today:true, hy:h.year}; break; }
@@ -1114,10 +1120,11 @@ function occasionNow(){
   return val;
 }
 
-function hijriMonthNow(){
+// raw = the calendar's own month, for the prayer calculation (Ramadan's longer Isha): the adjustment never moves a prayer time
+function hijriMonthNow(raw){
   try{
     return +new Intl.DateTimeFormat('en-u-ca-islamic-umalqura',{timeZone:CONFIG.timezone,month:'numeric'})
-      .format(new Date()).replace(/[^0-9]/g,'');
+      .format(raw ? new Date() : hijriDate(new Date())).replace(/[^0-9]/g,'');
   }catch(e){ return 0; }
 }
 function tickOccasion(){
@@ -1858,7 +1865,7 @@ function fastingNext(now){
   const p = riyadhParts(now), base = Date.UTC(p.y, p.mo - 1, p.d, 12);
   for(let i = 0; i < 12; i++){
     const date = new Date(base + i*86400000);
-    const h = FAST_HIJRI.formatToParts(date).reduce((a, x) => (a[x.type] = +x.value.replace(/[^0-9]/g, ''), a), {});
+    const h = FAST_HIJRI.formatToParts(hijriDate(date)).reduce((a, x) => (a[x.type] = +x.value.replace(/[^0-9]/g, ''), a), {});
     const why = fastReasons(h.month, h.day, date.getUTCDay());
     if(!why.length || (i === 0 && p.h >= FAST_TODAY_UNTIL && why[0] !== 'ramadan')) continue;
     return {key:why[0], days:i, day:h.day, wd:date.getUTCDay(), date};
@@ -2137,7 +2144,7 @@ function cnOccasions(){
   for(let i = 0; i < 400; i++){
     const d = new Date(base + i * 86400000), p = riyadhParts(d);
     MA_FIXED.forEach(([m, dd, n]) => { if(p.mo === m && p.d === dd && !found.has(n)) found.set(n, {n, days: i, est: false}); });
-    const h = hf.formatToParts(d).reduce((a, x) => (a[x.type] = +x.value.replace(/[^0-9]/g, ''), a), {});
+    const h = hf.formatToParts(hijriDate(d)).reduce((a, x) => (a[x.type] = +x.value.replace(/[^0-9]/g, ''), a), {});
     MA_HIJRI.forEach(([m, dd, n]) => { if(h.month === m && h.day === dd && !found.has(n)) found.set(n, {n, days: i, est: true}); });
   }
   const v = [...found.values()].sort((a, b) => a.days - b.days).slice(0, 2);

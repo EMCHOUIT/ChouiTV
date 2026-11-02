@@ -34,6 +34,8 @@
 #   optimize/saver.sh import settings.json         what it would change here («الاسم: الجديد (كان: القديم)»), nothing is sent; with --yes it applies it, all or
 #                                                  nothing, and keeps the settings from before (`import --undo --yes` puts them back)
 #   optimize/saver.sh digits latin                 numbers: hindi = ١٢٣ (default), latin = 123
+#   optimize/saver.sh hijri -1                     the Hijri date shown, in whole days: -2 -1 0 (default) +1 +2 (the moon is sighted on another day
+#                                                  in another country). Never moves the prayer times. Shown by `show` as hijri
 #   optimize/saver.sh tz Africa/Abidjan            the time zone the clock, prayers and dates go by: a zone (Africa/Abidjan = Morocco, GMT all year;
 #                                                  Africa/Algiers, Africa/Tunis, Africa/Cairo, Asia/Riyadh, Asia/Dubai, Europe/Paris…) or `city` (default:
 #                                                  the city's own). The prayer calculation follows it unless `prayermethod` says otherwise
@@ -190,6 +192,7 @@ case "${1:-}" in
     [ -z "$yes" ] || extra="$extra --es apply yes"
     send IMPORT "$extra" ;;
   digits)   set1 digits "${2:?usage: optimize/saver.sh digits latin}" ;;
+  hijri)    set1 hijri "${2:?usage: optimize/saver.sh hijri -2|-1|0|+1|+2}" ;;
   tz|prayermethod)
     key=tzchoice; [ "$1" = prayermethod ] && key=pmchoice
     [ $# -eq 2 ] || { echo "usage: optimize/saver.sh tz city|Africa/Abidjan|Asia/Riyadh|Europe/Paris …   |   optimize/saver.sh prayermethod auto|21|19|18|5|4|16|10|9|8|23|3|12|2|0"; exit 1; }

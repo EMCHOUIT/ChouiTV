@@ -138,7 +138,7 @@ final class SettingsBackup {
     static {
         String[][] l = {
             {"cityName", "المدينة"}, {"cityLat", "خط العرض"}, {"cityLon", "خط الطول"}, {"cityTz", "منطقة المدينة"},
-            {"c_tz_choice", "المنطقة الزمنية"}, {"c_pm_choice", "طريقة حساب الصلاة"}, {"prayerAdjOn", "تعديل وقت الصلاة"}, {"prayerAdj", "دقائق التعديل"},
+            {"c_tz_choice", "المنطقة الزمنية"}, {"c_pm_choice", "طريقة حساب الصلاة"}, {"c_hijri", "تعديل التاريخ الهجري"}, {"prayerAdjOn", "تعديل وقت الصلاة"}, {"prayerAdj", "دقائق التعديل"},
             {"teams", "الفرق"}, {"panel", "البطاقة بجانب الساعة"}, {"homePanel", "بطاقات الشاشة الرئيسية"}, {"greeting", "التحية"},
             {"adhanBar", "تنبيه قبل الأذان"}, {"yearStrip", "شريط السنة"}, {"digits", "الأرقام"}, {"national", "المناسبات الوطنية"},
             {"cardStyle", "شكل البطاقة"}, {"corner", "لمسة مغربية"}, {"family", "مدن العائلة"}, {"markets", "الأسواق"}, {"mkStyle", "شكل الأسواق"},
