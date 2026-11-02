@@ -32,6 +32,8 @@
 
 <p align="center"><img src="docs/media/stats.png" alt="12 formules de tasbih · 311 chaînes arabes · 37 radios marocaines · 40 récitants · 90 villes marocaines · 5 onglets" width="100%"></p>
 
+> 🛡️ **Si Google affiche un message de sécurité** (Play Protect) à l’installation de ChouiTV Installer sur votre téléphone, c’est normal : l’appli est récente et Google ne la connaît pas encore. Choisissez **« Installer sans analyser »**. Elle ne demande aucune permission sensible et n’installe rien sur votre téléphone.
+
 <a id="new"></a>
 
 ## 🆕 Nouveautés de la 4.1 · écoute, prière et hégire

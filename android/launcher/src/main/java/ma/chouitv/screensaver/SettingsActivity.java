@@ -1322,6 +1322,13 @@ public class SettingsActivity extends Activity {
         }
         box.addView(steps, new LinearLayout.LayoutParams(-2, -2));
 
+        TextView warn = new TextView(this);   // said before it happens: Google asks about apps it does not know yet
+        warn.setText("إن ظهرت رسالة أمان من غوغل فاختر «التثبيت بدون فحص»: هذا طبيعي.");
+        warn.setTextColor(0xFFD6AF6B);
+        warn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+        warn.setGravity(Gravity.CENTER);
+        warn.setPadding(dp(12), dp(10), dp(12), 0);
+        box.addView(warn, new LinearLayout.LayoutParams(-1, -2));
         ScrollView scroll = new ScrollView(this);   // a 1080p screen is short: the steps scroll, the button stays
         scroll.addView(box);
         AlertDialog d = new Dlg(this).setView(scroll).setPositiveButton("عرض الرمز", (x, w) -> showInstallerQr()).create();

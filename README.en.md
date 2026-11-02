@@ -32,6 +32,8 @@
 
 <p align="center"><img src="docs/media/stats.png" alt="12 tasbih formulas · 311 Arabic channels · 37 Moroccan radios · 40 reciters · 90 Moroccan cities · 5 tabs" width="100%"></p>
 
+> 🛡️ **If Google shows a security message** (Play Protect) when you install ChouiTV Installer on your phone, that is normal: the app is new and Google does not know it yet. Choose **"Install without scanning"**. It asks for no sensitive permission and installs nothing on your phone.
+
 <a id="new"></a>
 
 ## 🆕 What's new in 4.1 · listening, prayer and Hijri
