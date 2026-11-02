@@ -39,7 +39,7 @@ GITHUB_RUN_NUMBER=<n> $G -p . :launcher:assembleDebug --offline -q
 - Économie de tokens : pas d'agents sans demande, lectures ciblées (offset/limit, grep), captures réduites, `/compact` entre deux lots.
 
 ## Listes de nettoyage
-- Après toute modification de  : wrote /home/elmehdi/urtv-patch/optimize/lists/cleanup.json: 114861 bytes, 1223 packages (ads 86, optional 31, preinstalled 1080, tracking 26), 254 lists, consensus 39, sha256 01384e947026, puis OK   optimize/lists/cleanup.json signed (optimize/lists/cleanup.json.sig) (écrit ), puis copier  dans  de l'Installer.  (avec ) vérifie la signature et la copie.
+- Après toute modification de `optimize/lists/*` : `python3 optimize/gen-cleanup-json.py`, puis `./optimize/sign-manifest.sh optimize/lists/cleanup.json` (écrit `cleanup.json.sig`), puis copier `cleanup.json` dans `app/src/main/assets/` de l'Installer. `tests/cleanup_sig_test.py` (avec `CHOUITV_INSTALLER_DIR`) vérifie la signature et la copie.
 
 ## Pièges connus
 - `pm disable-user`, `uninstall --user 0` et `appops` sont remis à zéro à chaque démarrage pour Netflix et Prime Video sur MiTV-MSSP3 ; seul `am kill` après démarrage tient.
