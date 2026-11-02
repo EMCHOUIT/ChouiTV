@@ -144,6 +144,11 @@ public class MainActivity extends Activity {
                 && event.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP && !radioTab() && quranPane.upFromCards()) {
             return true;
         }
+        // ▼ from the tab bar goes to the chips row first (the focus search would jump over it to the first card)
+        if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_DPAD_DOWN && !radioTab() && tabs.hasFocus()) {
+            if (event.getRepeatCount() == 0) focusChips();
+            return true;
+        }
         // ▼ from the chips lands on the card that was selected (the first after a chip change), not on the one nearest the chip
         if (event.getAction() == KeyEvent.ACTION_DOWN && event.getRepeatCount() == 0
                 && event.getKeyCode() == KeyEvent.KEYCODE_DPAD_DOWN && !radioTab() && quranPane.atTop()) {

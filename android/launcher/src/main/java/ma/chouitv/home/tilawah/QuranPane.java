@@ -33,7 +33,7 @@ import java.util.Locale;
 /**
  * The «القرآن الكريم» tab: three chips under the tabs (★ المفضلة · القرّاء · مباشر) and a grid of four cards under them, built the way the
  * radios' tab is (RadioPane): the chip the focus is on shows its cards, ▲ from the chips goes to the tabs, ▼ goes into the cards.
- * المفضلة = the favourite reciters, then the saved lists of surahs; القرّاء = every reciter (and «متابعة»); مباشر = the live Quran stations.
+ * المفضلة = the favourite reciters, then the saved lists of surahs; القرّاء = every reciter ; مباشر = the live Quran stations.
  * OK opens a reciter (its surahs) or plays a list or a station; a long OK makes a reciter a favourite, or opens a list's menu (edit, delete).
  */
 final class QuranPane extends LinearLayout {
@@ -192,13 +192,14 @@ final class QuranPane extends LinearLayout {
     private void paintChips() {
         for (int i = 0; i < chipViews.size(); i++) {
             TextView t = chipViews.get(i);
-            boolean isActive = i == active;
+            boolean isActive = i == active, focus = t.hasFocus();
             GradientDrawable d = new GradientDrawable();
             d.setCornerRadius(dp(20));
-            d.setColor(isActive ? 0xE6DCB86F : 0x14FFFFFF);
-            d.setStroke(dp(2), t.hasFocus() ? 0xFFDCB86F : isActive ? 0xE6DCB86F : 0x00000000);
+            // the chip the cursor is on is solid gold with a cream ring; the open one, when the cursor is elsewhere, is only tinted
+            d.setColor(focus ? 0xFFDCB86F : isActive ? 0x40DCB86F : 0x14FFFFFF);
+            d.setStroke(dp(focus ? 3 : 2), focus ? 0xFFF6EFE0 : isActive ? 0xB3DCB86F : 0x00000000);
             t.setBackground(d);
-            t.setTextColor(getResources().getColor(isActive ? R.color.bg : R.color.sand));
+            t.setTextColor(getResources().getColor(focus ? R.color.bg : isActive ? R.color.gold : R.color.sand));
         }
     }
 
@@ -217,20 +218,9 @@ final class QuranPane extends LinearLayout {
                 rows.add(new Row(R_LIST, r, it.name, Playlists.surahCount(it.surahs.length) + "  ·  " + cat.reciters.get(r).name, false, false, it));
             }
         } else if (active == Playlists.CHIP_RECITERS) {
-            if (prefs.source() == Prefs.SOURCE_SURAH) {
-                int index = cat.reciterIndex(prefs.reciter());
-                if (index >= 0) {
-                    rows.add(new Row(R_RESUME, index, c.getString(R.string.continue_listening),
-                            c.getString(R.string.continue_detail, cat.surahName(prefs.surah()), cat.reciters.get(index).name), false, false, null));
-                }
-            }
             for (int i = 0; i < cat.reciters.size(); i++) addReciter(i);
         } else {
             String group = "quran";
-            int saved = prefs.stationIn(cat);
-            if (prefs.source() == Prefs.SOURCE_RADIO && saved >= 0 && saved < cat.stations.size() && group.equals(cat.stations.get(saved).group)) {
-                rows.add(new Row(R_RESUME, -1, cat.stations.get(saved).name, c.getString(R.string.continue_listening), false, false, null));
-            }
             boolean radioOn = MusicService.currentSource() == Prefs.SOURCE_RADIO && MusicService.isPlaying();
             for (int i : alphabetical(group)) {
                 boolean now = radioOn && MusicService.currentStation() == i;
