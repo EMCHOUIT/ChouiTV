@@ -157,6 +157,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
+        watchOwnScreens();
         ma.chouitv.screensaver.Migration.runOnce(this);   // once: the old screensaver app's settings, tasks and photos come over (never throws)
         Digits.init(this);   // the screensaver's «الأرقام» setting, for every number this screen writes
         dockApps = loadDock();
@@ -218,12 +219,41 @@ public class MainActivity extends Activity {
     }
 
     /**
-     * Another app, the screensaver or a «تلاوة» screen is in front: the card's WebView (and its renderer process, 40-55 MB) is let go instead of
-     * only paused; onResume builds it again and the page paints its last picture at once. Nothing the family relies on lives in it.
+     * Another app or the screensaver is in front: the card's WebView (and its renderer process, 40-55 MB) is let go instead of only paused;
+     * onResume builds it again and the page paints its last picture at once. NOT when it is one of this app's own screens («تلاوة», the
+     * settings, the player) that came in front: coming back from them must not reload the card, it would look like the home screen restarted.
+     * ownScreens counts those screens that are started (the DreamActivity is the system's, it is not counted).
      */
+    private int ownScreens;
+    private boolean homeStopped;
+
+    private void watchOwnScreens() {
+        getApplication().registerActivityLifecycleCallbacks(new android.app.Application.ActivityLifecycleCallbacks() {
+            private boolean ours(Activity a) { return a != MainActivity.this && a.getClass().getName().startsWith("ma.chouitv."); }
+            @Override public void onActivityStarted(Activity a) { if (ours(a)) ownScreens++; }
+            @Override public void onActivityStopped(Activity a) {
+                if (!ours(a)) return;
+                ownScreens = Math.max(0, ownScreens - 1);
+                if (ownScreens == 0 && homeStopped) homeCard.destroy();   // the last own screen went away and the home screen is not coming back first
+            }
+            @Override public void onActivityCreated(Activity a, Bundle b) { }
+            @Override public void onActivityResumed(Activity a) { }
+            @Override public void onActivityPaused(Activity a) { }
+            @Override public void onActivitySaveInstanceState(Activity a, Bundle b) { }
+            @Override public void onActivityDestroyed(Activity a) { }
+        });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        homeStopped = false;
+    }
+
     @Override
     protected void onStop() {
-        homeCard.destroy();
+        homeStopped = true;
+        if (ownScreens == 0) homeCard.destroy();
         super.onStop();
     }
 
