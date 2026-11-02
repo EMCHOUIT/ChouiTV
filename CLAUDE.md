@@ -36,7 +36,6 @@ GITHUB_RUN_NUMBER=<n> $G -p . :launcher:assembleDebug --offline -q
 - Identité visuelle ChouiTV : reprendre les fonctions des autres projets, jamais leur look.
 - Fuseau des TV : Maroc à GMT (UTC+0), ville `Africa/Abidjan` : c'est voulu.
 - Garder `ChouiTV-Installer.apk` comme alias stable du lien (le QR de ChouiTV 4.1 pointe dessus).
-- Économie de tokens : pas d'agents sans demande, lectures ciblées (offset/limit, grep), captures réduites, `/compact` entre deux lots.
 
 ## Listes de nettoyage
 - Après toute modification de `optimize/lists/*` : `python3 optimize/gen-cleanup-json.py`, puis `./optimize/sign-manifest.sh optimize/lists/cleanup.json` (écrit `cleanup.json.sig`), puis copier `cleanup.json` dans `app/src/main/assets/` de l'Installer. `tests/cleanup_sig_test.py` (avec `CHOUITV_INSTALLER_DIR`) vérifie la signature et la copie.
