@@ -2,6 +2,7 @@ package ma.chouitv.screensaver;
 
 import ma.chouitv.home.R;
 import ma.chouitv.home.SelfUpdate;
+import ma.chouitv.home.tilawah.AdhanSettings;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
@@ -185,8 +186,14 @@ public class SettingsActivity extends Activity {
 
     @Override
     public boolean dispatchKeyEvent(android.view.KeyEvent e) {
+        if (AdhanSettings.onKey(this, e)) return true;   // any key ends a ringing adhan, as on the other screens of the app
         int c = e.getKeyCode();
         View f = getCurrentFocus();
+        if ((c == android.view.KeyEvent.KEYCODE_DPAD_LEFT || c == android.view.KeyEvent.KEYCODE_DPAD_RIGHT) && f != null && f == volumeRow) {
+            if (e.getAction() == android.view.KeyEvent.ACTION_DOWN && AdhanSettings.changeVolume(this, c == android.view.KeyEvent.KEYCODE_DPAD_LEFT ? 10 : -10))
+                setSecondLine(volumeRow, AdhanSettings.volumeLine(this) + VOLUME_HINT);   // left louder, right quieter, like the listening screen had it
+            return true;
+        }
         if ((c == android.view.KeyEvent.KEYCODE_DPAD_LEFT || c == android.view.KeyEvent.KEYCODE_DPAD_RIGHT) && f != null && f.getParent() == list) {
             if (e.getAction() == android.view.KeyEvent.ACTION_DOWN && e.getRepeatCount() == 0) {
                 int next = tab + (c == android.view.KeyEvent.KEYCODE_DPAD_RIGHT ? -1 : 1);   // RTL: the first tab is on the right
@@ -241,6 +248,7 @@ public class SettingsActivity extends Activity {
         final boolean tabFocus = focused != null && isTabView(focused);
         rendering = true;
         list.removeAllViews();
+        volumeRow = null;
         sink = new LinearLayout(this);
         target = list;
         sec(0);
@@ -324,6 +332,7 @@ public class SettingsActivity extends Activity {
 
         contentRows();
         sec(3);
+        adhanRows();
         tasbihRows();
         header("الأذان");
         row("تنبيه قبل الأذان", prefs.adhanBar() ? "يعمل · شريط في أعلى الشاشة آخر ١٠ دقائق، ثم حتى الإقامة" : "متوقف", R.drawable.ic_eye,
@@ -357,7 +366,8 @@ public class SettingsActivity extends Activity {
         // the updates come last in the tab, just above the version line
         header("التحديث");
         row("التحديث التلقائي للصفحة", prefs.autoUpdate() ? "يعمل · عند بدء الشاشة، كل ٦ ساعات" : "متوقف", R.drawable.ic_sync, new Runnable() { public void run() { pickOnOff("التحديث التلقائي للصفحة", prefs.autoUpdate(), v -> prefs.setAutoUpdate(v)); } });
-        View last = row("تحديث التطبيق والشاشة الآن", "ينزّل أحدث إصدار من التطبيق ومن الشاشة", R.drawable.ic_sync, new Runnable() { public void run() { updateNow(); } });
+        row("تحديث التطبيق والشاشة الآن", "ينزّل أحدث إصدار من التطبيق ومن الشاشة", R.drawable.ic_sync, new Runnable() { public void run() { updateNow(); } });
+        View last = qrInstallerRow();
         noConv = true;   // a version number stays in Latin digits
         note(last, Updater.versionLines(this));   // at the very end: only the last row jumps to the bottom, not one in the middle
         noConv = false;
@@ -1184,6 +1194,102 @@ public class SettingsActivity extends Activity {
             choiceRow("تبديل الحكمة", "wis_rot", "300", Prefs.WIS_ROT);
             choiceRow("مكان الحكمة", "wis_at", "B", Prefs.PLACES);
         }
+    }
+
+    // ---- «أذان الصلوات»: the adhan (it was a tab of the listening screen). Every change goes through AdhanSettings, which sets the alarm again. ----
+
+    private static final String VOLUME_HINT = "  ·  يمين/يسار للتغيير";
+    private View volumeRow;   // left/right on it change the volume (dispatchKeyEvent)
+
+    private void adhanRows() {
+        header("أذان الصلوات");
+        row("الأذان التلقائي", AdhanSettings.stateLine(this), R.drawable.ic_listen, new Runnable() { public void run() {
+            AdhanSettings.setOn(SettingsActivity.this, !AdhanSettings.on(SettingsActivity.this));
+            render();
+        } });
+        if (AdhanSettings.on(this) && !AdhanSettings.exactAllowed(this)) {   // the alarm may be minutes late
+            row("قد يتأخر الأذان دقائق", "فعّل المنبّهات الدقيقة · اختيار يفتح الإعداد", R.drawable.ic_settings, new Runnable() { public void run() {
+                if (!AdhanSettings.openExactAlarmSettings(SettingsActivity.this)) toast("تعذّر فتح الإعداد");
+            } });
+        }
+        row("صوت المؤذّن", AdhanSettings.voiceLine(this), R.drawable.ic_mic, new Runnable() { public void run() {
+            startActivity(AdhanSettings.voiceScreen(SettingsActivity.this));   // back (or a choice) returns here; onResume shows the new voice
+        } });
+        volumeRow = row("مستوى الصوت", AdhanSettings.volumeLine(this) + VOLUME_HINT, R.drawable.ic_listen, null);
+        row("الصلوات", AdhanSettings.prayersLine(this), R.drawable.ic_eye, new Runnable() { public void run() { pickAdhanPrayer(); } });
+        row("الصلوات اليوم", todayLine(), R.drawable.ic_eye, new Runnable() { public void run() {
+            new Dlg(SettingsActivity.this).setTitle("الصلوات اليوم").setItems(AdhanSettings.todayLines(SettingsActivity.this), null).show();
+        } });
+    }
+
+    /** The five times in one line, the next one marked: «الفجر ٥:١٢ ص · الظهر …» */
+    private String todayLine() {
+        return android.text.TextUtils.join(" · ", AdhanSettings.todayLines(this)).replace("  ", " ");
+    }
+
+    /** Which of the five prayers ring: each one's own options (its adhan on or off, its minutes, a trial) open on the listening app's screen. */
+    private void pickAdhanPrayer() {
+        String[] times = AdhanSettings.todayLines(this), items = new String[times.length];
+        for (int i = 0; i < items.length; i++) items[i] = times[i] + "  ·  " + (AdhanSettings.prayerOn(this, i) ? "الأذان مفعّل" : "الأذان متوقف");
+        new Dlg(this).setTitle("الصلوات").setItems(items, (d, i) -> startActivity(AdhanSettings.prayerScreen(this, i))).show();
+    }
+
+    /** The second line of a row (the value), changed where it is, so the focus and the scroll stay. */
+    private void setSecondLine(View card, String text) {
+        if (!(card instanceof ViewGroup)) return;
+        View texts = ((ViewGroup) card).getChildAt(1);
+        if (!(texts instanceof ViewGroup) || ((ViewGroup) texts).getChildCount() < 2) return;
+        View value = ((ViewGroup) texts).getChildAt(1);
+        if (value instanceof TextView) ((TextView) value).setText(noConv ? text : conv(text));
+    }
+
+    // ---- «تحميل ChouiTV Installer لتلفزيون آخر»: a big QR for the phone of a guest ----
+
+    private static final int QR_DP = 360;   // the code on a white card: a phone reads it from the sofa
+    private static final String INSTALLER_LINK = "https://github.com/EMCHOUIT/ChouiTV-Installer/releases/latest/download/ChouiTV-Installer.apk";
+
+    private View qrInstallerRow() {
+        return row("تحميل ChouiTV Installer لتلفزيون آخر", "اعرض الرمز على ضيوفك ليثبّتوا ChouiTV على تلفزيونهم", R.drawable.ic_sync,
+            new Runnable() { public void run() { showInstallerQr(); } });
+    }
+
+    /** The picture is made at development time (optimize/make_qr.py): the app has no QR library. Back (or OK) closes it. */
+    private void showInstallerQr() {
+        LinearLayout box = new LinearLayout(this);
+        box.setOrientation(LinearLayout.VERTICAL);
+        box.setGravity(Gravity.CENTER_HORIZONTAL);
+        box.setPadding(dp(24), dp(20), dp(24), dp(20));
+        FrameLayout card = new FrameLayout(this);   // white all round: the quiet zone the scanner needs, whatever is behind the glass
+        card.setBackgroundColor(0xFFFFFFFF);
+        card.setPadding(dp(10), dp(10), dp(10), dp(10));
+        ImageView qr = new ImageView(this);
+        qr.setImageResource(R.drawable.qr_installer);
+        qr.setScaleType(ImageView.ScaleType.FIT_XY);
+        qr.setContentDescription("رمز تنزيل ChouiTV Installer");
+        card.addView(qr, new FrameLayout.LayoutParams(dp(QR_DP), dp(QR_DP)));
+        box.addView(card, new LinearLayout.LayoutParams(-2, -2));
+        TextView line = new TextView(this);
+        line.setText("امسح الرمز بهاتفك لتنزيل ChouiTV Installer");
+        line.setTextColor(0xFFF6EFE0);
+        line.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+        line.setGravity(Gravity.CENTER);
+        line.setPadding(0, dp(14), 0, dp(4));
+        box.addView(line, new LinearLayout.LayoutParams(-2, -2));
+        TextView link = new TextView(this);
+        link.setText(INSTALLER_LINK);
+        link.setTextColor(0xFFC6BBA4);
+        link.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        link.setTextDirection(View.TEXT_DIRECTION_LTR);
+        link.setGravity(Gravity.CENTER);
+        link.setMaxWidth(dp(QR_DP + 20));
+        box.addView(link, new LinearLayout.LayoutParams(-2, -2));
+        ScrollView scroll = new ScrollView(this);   // a small screen can still reach the link
+        scroll.addView(box);
+        final AlertDialog d = new Dlg(this).raw().setView(scroll).create();
+        box.setFocusable(true);
+        box.setOnClickListener(x -> d.dismiss());   // OK closes it too
+        d.show();
+        box.requestFocus();
     }
 
     // ---- «التسبيح»: the guided tasbih ----

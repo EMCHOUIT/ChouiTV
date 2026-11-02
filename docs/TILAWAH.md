@@ -131,16 +131,22 @@ right and the left arrow to the left.
 - **The city** is the one picked in the screensaver settings (the app's own `ConfigProvider`, authority `ma.chouitv.home.config`: `lat`, `lon`, `tz`);
   without a picked city, `config.xml`'s `latitude`, `longitude` and `timezone` are used.
 - **The switch is off by default.** «الأذان التلقائي» turns it on; the choice is remembered.
+- **Where it is set: the screensaver settings, tab «الصلاة», group «أذان الصلوات»** (no longer a tab of this screen): «الأذان التلقائي»
+  (OK switches it; the line says «مفعّل · العصر بعد ٣٨ د»), «صوت المؤذّن» (opens the 21 recordings, `AdhanActivity`), «مستوى الصوت»
+  (Left/Right), «الصلوات» (which of the five ring: a list, then each prayer's own options, `PrayerOptionsActivity`) and «الصلوات اليوم»
+  (the five times). The settings reach the adhan only through the public `AdhanSettings` (the rest of the package stays package-private),
+  which does what the old tab did: the preference, then `AdhanScheduler.schedule`. Back from the two screens returns to the settings, which
+  redraw in `onResume`. Any key ends a ringing adhan there too (`AdhanStop`).
 - **The alarm** is one `AlarmManager` alarm for the next of the five prayers (action `ADHAN_ALARM`, naming the receiver; the
   shell's `ma.chouitv.home.ADHAN` is «adhan now» and reaches `MusicReceiver` only). It is exact when Android allows it; from
-  Android 12 without the exact-alarm permission the system may deliver it minutes late, and the adhan tab says so. It is put
+  Android 12 without the exact-alarm permission the system may deliver it minutes late, and the settings say so (a row «قد يتأخر الأذان دقائق» under the switch). It is put
   back when the adhan has played, after a reboot, after a clock or timezone change, after an update and when Aladhan's times
   arrive. The same prayer's adhan never plays twice (judged by the prayer's own time, so a preview of a muezzin five
   minutes before does not silence the real one); a preview that is playing gives way to the real adhan.
 - **Only while the TV is on.** An alarm that arrives in standby is skipped, not played late: there is
   no catch-up after a reboot or a missed prayer, and an adhan that is playing stops when the screen
   goes off.
-- **Its own volume.** The adhan plays at 30% of the TV's maximum (`صوت الأذان` in the adhan tab: Left/Right, 10–100% in
+- **Its own volume.** The adhan plays at 30% of the TV's maximum («مستوى الصوت» in the settings, group «أذان الصلوات»: Left/Right, 10–100% in
   steps of 10; `optimize/music.sh adhan volume 60`), and the volume the TV had comes back when the adhan ends.
 - **During an adhan** a playing surah (or station) pauses, the adhan plays, and the surah resumes
   where it stopped. «متابعة التلاوة» keeps pointing at the surah, never at the adhan.
