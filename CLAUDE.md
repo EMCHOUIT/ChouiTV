@@ -3,6 +3,12 @@
 Dépôt : `/home/elmehdi/urtv-patch` (WSL Ubuntu), branche de travail `v4`, `main` = ce qui est publié.
 Ouvrir la session **dans ce dossier** (Windows : `\\wsl.localhost\Ubuntu\home\elmehdi\urtv-patch`), sinon TODO/CLAUDE/git ne sont pas vus.
 
+## Deux copies du dépôt
+- **Référence (build, tests, adb, signature) :**  dans WSL. Tout ce qui compile ou touche une TV se fait ici.
+- **Copie de lecture/édition :**  (clone,  = le dépôt WSL, ). Pas de clés ni d'APK dedans.
+- Ne pas éditer les deux en parallèle. Synchroniser : depuis la copie G: , ou pousser une branche vers  puis la fusionner côté WSL. Si On branch v4
+nothing to commit, working tree clean y montre des fichiers « modifiés » sans , faire  (cache du disque synchronisé).
+
 ## Au démarrage d'une session (rapide, sans tout relire)
 1. Lire `TODO.md` (état et première étape) puis le dernier paragraphe de `PROGRESS.md`.
 2. `git status -sb` et `git log --oneline -5`.
