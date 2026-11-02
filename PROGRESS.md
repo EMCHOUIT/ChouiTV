@@ -1,0 +1,5 @@
+# PROGRESS
+
+## 2026-11-02
+
+ChouiTV 4.1 and ChouiTV Installer 1.6.1 / 1.6.2 were published. 4.1 brings the two-tab listening screen (Quran with favourite reciters and named surah lists, radios), the adhan in Settings, the Installer QR with an explanation popup, and a Hijri date adjustment. After a review on the TVs, the QR popup got an opaque background and a Play Protect note, ▼ from the tab bar now reaches the chips (whose focus is clearer), and the «continue listening» card was dropped. A Xiaomi TV lost its picture settings because a community cleanup list turned off `mitv.service` and the Mi TV Manager; both are now protected in `keep.txt` and in the Installer 1.6.2 plan (the ChouiTV-side commit is not pushed yet). Netflix/Prime behaviour after reboot on TV2 is still to be checked.
