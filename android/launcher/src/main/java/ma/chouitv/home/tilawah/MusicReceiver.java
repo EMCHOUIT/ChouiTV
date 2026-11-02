@@ -114,6 +114,7 @@ public class MusicReceiver extends BroadcastReceiver {
             case MusicService.ACTION_PLAY_SURAH:
                 service.putExtra(MusicService.EXTRA_RECITER, intent.getStringExtra("reciter"));
                 service.putExtra(MusicService.EXTRA_SURAH, intent.getIntExtra("surah", 1));
+                service.putExtra(MusicService.EXTRA_QUEUE, intent.getStringExtra("queue"));   // music.sh surah ... --es queue 3,5,9
                 break;
             case MusicService.ACTION_PLAY_RADIO: {
                 int index = intent.getIntExtra("station", -1);
@@ -213,6 +214,7 @@ public class MusicReceiver extends BroadcastReceiver {
                 + "|surah_name=" + (source == Prefs.SOURCE_SURAH ? cat.surahName(surah) : "")
                 + "|station=" + (source == Prefs.SOURCE_RADIO ? station : -1)
                 + "|station_name=" + (source == Prefs.SOURCE_RADIO ? stationName : "")
+                + "|queue=" + (source == Prefs.SOURCE_SURAH && MusicService.currentSource() == Prefs.SOURCE_SURAH ? SurahQueue.csv(MusicService.queueSnapshot()) : "")
                 + "|pos=" + position
                 + "|dur=" + duration
                 + "|sleep=" + sleepLeft

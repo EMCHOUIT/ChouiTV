@@ -14,7 +14,10 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
- * The radios' part of «تصدير / استيراد الإعدادات» (BackupData asks for it): the countries, the stations unticked and the favourites.
+ * The radios' part of «تصدير / استيراد الإعدادات» (BackupData asks for it): the countries, the stations unticked and the favourites;
+ * and, in the same part (so the screensaver's preview lists them without a change on its side), «rfav» (the favourite reciters, ids
+ * separated by commas) and «plists» (the saved lists of surahs, one per line: reciter|name|3,5,9). A file from before 4.1 has neither: an import
+ * then empties them, like any other setting the file does not name.
  * Not the downloaded lists: a TV that gets a file with other countries downloads them itself, once the file is applied.
  */
 public final class RadioBackup {
@@ -29,6 +32,10 @@ public final class RadioBackup {
         Set<String> off = new TreeSet<>(p.getStringSet("off", new HashSet<String>())), fav = new TreeSet<>(p.getStringSet("fav", new HashSet<String>()));
         if (!off.isEmpty()) o.put("off", join(off, ","));
         if (!fav.isEmpty()) o.put("fav", join(fav, "\n"));
+        Set<String> rfav = new TreeSet<>(ReciterStore.favourites(c));
+        if (!rfav.isEmpty()) o.put("rfav", join(rfav, ","));
+        String lists = Playlists.serialize(ReciterStore.lists(c));
+        if (!lists.isEmpty()) o.put("plists", lists);
         return o;
     }
 
@@ -48,10 +55,12 @@ public final class RadioBackup {
     public static void check(JSONObject want) {
         for (java.util.Iterator<String> it = want.keys(); it.hasNext(); ) {
             String k = it.next();
-            if (!(k.equals("countries") || k.equals("off") || k.equals("fav"))) throw new IllegalArgumentException("radio: unknown setting " + k);
+            if (!(k.equals("countries") || k.equals("off") || k.equals("fav") || k.equals("rfav") || k.equals("plists"))) throw new IllegalArgumentException("radio: unknown setting " + k);
             if (!(want.opt(k) instanceof String)) throw new IllegalArgumentException("radio " + k + " is text");
         }
         String bad = RadioBackupRules.check(offered(), want.optString("countries"), want.optString("off"), want.optString("fav"));
+        if (bad != null) throw new IllegalArgumentException(bad);
+        bad = Playlists.check(want.optString("rfav"), want.optString("plists"));
         if (bad != null) throw new IllegalArgumentException(bad);
     }
 
@@ -76,8 +85,26 @@ public final class RadioBackup {
         if (off.isEmpty()) ed.remove("off"); else ed.putStringSet("off", off);
         if (fav.isEmpty()) ed.remove("fav"); else ed.putStringSet("fav", fav);
         ed.commit();
+        n += applyReciters(c, want);
         RadioStore.changed(c);   // the catalogue follows the countries and the unticked stations
         if (n > 0) downloadMissing(c);
+        return n;
+    }
+
+    /** The favourite reciters and the lists of the file (what it does not name is emptied); returns how many of the two changed. */
+    private static int applyReciters(Context c, JSONObject want) {
+        int n = 0;
+        Set<String> fav = new HashSet<>();
+        Playlists.splitFavourites(want.optString("rfav"), fav);
+        if (!fav.equals(ReciterStore.favourites(c))) {
+            n++;
+            ReciterStore.setFavourites(c, fav);
+        }
+        List<Playlists.Item> lists = Playlists.parse(want.optString("plists"));
+        if (!Playlists.serialize(lists).equals(Playlists.serialize(ReciterStore.lists(c)))) {
+            n++;
+            ReciterStore.saveLists(c, lists);
+        }
         return n;
     }
 

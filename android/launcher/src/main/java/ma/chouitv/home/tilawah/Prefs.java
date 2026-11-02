@@ -38,6 +38,10 @@ final class Prefs {
         e.apply();
     }
 
+    /** The list of surahs that was playing («3,5,9», surah order; "" when one surah played alone): «متابعة» takes the list back with the surah. */
+    String queue() { return sp.getString("queue", ""); }
+    void setQueue(String csv) { sp.edit().putString("queue", csv == null ? "" : csv).apply(); }
+
     // ---- the adhan ----
 
     /** Off until the user turns it on; there is a switch row for it in «تلاوة». */

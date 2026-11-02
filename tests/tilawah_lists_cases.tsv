@@ -1,0 +1,86 @@
+# op, arguments..., expected.   «_» stands for an empty text. In a lists text, «;» stands for a new line (a list is  reciter|name|1,5,9 ).
+# --- the surahs ticked become a queue: surah order, no duplicates, only 1..total
+normalize	114	5,3,3,0,200,9	3,5,9
+normalize	114	_	_
+normalize	6	1,6,7	1,6
+parseq	114	3,5,x,9	3,5,9
+parseq	114	 7 , 2 	2,7
+parseq	114	_	_
+# --- stepping inside the queue: next and previous wrap round
+step	3,5,9	0	1	1
+step	3,5,9	1	1	2
+step	3,5,9	2	1	0
+step	3,5,9	0	-1	2
+step	3,5,9	2	-1	1
+step	7	0	1	0
+step	7	0	-1	0
+step	_	0	1	-1
+step	3,5,9	-1	1	0
+step	3,5,9	9	1	0
+# --- where the surah playing is in the queue (-1: not in it, the queue is dropped)
+indexof	3,5,9	5	1
+indexof	3,5,9	9	2
+indexof	3,5,9	4	-1
+indexof	_	4	-1
+# --- the position text «٢ من ٣» is built by the screen; the numbers come from here (1-based)
+position	3,5,9	5	2/3
+position	3,5,9	9	3/3
+position	3,5,9	4	0/3
+# --- saved playlists: parse, write, number the names per reciter
+roundtrip	sudais|قائمة ١|3,5,9;afasy|قائمة ١|2	sudais|قائمة ١|3,5,9;afasy|قائمة ١|2
+roundtrip	sudais|قائمة ١|9,3,3,5	sudais|قائمة ١|3,5,9
+roundtrip	bad line;sudais|قائمة ١|3	sudais|قائمة ١|3
+roundtrip	sudais||3	_
+roundtrip	sudais|قائمة ١|	_
+roundtrip	sudais|قائمة ١|0,115	_
+roundtrip	|قائمة ١|3	_
+roundtrip	_	_
+name	sudais	_	قائمة ١
+name	sudais	sudais|قائمة ١|3	قائمة ٢
+name	sudais	sudais|قائمة ١|3;sudais|قائمة ٢|4	قائمة ٣
+name	sudais	afasy|قائمة ٧|3	قائمة ١
+name	sudais	sudais|قائمة ٢|4	قائمة ٣
+name	sudais	sudais|ختمة رمضان|4	قائمة ١
+name	sudais	sudais|قائمة ١٠|4	قائمة ١١
+add	sudais	5,3	_	sudais|قائمة ١|3,5
+add	sudais	5,3	sudais|قائمة ١|3,5	sudais|قائمة ١|3,5
+add	sudais	5,3	afasy|قائمة ١|2	afasy|قائمة ١|2;sudais|قائمة ١|3,5
+add	sudais	_	_	_
+update	sudais	قائمة ١	4,6	sudais|قائمة ١|3;afasy|قائمة ١|2	sudais|قائمة ١|4,6;afasy|قائمة ١|2
+update	sudais	قائمة ٩	4,6	sudais|قائمة ١|3	sudais|قائمة ١|3
+remove	sudais	قائمة ١	sudais|قائمة ١|3;afasy|قائمة ١|2;sudais|قائمة ٢|4	afasy|قائمة ١|2;sudais|قائمة ٢|4
+remove	sudais	قائمة ٥	sudais|قائمة ١|3	sudais|قائمة ١|3
+listsfor	sudais	sudais|قائمة ٢|4;afasy|قائمة ١|2;sudais|قائمة ١|3	قائمة ٢,قائمة ١
+# --- the reciters' favourites come in the catalogue's order, the unknown ids are ignored
+favorder	sudais,shuraim,muaiqly,afasy	afasy,sudais,nobody	0,3
+favorder	sudais,shuraim	nobody	_
+favorder	sudais,shuraim	_	_
+# --- the count under a list: Arabic plural
+count	1	سورة واحدة
+count	2	سورتان
+count	3	3 سور
+count	10	10 سور
+count	11	11 سورة
+count	114	114 سورة
+# --- the chip the «القرآن الكريم» tab opens on
+chip	1	0	fav
+chip	0	1	fav
+chip	1	1	fav
+chip	0	0	reciters
+# --- what a settings file may say (favourites: ids with commas; lists: lines)
+check	sudais,afasy	sudais|قائمة ١|3,5;afasy|قائمة ٢|1	OK
+check	_	_	OK
+check	sudais	_	OK
+check	_	sudais|قائمة ١|3	OK
+check	Sudais	_	reciters fav: Sudais is not a reciter id
+check	sudais,	sudais|a|3	OK
+check	_	sudais|قائمة ١|3,0	reciters lists: surahs
+check	_	sudais|قائمة ١|3,115	reciters lists: surahs
+check	_	sudais|قائمة ١|	reciters lists: surahs
+check	_	sudais|قائمة ١	reciters lists: not a list
+check	_	sudais||3	reciters lists: name
+check	_	sudais|XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX|3	reciters lists: name
+check	_	|قائمة ١|3	reciters lists: reciter
+check	_	sudais|قائمة ١|3,x	reciters lists: surahs
+check	_	sudais|قائمة ١|3,3	reciters lists: surahs
+check	_	sudais|قائمة ١|5,3	reciters lists: surahs
