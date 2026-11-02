@@ -4,10 +4,9 @@ Dépôt : `/home/elmehdi/urtv-patch` (WSL Ubuntu), branche de travail `v4`, `mai
 Ouvrir la session **dans ce dossier** (Windows : `\\wsl.localhost\Ubuntu\home\elmehdi\urtv-patch`), sinon TODO/CLAUDE/git ne sont pas vus.
 
 ## Deux copies du dépôt
-- **Référence (build, tests, adb, signature) :**  dans WSL. Tout ce qui compile ou touche une TV se fait ici.
-- **Copie de lecture/édition :**  (clone,  = le dépôt WSL, ). Pas de clés ni d'APK dedans.
-- Ne pas éditer les deux en parallèle. Synchroniser : depuis la copie G: , ou pousser une branche vers  puis la fusionner côté WSL. Si On branch v4
-nothing to commit, working tree clean y montre des fichiers « modifiés » sans , faire  (cache du disque synchronisé).
+- **Référence (build, tests, adb, signature) :** `/home/elmehdi/urtv-patch` dans WSL. Tout ce qui compile ou touche une TV se fait ici.
+- **Copie de lecture/édition :** `G:\Autres ordinateurs\Mon ordinateur portable\ATS\Claude102026\urtv-patch` (clone, `origin` = le dépôt WSL, `core.autocrlf=false`). Pas de clés ni d'APK dedans.
+- Ne pas éditer les deux en parallèle. Synchroniser : depuis la copie G: `git fetch origin` puis `git merge --ff-only origin/v4`, ou pousser une branche vers `origin` puis la fusionner côté WSL. Si `git status` y montre des fichiers « modifiés » sans `git diff`, faire `git add -u` (cache du disque synchronisé).
 
 ## Au démarrage d'une session (rapide, sans tout relire)
 1. Lire `TODO.md` (état et première étape) puis le dernier paragraphe de `PROGRESS.md`.
