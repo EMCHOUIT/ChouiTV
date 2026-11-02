@@ -50,7 +50,7 @@ public class MainActivity extends Activity {
             @Override public void openPlayer() { MainActivity.this.openPlayer(); }
             @Override public void hint(int chip) {
                 if (tab == TAB_QURAN) {
-                    hint.setText(chip == Playlists.CHIP_FAV ? R.string.hint_quran_fav
+                    hint.setText(chip == Playlists.CHIP_LISTS ? R.string.hint_quran_lists
                             : chip == Playlists.CHIP_LIVE ? R.string.hint_quran_live : R.string.hint_quran_reciters);
                 }
             }

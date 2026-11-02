@@ -54,6 +54,22 @@ final class ReciterStore {
         return made;
     }
 
+    /** Saves the surahs as a list of the reciter with this name (made unique); null when there is nothing to save or the name is empty. */
+    static Playlists.Item addNamedList(Context c, String reciterId, int[] surahs, String name) {
+        List<Playlists.Item> items = lists(c);
+        Playlists.Item made = Playlists.addNamed(items, reciterId, surahs, name);
+        if (made != null) saveLists(c, items);
+        return made;
+    }
+
+    /** The name the list has now, or null when it was not renamed. */
+    static String renameList(Context c, String reciterId, String oldName, String newName) {
+        List<Playlists.Item> items = lists(c);
+        String now = Playlists.rename(items, reciterId, oldName, newName);
+        if (now != null) saveLists(c, items);
+        return now;
+    }
+
     static boolean updateList(Context c, String reciterId, String name, int[] surahs) {
         List<Playlists.Item> items = lists(c);
         boolean ok = Playlists.update(items, reciterId, name, surahs);

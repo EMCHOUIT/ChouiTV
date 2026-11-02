@@ -77,7 +77,7 @@ final class QuranPane extends LinearLayout {
         chips = new LinearLayout(context);
         chips.setOrientation(HORIZONTAL);
         addView(chips, new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        String[] names = {"★  " + context.getString(R.string.quran_fav), context.getString(R.string.quran_reciters), context.getString(R.string.quran_live)};
+        String[] names = {"★ " + context.getString(R.string.quran_fav), context.getString(R.string.quran_lists), context.getString(R.string.quran_reciters), context.getString(R.string.quran_live)};
         for (int i = 0; i < names.length; i++) {
             final int at = i;
             TextView t = new TextView(context);
@@ -127,8 +127,7 @@ final class QuranPane extends LinearLayout {
         note.setTextColor(getResources().getColor(R.color.dim));
         note.setGravity(Gravity.CENTER);
         note.setPadding(dp(60), dp(40), dp(60), 0);
-        note.setText(R.string.quran_no_favourites);
-        note.setVisibility(View.GONE);
+                note.setVisibility(View.GONE);
         addView(note, new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f));
 
         grid.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -211,6 +210,7 @@ final class QuranPane extends LinearLayout {
             List<String> ids = new ArrayList<>();
             for (Catalog.Reciter r : cat.reciters) ids.add(r.id);
             for (int i : Playlists.favouriteOrder(ids, ReciterStore.favourites(c))) addReciter(i);
+        } else if (active == Playlists.CHIP_LISTS) {
             for (Playlists.Item it : ReciterStore.lists(c)) {
                 int r = cat.reciterIndex(it.reciter);
                 if (r < 0) continue;   // a list of a reciter this version does not have
@@ -237,7 +237,8 @@ final class QuranPane extends LinearLayout {
                 rows.add(new Row(R_STATION, i, cat.stations.get(i).name, now ? "●  " + c.getString(R.string.live) : "", false, now, null));
             }
         }
-        boolean empty = rows.isEmpty();   // only المفضلة can be empty
+        boolean empty = rows.isEmpty();   // only the two favourites chips can be empty
+        note.setText(active == Playlists.CHIP_LISTS ? R.string.quran_no_lists : R.string.quran_no_favourites);
         boolean cardsHadFocus = grid.hasFocus();
         grid.setVisibility(empty ? View.GONE : View.VISIBLE);
         if (empty && cardsHadFocus) focusChips();   // the last favourite was just taken out: the focus does not stay on cards that are gone
@@ -279,10 +280,14 @@ final class QuranPane extends LinearLayout {
         String sub = Ui.digits(Playlists.surahCount(it.surahs.length)) + "  ·  " + cat.reciters.get(r).name;
         final int reciterIndex = r;
         choices(Ui.digits(it.name), sub,
-                new String[] {c.getString(R.string.list_menu_edit), c.getString(R.string.list_menu_delete), c.getString(R.string.list_menu_close)},
-                new int[] {R.color.sand, R.color.red, R.color.sand},
+                new String[] {c.getString(R.string.list_menu_edit), c.getString(R.string.list_menu_rename), c.getString(R.string.list_menu_delete), c.getString(R.string.list_menu_close)},
+                new int[] {R.color.sand, R.color.sand, R.color.red, R.color.sand},
                 new Runnable[] {
                         () -> c.startActivity(new Intent(c, SurahActivity.class).putExtra("reciter", reciterIndex).putExtra("list", it.name)),
+                        () -> NameDialog.ask(c, c.getString(R.string.name_title), it.name, name -> {
+                            ReciterStore.renameList(c, it.reciter, it.name, name);
+                            refreshKeeping(Math.max(0, grid.getSelectedItemPosition()));
+                        }),
                         () -> confirmDelete(it),
                         null});
     }

@@ -88,4 +88,17 @@ check("an old file without them is accepted: the favourites and lists are emptie
 check("the favourite reciters are a set of ids in their own prefs file, like the radios' favourites",
       'getStringSet("fav"' in text(TIL / "ReciterStore.java") and '"reciters"' in text(TIL / "ReciterStore.java"))
 check("the music.sh hook takes a queue", 'EXTRA_QUEUE' in text(TIL / "MusicReceiver.java"))
+check("four chips: القرّاء المفضلون · قوائم السور · القرّاء · مباشر",
+      'name="quran_fav">القرّاء المفضلون<' in strings and 'name="quran_lists">قوائم السور<' in strings
+      and "Playlists.CHIP_LISTS" in pane and "CHIP_LISTS = 1" in text(TIL / "Playlists.java"))
+check("each empty chip has its own one-line invitation",
+      "لا قرّاء مفضلون بعد: اضغط مطوّلًا على قارئ" in strings and "لا قوائم بعد: حدّد سورًا في صفحة قارئ ثم «حفظ كقائمة»" in strings
+      and "quran_no_lists" in pane)
+check("the list menu has «إعادة التسمية» before «حذف»",
+      pane.index("list_menu_rename") < pane.index("list_menu_delete") and "NameDialog.ask(" in pane and "ReciterStore.renameList(" in pane)
+dialog = text(TIL / "NameDialog.java")
+check("the name dialog: one-line EditText, keyboard up, empty refused, cut to 40",
+      "EditText" in dialog and "SOFT_INPUT_STATE_ALWAYS_VISIBLE" in dialog and "name.isEmpty()" in dialog and "LengthFilter(Playlists.MAX_NAME)" in dialog
+      and "Playlists.MAX_NAME = 40" .replace("Playlists.", "") in text(TIL / "Playlists.java").replace(" ", " ") or "MAX_NAME = 40" in text(TIL / "Playlists.java"))
+check("«حفظ كقائمة» asks for the name, prefilled with the automatic one", "NameDialog.ask(" in surah and "Playlists.nextName(" in surah and "addNamedList(" in surah)
 sys.exit(1 if failed else 0)

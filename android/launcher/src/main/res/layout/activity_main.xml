@@ -90,7 +90,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:gravity="center"
-            android:text="@string/hint_quran_fav"
+            android:text="@string/hint_quran_reciters"
             android:textColor="@color/dim"
             android:textSize="13sp" />
     </LinearLayout>

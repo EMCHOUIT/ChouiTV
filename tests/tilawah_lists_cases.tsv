@@ -64,9 +64,30 @@ count	11	11 سورة
 count	114	114 سورة
 # --- the chip the «القرآن الكريم» tab opens on
 chip	1	0	fav
-chip	0	1	fav
-chip	1	1	fav
+chip	0	1	lists
+chip	1	1	lists
 chip	0	0	reciters
+# --- naming: cleaned, cut to 40, unique per reciter (« ٢» on a conflict)
+clean	  ختمة رمضان  	ختمة رمضان
+clean	a|b	a b
+clean	_	_
+clean	   	_
+clean	XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX	XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+uniq	sudais	ختمة	_	ختمة
+uniq	sudais	ختمة	sudais|ختمة|3	ختمة ٢
+uniq	sudais	ختمة	sudais|ختمة|3;sudais|ختمة ٢|4	ختمة ٣
+uniq	sudais	ختمة	afasy|ختمة|3	ختمة
+uniq	sudais	ختمة	sudais|ختمة|3	ختمة	ختمة
+uniq	sudais	_	_	_
+addnamed	sudais	3,5	ختمة	_	sudais|ختمة|3,5
+addnamed	sudais	3,5	ختمة	sudais|ختمة|1	sudais|ختمة|1;sudais|ختمة ٢|3,5
+addnamed	sudais	3,5	_	_	_
+addnamed	sudais	3,5	قائمة ١	sudais|قائمة ١|3,5	sudais|قائمة ١|3,5;sudais|قائمة ١ ٢|3,5
+rename	sudais	قائمة ١	ورد الصباح	sudais|قائمة ١|3;sudais|قائمة ٢|4	sudais|ورد الصباح|3;sudais|قائمة ٢|4
+rename	sudais	قائمة ١	قائمة ٢	sudais|قائمة ١|3;sudais|قائمة ٢|4	sudais|قائمة ٢ ٢|3;sudais|قائمة ٢|4
+rename	sudais	قائمة ١	قائمة ١	sudais|قائمة ١|3	sudais|قائمة ١|3
+rename	sudais	قائمة ١	   	sudais|قائمة ١|3	sudais|قائمة ١|3
+rename	sudais	قائمة ٩	جديد	sudais|قائمة ١|3	sudais|قائمة ١|3
 # --- what a settings file may say (favourites: ids with commas; lists: lines)
 check	sudais,afasy	sudais|قائمة ١|3,5;afasy|قائمة ٢|1	OK
 check	_	_	OK
@@ -82,5 +103,7 @@ check	_	sudais||3	reciters lists: name
 check	_	sudais|XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX|3	reciters lists: name
 check	_	|قائمة ١|3	reciters lists: reciter
 check	_	sudais|قائمة ١|3,x	reciters lists: surahs
+check	_	sudais|قائمة ١|3;sudais|قائمة ١|4	reciters lists: name twice
+check	_	sudais|قائمة ١|3;afasy|قائمة ١|4	OK
 check	_	sudais|قائمة ١|3,3	reciters lists: surahs
 check	_	sudais|قائمة ١|5,3	reciters lists: surahs

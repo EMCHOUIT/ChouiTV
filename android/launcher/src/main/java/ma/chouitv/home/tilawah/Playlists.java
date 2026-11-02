@@ -13,7 +13,8 @@ import java.util.regex.Pattern;
  * «قائمة ٢»… numbered per reciter) and its surahs in surah order. The text form is one list per line:  reciter|name|3,5,9
  */
 final class Playlists {
-    static final int CHIP_FAV = 0, CHIP_RECITERS = 1, CHIP_LIVE = 2;
+    /** the chips, first (rightmost) to last: القرّاء المفضلون · قوائم السور · القرّاء · مباشر */
+    static final int CHIP_FAV = 0, CHIP_LISTS = 1, CHIP_RECITERS = 2, CHIP_LIVE = 3;
     static final int TOTAL = 114, MAX_LISTS = 100, MAX_NAME = 40, MAX_ID = 40;
     private static final String BASE_NAME = "قائمة ";
     private static final Pattern NUMBERED = Pattern.compile("^" + BASE_NAME + "([0-9٠-٩]+)$");
@@ -65,6 +66,52 @@ final class Playlists {
             }
         }
         return BASE_NAME + indic(String.valueOf(max + 1));
+    }
+
+    /** A name as typed: trimmed, without the characters the text form uses, cut to 40; "" when nothing is left. */
+    static String cleanName(String raw) {
+        if (raw == null) return "";
+        String s = raw.replace('|', ' ').replace('\n', ' ').replace('\r', ' ').trim();
+        if (s.length() > MAX_NAME) s = s.substring(0, MAX_NAME).trim();
+        return s;
+    }
+
+    /** The name, or the name with « ٢», « ٣»… when this reciter already has a list of that name (`except` is the list being renamed). */
+    static String uniqueName(List<Item> items, String reciter, String name, String except) {
+        String base = cleanName(name);
+        if (base.isEmpty()) return "";
+        String candidate = base;
+        for (int n = 2; taken(items, reciter, candidate, except); n++) {
+            String suffix = " " + indic(String.valueOf(n));
+            candidate = (base.length() + suffix.length() > MAX_NAME ? base.substring(0, MAX_NAME - suffix.length()).trim() : base) + suffix;
+        }
+        return candidate;
+    }
+
+    private static boolean taken(List<Item> items, String reciter, String name, String except) {
+        for (Item it : items) if (it.reciter.equals(reciter) && it.name.equals(name) && !it.name.equals(except)) return true;
+        return false;
+    }
+
+    /** Adds a list with a name of the person's (made unique); null for no surah, no room or an empty name. */
+    static Item addNamed(List<Item> items, String reciter, int[] surahs, String name) {
+        if (surahs == null || surahs.length == 0 || reciter == null || reciter.isEmpty() || items.size() >= MAX_LISTS) return null;
+        String unique = uniqueName(items, reciter, name, null);
+        if (unique.isEmpty()) return null;
+        Item made = new Item(reciter, unique, surahs);
+        items.add(made);
+        return made;
+    }
+
+    /** Renames a list; returns the name it has now (unique), or null when there is no such list or the new name is empty. */
+    static String rename(List<Item> items, String reciter, String oldName, String newName) {
+        String unique = uniqueName(items, reciter, newName, oldName);
+        if (unique.isEmpty()) return null;
+        for (int i = 0; i < items.size(); i++) {
+            Item it = items.get(i);
+            if (it.reciter.equals(reciter) && it.name.equals(oldName)) { items.set(i, new Item(reciter, unique, it.surahs)); return unique; }
+        }
+        return null;
     }
 
     /** Adds a list of these surahs to the reciter and returns it; the list that already holds exactly these surahs is returned as it is; null for no surah or no room. */
@@ -121,9 +168,9 @@ final class Playlists {
         return out;
     }
 
-    /** The chip the «القرآن الكريم» tab opens on: المفضلة when it holds something (a reciter or a list), else القرّاء. */
+    /** The chip the «القرآن الكريم» tab opens on: قوائم السور when there are lists, else القرّاء المفضلون when there are favourites, else القرّاء. */
     static int defaultChip(boolean anyFavouriteReciter, boolean anyList) {
-        return anyFavouriteReciter || anyList ? CHIP_FAV : CHIP_RECITERS;
+        return anyList ? CHIP_LISTS : anyFavouriteReciter ? CHIP_FAV : CHIP_RECITERS;
     }
 
     // ---- the settings file ----
@@ -141,9 +188,11 @@ final class Playlists {
         if (lists != null && !lists.isEmpty()) {
             String[] lines = lists.split("\n");
             if (lines.length > MAX_LISTS) return "reciters lists: too many";
+            java.util.Set<String> seen = new java.util.HashSet<>();
             for (String line : lines) {
                 String[] f = line.split("\\|", -1);
                 if (f.length != 3) return "reciters lists: not a list";
+                if (!seen.add(f[0] + "|" + f[1])) return "reciters lists: name twice";
                 if (!ID.matcher(f[0]).matches()) return "reciters lists: reciter";
                 if (f[1].trim().isEmpty() || f[1].length() > MAX_NAME) return "reciters lists: name";
                 if (!strictSurahs(f[2])) return "reciters lists: surahs";
