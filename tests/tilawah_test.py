@@ -129,8 +129,10 @@ activities = {a.get(A + "name"): a for a in app.findall("activity")}
 for name in [".tilawah.MainActivity", ".tilawah.SurahActivity", ".tilawah.PlayerActivity",
              ".tilawah.AdhanActivity"]:
     activity = activities.get(name)
-    check(f"{name} exists and is private",
-          activity is not None and activity.get(A + "exported") == "false",
+    # the listening screen is exported on purpose: ChouiTV Companion (the phone app) opens it from its remote; the other three stay private
+    want = "true" if name == ".tilawah.MainActivity" else "false"
+    check(f"{name} exists and is {'exported (the Companion opens it)' if want == 'true' else 'private'}",
+          activity is not None and activity.get(A + "exported") == want,
           activity.get(A + "exported") if activity is not None else "missing")
     if activity is None:
         continue
