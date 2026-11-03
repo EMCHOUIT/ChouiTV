@@ -49,11 +49,11 @@ check("README (ar) links the same file", LINK in read("README.md"))
 check("README (en) links the same file", LINK in read("README.en.md"))
 
 # the screen: a row near the version line, a glass dialog, a picture at least 360 dp, back closes
-check("settings row title", "تحميل ChouiTV Installer لتلفزيون آخر" in settings)
+check("settings row title", "تحميل ChouiTV Companion لتلفزيون آخر" in settings)
 check("settings row subtitle", "اعرض الرمز على ضيوفك ليثبّتوا ChouiTV على تلفزيونهم" in settings)
-check("dialog line under the code", "امسح الرمز بهاتفك: يُنزَّل ChouiTV Installer على هاتفك" in settings)
+check("dialog line under the code", "امسح الرمز بهاتفك: يُنزَّل ChouiTV Companion على هاتفك" in settings)
 check("the row opens the explanation first, then the code", "showInstallerHelp(); }" in settings and "(x, w) -> showInstallerQr()" in settings)
-for words in ("١  امسح الرمز بهاتفك", "٢  ثبّت ChouiTV Installer على هاتفك", "٣  من الهاتف، ثبّت ChouiTV على تلفزيونك (على نفس شبكة الواي فاي)",
+for words in ("١  امسح الرمز بهاتفك", "٢  ثبّت ChouiTV Companion على هاتفك", "٣  من الهاتف، ثبّت ChouiTV على تلفزيونك (على نفس شبكة الواي فاي)",
               "لا يُثبَّت شيء على هذا التلفزيون", "عرض الرمز"):
     check("explanation says «%s»" % words, words in settings)
 check("the button gets the focus", "go.requestFocus()" in settings)

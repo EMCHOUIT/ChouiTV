@@ -1259,18 +1259,18 @@ public class SettingsActivity extends Activity {
         }
     }
 
-    // ---- «تحميل ChouiTV Installer لتلفزيون آخر»: a big QR for the phone of a guest ----
+    // ---- «تحميل ChouiTV Companion لتلفزيون آخر»: a big QR for the phone of a guest ----
 
     private static final int QR_DP = 360;   // the code on a white card: a phone reads it from the sofa
     private static final String INSTALLER_LINK = "https://github.com/EMCHOUIT/ChouiTV-Installer/releases/latest/download/ChouiTV-Installer.apk";
 
     private View qrInstallerRow() {
-        return row("تحميل ChouiTV Installer لتلفزيون آخر", "اعرض الرمز على ضيوفك ليثبّتوا ChouiTV على تلفزيونهم", R.drawable.ic_qr,
+        return row("تحميل ChouiTV Companion لتلفزيون آخر", "اعرض الرمز على ضيوفك ليثبّتوا ChouiTV على تلفزيونهم", R.drawable.ic_qr,
             new Runnable() { public void run() { showInstallerHelp(); } });
     }
 
     /**
-     * First, what this is: ChouiTV Installer goes on the GUEST'S PHONE and the phone installs ChouiTV on their TV; nothing is installed on this one.
+     * First, what this is: ChouiTV Companion goes on the GUEST'S PHONE and the phone installs ChouiTV on their TV; nothing is installed on this one.
      * Three steps drawn with views (a phone, a TV, arrows: no image), one button «عرض الرمز» that opens the code. Back closes.
      */
     private void showInstallerHelp() {
@@ -1280,13 +1280,13 @@ public class SettingsActivity extends Activity {
         box.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
         box.setPadding(dp(20), dp(16), dp(20), dp(8));
         TextView title = new TextView(this);
-        title.setText("تحميل ChouiTV Installer لتلفزيون آخر");
+        title.setText("تحميل ChouiTV Companion لتلفزيون آخر");
         title.setTextColor(0xFFD6AF6B);
         title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
         title.setGravity(Gravity.CENTER);
         box.addView(title, new LinearLayout.LayoutParams(-1, -2));
         TextView intro = new TextView(this);
-        intro.setText("ChouiTV Installer تطبيق يُثبَّت على هاتف ضيفك، ثم يثبّت الهاتفُ ChouiTV على تلفزيونه. لا يُثبَّت شيء على هذا التلفزيون.");
+        intro.setText("ChouiTV Companion تطبيق يُثبَّت على هاتف ضيفك، ثم يثبّت الهاتفُ ChouiTV على تلفزيونه. لا يُثبَّت شيء على هذا التلفزيون.");
         intro.setTextColor(0xFFF6EFE0);
         intro.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         intro.setGravity(Gravity.CENTER);
@@ -1297,7 +1297,7 @@ public class SettingsActivity extends Activity {
         steps.setOrientation(LinearLayout.HORIZONTAL);
         steps.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
         steps.setGravity(Gravity.CENTER);
-        String[] words = {"١  امسح الرمز بهاتفك", "٢  ثبّت ChouiTV Installer على هاتفك", "٣  من الهاتف، ثبّت ChouiTV على تلفزيونك (على نفس شبكة الواي فاي)"};
+        String[] words = {"١  امسح الرمز بهاتفك", "٢  ثبّت ChouiTV Companion على هاتفك", "٣  من الهاتف، ثبّت ChouiTV على تلفزيونك (على نفس شبكة الواي فاي)"};
         for (int k = 0; k < 3; k++) {
             if (k > 0) {
                 TextView arrow = new TextView(this);
@@ -1401,11 +1401,11 @@ public class SettingsActivity extends Activity {
         ImageView qr = new ImageView(this);
         qr.setImageResource(R.drawable.qr_installer);
         qr.setScaleType(ImageView.ScaleType.FIT_XY);
-        qr.setContentDescription("رمز تنزيل ChouiTV Installer");
+        qr.setContentDescription("رمز تنزيل ChouiTV Companion");
         card.addView(qr, new FrameLayout.LayoutParams(dp(QR_DP), dp(QR_DP)));
         box.addView(card, new LinearLayout.LayoutParams(-2, -2));
         TextView line = new TextView(this);
-        line.setText("امسح الرمز بهاتفك: يُنزَّل ChouiTV Installer على هاتفك");
+        line.setText("امسح الرمز بهاتفك: يُنزَّل ChouiTV Companion على هاتفك");
         line.setTextColor(0xFFF6EFE0);
         line.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
         line.setGravity(Gravity.CENTER);

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Makes the QR code of «تحميل ChouiTV Installer لتلفزيون آخر» (Settings, tab الرئيسية والنظام).
+"""Makes the QR code of «تحميل ChouiTV Companion لتلفزيون آخر» (Settings, tab الرئيسية والنظام).
 
 The app has no QR library and must not get one: the code is a picture made here, once, and shipped as a resource
 (android/launcher/src/main/res/drawable-nodpi/qr_installer.png). Run again only if LINK changes:
