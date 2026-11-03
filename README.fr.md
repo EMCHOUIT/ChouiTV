@@ -32,7 +32,7 @@
 
 <p align="center"><img src="docs/media/stats.png" alt="12 formules de tasbih · 311 chaînes arabes · 37 radios marocaines · 40 récitants · 90 villes marocaines · 5 onglets" width="100%"></p>
 
-> 🛡️ **Si Google affiche un message de sécurité** (Play Protect) à l’installation de ChouiTV Installer sur votre téléphone, c’est normal : l’appli est récente et Google ne la connaît pas encore. Choisissez **« Installer sans analyser »**. Elle ne demande aucune permission sensible et n’installe rien sur votre téléphone.
+> 🛡️ **Si Google affiche un message de sécurité** (Play Protect) à l’installation de ChouiTV Companion sur votre téléphone, c’est normal : l’appli est récente et Google ne la connaît pas encore. Choisissez **« Installer sans analyser »**. Elle ne demande aucune permission sensible et n’installe rien sur votre téléphone.
 
 <a id="new"></a>
 
@@ -47,7 +47,7 @@
 - 🎧 **Nouvel écran d'écoute** : onglet «القرآن الكريم» (récitants, direct, ★ récitants favoris, **listes de sourates nommées** créées en cochant) et onglet «الإذاعات»
 - 🕌 **L'adhan** passe dans les réglages : onglet «الصلاة», groupe «أذان الصلوات»
 - 🔢 **Date hégirienne ajustable** de −2 à +2 jours selon votre pays
-- 📱 **QR de ChouiTV Installer** dans «الرئيسية والنظام», avec une fenêtre qui explique qu'il s'installe sur le téléphone de l'invité, lequel installe ChouiTV sur sa télé
+- 📱 **QR de ChouiTV Companion** dans «الرئيسية والنظام», avec une fenêtre qui explique qu'il s'installe sur le téléphone de l'invité, lequel installe ChouiTV sur sa télé
 
 ## 🆕 Nouveautés de la 4.0 · une seule appli
 
@@ -72,7 +72,7 @@
 
 - 📥 Au premier démarrage, la 4.0 reprend de l'ancien écran de veille les **réglages, les tâches et les photos**
 - 👆 Une ligne en haut des réglages vous guide ensuite pour **deux étapes** : choisir l'écran de veille « شاشة تلفزيونك » **qui n'est pas coché** dans la liste d'Android, puis retirer l'ancienne appli
-- 📱 Depuis le téléphone, **ChouiTV Installer 1.6** fait tout cela pour vous
+- 📱 Depuis le téléphone, **ChouiTV Companion 1.6** fait tout cela pour vous
 
 </td>
 </tr>
@@ -325,7 +325,7 @@ L'application **Channels** accompagne ChouiTV dans le dock et diffuse **en direc
 > [!NOTE]
 > 📺 **Fonctionne sur les télés Android TV et Google TV** (testé sur une télé Xiaomi sous Android 11). L'appli vient des [versions de ChouiTV](https://github.com/EMCHOUIT/ChouiTV/releases/latest) et les mises à jour arrivent d'une pression sur **OK**, depuis un fichier de version signé par le propriétaire.
 
-Il y a **trois façons** d'installer ChouiTV. La plus simple passe par votre téléphone, et elle a son propre dépôt : [**ChouiTV Installer**](https://github.com/EMCHOUIT/ChouiTV-Installer).
+Il y a **trois façons** d'installer ChouiTV. La plus simple passe par votre téléphone, et elle a son propre dépôt : [**ChouiTV Companion**](https://github.com/EMCHOUIT/ChouiTV-Installer).
 
 | | Option | Pour qui | Durée |
 |---|---|---|---|
@@ -337,7 +337,7 @@ Il y a **trois façons** d'installer ChouiTV. La plus simple passe par votre té
 
 ### 📱 Option 1 : depuis votre téléphone, sans ordinateur ⭐ recommandée
 
-Rendez-vous sur le dépôt **[ChouiTV Installer](https://github.com/EMCHOUIT/ChouiTV-Installer)** et téléchargez l'appli sur un téléphone Android. Elle :
+Rendez-vous sur le dépôt **[ChouiTV Companion](https://github.com/EMCHOUIT/ChouiTV-Installer)** et téléchargez l'appli sur un téléphone Android. Elle :
 
 - trouve votre télé sur le Wi-Fi, télécharge toujours la **dernière version** de ChouiTV (une seule appli), l'installe et la règle en environ deux minutes ;
 - **vous guide pas à pas** (ou vous laisse choisir vous-même) et parle **arabe, français et anglais**, avec une barre de progression et un filet de sécurité si l'accueil ne s'ouvre pas ;
@@ -347,7 +347,7 @@ Rendez-vous sur le dépôt **[ChouiTV Installer](https://github.com/EMCHOUIT/Cho
 - n'accepte qu'un fichier de version signé par le propriétaire ;
 - ne demande ni compte, ni publicité.
 
-<p align="center"><a href="https://github.com/EMCHOUIT/ChouiTV-Installer/releases/latest/download/ChouiTV-Installer.apk"><img src="https://img.shields.io/badge/%E2%AC%87%20ChouiTV%20Installer-D6AF6B?style=for-the-badge&labelColor=0A1D14" alt="ChouiTV Installer"></a></p>
+<p align="center"><a href="https://github.com/EMCHOUIT/ChouiTV-Installer/releases/latest/download/ChouiTV-Installer.apk"><img src="https://img.shields.io/badge/%E2%AC%87%20ChouiTV%20Companion-D6AF6B?style=for-the-badge&labelColor=0A1D14" alt="ChouiTV Companion"></a></p>
 
 [Détails, captures et FAQ](https://github.com/EMCHOUIT/ChouiTV-Installer)
 
@@ -464,7 +464,7 @@ optimize/install.sh all    # télécharge la dernière version, installe l'appli
 
 Sur une télé encore en 3.x, utilisez `optimize/migrate-to-v4.sh` plutôt que `all` (étape 3 ci-dessus) : `all` laisserait l'ancienne appli d'écran de veille à côté de la nouvelle.
 
-Remarque : le **nettoyage de la télé** (suppression du pistage, des publicités et des applis d'essai) est une étape importante pour de meilleures performances : il libère de 85 à 215 Mo de mémoire. L'assistant vous demande avant de commencer : si vous acceptez, il nettoie ; sinon, il installe seulement ce dont nos applis ont besoin (`SKIP_CLEANUP=1`), et vous pouvez demander le nettoyage plus tard. Depuis le téléphone, [ChouiTV Installer](https://github.com/EMCHOUIT/ChouiTV-Installer) propose le même nettoyage en option : il montre d'abord le plan, ne coupe que ce que vous choisissez et permet de tout annuler.
+Remarque : le **nettoyage de la télé** (suppression du pistage, des publicités et des applis d'essai) est une étape importante pour de meilleures performances : il libère de 85 à 215 Mo de mémoire. L'assistant vous demande avant de commencer : si vous acceptez, il nettoie ; sinon, il installe seulement ce dont nos applis ont besoin (`SKIP_CLEANUP=1`), et vous pouvez demander le nettoyage plus tard. Depuis le téléphone, [ChouiTV Companion](https://github.com/EMCHOUIT/ChouiTV-Installer) propose le même nettoyage en option : il montre d'abord le plan, ne coupe que ce que vous choisissez et permet de tout annuler.
 
 Pour revenir à l'état d'origine : `optimize/reset.sh`. Tous les détails dans [`docs/SETUP-PROMPT.md`](docs/SETUP-PROMPT.md).
 </details>
@@ -490,7 +490,7 @@ adb install -r channels/out/channels-release.apk
 
 <details><summary>⬆️ <b>Ma télé est en 3.x : comment passer à la 4.0 ?</b></summary>
 
-La mise à jour arrive comme d'habitude, d'une pression sur **OK**. Au premier démarrage, la 4.0 reprend de l'ancienne appli d'écran de veille les **réglages, les tâches et les photos** (10 photos au plus), puis une ligne « إكمال الانتقال إلى النسخة الجديدة » en haut des réglages vous guide pour les deux dernières étapes : choisir le nouvel écran de veille, puis retirer l'ancienne appli. L'ancien écran de veille continue de fonctionner jusqu'à ce que vous choisissiez le nouveau. Depuis le téléphone, **ChouiTV Installer 1.6** fait tout cela pour vous ; pour les initiés, il y a [le script](#install-adb).
+La mise à jour arrive comme d'habitude, d'une pression sur **OK**. Au premier démarrage, la 4.0 reprend de l'ancienne appli d'écran de veille les **réglages, les tâches et les photos** (10 photos au plus), puis une ligne « إكمال الانتقال إلى النسخة الجديدة » en haut des réglages vous guide pour les deux dernières étapes : choisir le nouvel écran de veille, puis retirer l'ancienne appli. L'ancien écran de veille continue de fonctionner jusqu'à ce que vous choisissiez le nouveau. Depuis le téléphone, **ChouiTV Companion 1.6** fait tout cela pour vous ; pour les initiés, il y a [le script](#install-adb).
 </details>
 
 <details><summary>🔀 <b>« شاشة تلفزيونك » apparaît deux fois dans la liste d'Android ?</b></summary>

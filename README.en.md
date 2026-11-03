@@ -32,7 +32,7 @@
 
 <p align="center"><img src="docs/media/stats.png" alt="12 tasbih formulas · 311 Arabic channels · 37 Moroccan radios · 40 reciters · 90 Moroccan cities · 5 tabs" width="100%"></p>
 
-> 🛡️ **If Google shows a security message** (Play Protect) when you install ChouiTV Installer on your phone, that is normal: the app is new and Google does not know it yet. Choose **"Install without scanning"**. It asks for no sensitive permission and installs nothing on your phone.
+> 🛡️ **If Google shows a security message** (Play Protect) when you install ChouiTV Companion on your phone, that is normal: the app is new and Google does not know it yet. Choose **"Install without scanning"**. It asks for no sensitive permission and installs nothing on your phone.
 
 <a id="new"></a>
 
@@ -47,7 +47,7 @@
 - 🎧 **New listening screen**: tab «القرآن الكريم» (reciters, live, ★ favourite reciters, **named surah lists** you build by ticking) and tab «الإذاعات»
 - 🕌 **Adhan** moved to the settings: tab «الصلاة», group «أذان الصلوات»
 - 🔢 **Hijri date adjustment** from −2 to +2 days to suit your country
-- 📱 **ChouiTV Installer QR** in «الرئيسية والنظام», with a popup explaining it goes on your guest's phone, which installs ChouiTV on their TV
+- 📱 **ChouiTV Companion QR** in «الرئيسية والنظام», with a popup explaining it goes on your guest's phone, which installs ChouiTV on their TV
 
 ## 🆕 What's new in 4.0 · one app
 
@@ -72,7 +72,7 @@
 
 - 📥 On first start, 4.0 takes the old screensaver's **settings, tasks and photos**
 - 👆 A row at the top of the settings then walks you through **two steps**: pick the screensaver «شاشة تلفزيونك» that is **not ticked** in Android's list, then remove the old app
-- 📱 From your phone, **ChouiTV Installer 1.6** does all of it for you
+- 📱 From your phone, **ChouiTV Companion 1.6** does all of it for you
 
 </td>
 </tr>
@@ -325,7 +325,7 @@ The **Channels** app sits beside ChouiTV in the dock and shows **live** Moroccan
 > [!NOTE]
 > 📺 **Works on Android TV and Google TV sets** (tested on a Xiaomi TV running Android 11). The app comes from the [ChouiTV releases](https://github.com/EMCHOUIT/ChouiTV/releases/latest), and updates arrive with a press of **OK**, from a version file signed by the owner.
 
-There are **three ways** to install ChouiTV. The simplest goes through your phone, and it has its own repository: [**ChouiTV Installer**](https://github.com/EMCHOUIT/ChouiTV-Installer).
+There are **three ways** to install ChouiTV. The simplest goes through your phone, and it has its own repository: [**ChouiTV Companion**](https://github.com/EMCHOUIT/ChouiTV-Installer).
 
 | | Option | For whom | Time |
 |---|---|---|---|
@@ -337,7 +337,7 @@ There are **three ways** to install ChouiTV. The simplest goes through your phon
 
 ### 📱 Option 1: from your phone, no computer ⭐ recommended
 
-Go to the **[ChouiTV Installer](https://github.com/EMCHOUIT/ChouiTV-Installer)** repository and download the app on an Android phone. It:
+Go to the **[ChouiTV Companion](https://github.com/EMCHOUIT/ChouiTV-Installer)** repository and download the app on an Android phone. It:
 
 - finds your TV on the Wi-Fi, always downloads the **latest version** of ChouiTV (one app), installs and sets it up in about two minutes;
 - **guides you step by step** (or lets you choose yourself) and speaks **Arabic, French and English**, with a progress bar and a safety net if the home screen does not open;
@@ -347,7 +347,7 @@ Go to the **[ChouiTV Installer](https://github.com/EMCHOUIT/ChouiTV-Installer)**
 - accepts only a version file signed by the owner;
 - asks for no account and shows no ads.
 
-<p align="center"><a href="https://github.com/EMCHOUIT/ChouiTV-Installer/releases/latest/download/ChouiTV-Installer.apk"><img src="https://img.shields.io/badge/%E2%AC%87%20ChouiTV%20Installer-D6AF6B?style=for-the-badge&labelColor=0A1D14" alt="ChouiTV Installer"></a></p>
+<p align="center"><a href="https://github.com/EMCHOUIT/ChouiTV-Installer/releases/latest/download/ChouiTV-Installer.apk"><img src="https://img.shields.io/badge/%E2%AC%87%20ChouiTV%20Companion-D6AF6B?style=for-the-badge&labelColor=0A1D14" alt="ChouiTV Companion"></a></p>
 
 [Details, screenshots and FAQ](https://github.com/EMCHOUIT/ChouiTV-Installer)
 
@@ -464,7 +464,7 @@ optimize/install.sh all    # downloads the latest release, installs and sets up 
 
 On a TV that is still on 3.x, use `optimize/migrate-to-v4.sh` instead of `all` (step 3 above): `all` would leave the old screensaver app beside the new one.
 
-Note: **cleaning the TV** (removing tracking, ads and trial apps) is an important step for better performance: it frees 85 to 215 MB of memory. The assistant asks before starting: if you agree it cleans, if you decline it installs only what our apps need (`SKIP_CLEANUP=1`), and you can ask for the cleanup later. From your phone, [ChouiTV Installer](https://github.com/EMCHOUIT/ChouiTV-Installer) offers the same cleanup as an option: it shows the plan first, turns off only what you choose and lets you undo everything.
+Note: **cleaning the TV** (removing tracking, ads and trial apps) is an important step for better performance: it frees 85 to 215 MB of memory. The assistant asks before starting: if you agree it cleans, if you decline it installs only what our apps need (`SKIP_CLEANUP=1`), and you can ask for the cleanup later. From your phone, [ChouiTV Companion](https://github.com/EMCHOUIT/ChouiTV-Installer) offers the same cleanup as an option: it shows the plan first, turns off only what you choose and lets you undo everything.
 
 To go back to how the TV was: `optimize/reset.sh`. All the details are in [`docs/SETUP-PROMPT.md`](docs/SETUP-PROMPT.md).
 </details>
@@ -490,7 +490,7 @@ adb install -r channels/out/channels-release.apk
 
 <details><summary>⬆️ <b>My TV is on 3.x. How do I get to 4.0?</b></summary>
 
-The update arrives as usual, with a press of **OK**. On first start 4.0 takes the old screensaver's **settings, tasks and photos** (up to 10 photos), then a row at the top of the settings, «إكمال الانتقال إلى النسخة الجديدة», walks you through the last two steps: pick the new screensaver, then remove the old app. The old screensaver keeps working until you pick the new one. From your phone, **ChouiTV Installer 1.6** does it all; for the experienced, there is [the script](#install-adb).
+The update arrives as usual, with a press of **OK**. On first start 4.0 takes the old screensaver's **settings, tasks and photos** (up to 10 photos), then a row at the top of the settings, «إكمال الانتقال إلى النسخة الجديدة», walks you through the last two steps: pick the new screensaver, then remove the old app. The old screensaver keeps working until you pick the new one. From your phone, **ChouiTV Companion 1.6** does it all; for the experienced, there is [the script](#install-adb).
 </details>
 
 <details><summary>🔀 <b>«شاشة تلفزيونك» shows twice in Android's list?</b></summary>
