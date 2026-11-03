@@ -36,6 +36,12 @@
 
 <a id="new"></a>
 
+## 🆕 What's new in 4.2 · ready for ChouiTV Companion
+
+- 📱 **ChouiTV Companion** (the phone app, formerly ChouiTV Installer) can open the **listening screen** straight from its remote, with the "Quran & Radio" button.
+- 🏷️ **The QR in the settings** and its explanation pop-up now say **ChouiTV Companion**.
+- 🛡️ **Cleanup**: the cleanup list is signed and never turns off Xiaomi's TV service again (the TV's Picture menu needs it).
+
 ## 🆕 What's new in 4.1 · listening, prayer and Hijri
 
 - 🎧 **New listening screen**: tab «القرآن الكريم» (reciters, live, ★ favourite reciters, **named surah lists** you build by ticking) and tab «الإذاعات»

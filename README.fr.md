@@ -36,6 +36,12 @@
 
 <a id="new"></a>
 
+## 🆕 Nouveautés de la 4.2 · prête pour ChouiTV Companion
+
+- 📱 **ChouiTV Companion** (le téléphone, anciennement ChouiTV Installer) peut ouvrir l'**écran d'écoute** directement depuis sa télécommande, avec le bouton « Coran et radio ».
+- 🏷️ **Le QR des réglages** et sa fenêtre d'explication parlent maintenant de **ChouiTV Companion**.
+- 🛡️ **Nettoyage** : la liste de nettoyage est signée et ne coupe plus jamais le service TV de Xiaomi (le menu Image de la télé en a besoin).
+
 ## 🆕 Nouveautés de la 4.1 · écoute, prière et hégire
 
 - 🎧 **Nouvel écran d'écoute** : onglet «القرآن الكريم» (récitants, direct, ★ récitants favoris, **listes de sourates nommées** créées en cochant) et onglet «الإذاعات»
