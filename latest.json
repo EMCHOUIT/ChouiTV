@@ -1,11 +1,11 @@
 {
-  "versionCode": 220,
-  "versionName": "4.1",
+  "versionCode": 222,
+  "versionName": "4.2",
   "apks": [
     {
       "package": "ma.chouitv.home",
-      "url": "https://github.com/EMCHOUIT/ChouiTV/releases/download/v4.1/chouitv-home.apk",
-      "sha256": "055c148d8922fbaf52bee11388f777897df41d57672c16fa699b8d2683257739"
+      "url": "https://github.com/EMCHOUIT/ChouiTV/releases/download/v4.2/chouitv-home.apk",
+      "sha256": "212fe78ab31b64b75967a821795100f6e78584024cd9cdf1a40bb2e4564075e5"
     }
   ]
 }
