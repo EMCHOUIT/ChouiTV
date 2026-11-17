@@ -1,11 +1,16 @@
 {
-  "versionCode": 222,
-  "versionName": "4.2",
+  "versionCode": 223,
+  "versionName": "4.3",
   "apks": [
     {
       "package": "ma.chouitv.home",
-      "url": "https://github.com/EMCHOUIT/ChouiTV/releases/download/v4.2/chouitv-home.apk",
-      "sha256": "212fe78ab31b64b75967a821795100f6e78584024cd9cdf1a40bb2e4564075e5"
+      "url": "https://github.com/EMCHOUIT/ChouiTV/releases/download/v4.3/chouitv-home.apk",
+      "sha256": "6fe35086a24642e23f0e45b247bc42cdedbd95dfd87986a2d8ed5b2cebdf76d9"
     }
-  ]
+  ],
+  "notes": {
+    "fr": "Nouveau logo, et le nom ChouiTV partout. L'adhan ne démarre plus quand on allume la télé si son heure est déjà passée.",
+    "en": "A new logo, and the name ChouiTV everywhere. The adhan no longer starts when you switch the TV on if its time has already passed.",
+    "ar": "شعار جديد واسم ChouiTV في كل مكان. لم يعد الأذان يبدأ عند تشغيل التلفزيون إذا كان وقته قد مضى."
+  }
 }
