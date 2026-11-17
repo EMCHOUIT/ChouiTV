@@ -901,7 +901,7 @@ public class MainActivity extends Activity {
         for (int m : SleepTimer.MINUTES) rows.add(inputRow(arabicDigits(String.valueOf(m)) + " دقيقة", () -> SleepTimer.start(this, m)));
         if (SleepTimer.minutesLeft(this) > 0) rows.add(inputRow("إلغاء", () -> SleepTimer.start(this, 0)));
         if (!SleepService.enabled()) {   // without it the end only stops the sound and brings the screensaver: say so, and where to turn it on
-            rows.add(inputRow("لإطفاء الشاشة: فعّل «تلفزيونك: إطفاء الشاشة»", () -> launch(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))));
+            rows.add(inputRow("لإطفاء الشاشة: فعّل «ChouiTV: إطفاء الشاشة»", () -> launch(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))));
         }
         for (TextView r : rows) {
             r.setOnClickListener(v -> { pw.dismiss(); ((Runnable) v.getTag()).run(); });

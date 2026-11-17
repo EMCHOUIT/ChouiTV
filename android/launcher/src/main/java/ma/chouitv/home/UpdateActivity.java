@@ -50,7 +50,7 @@ public class UpdateActivity extends Activity {
         box.addView(title);
         box.addView(detail);
         setContentView(box);
-        title.setText("تحديث تلفزيونك");
+        title.setText("تحديث ChouiTV");
         detail.setText("جارٍ التحضير…");
         live = this;
         startNext();

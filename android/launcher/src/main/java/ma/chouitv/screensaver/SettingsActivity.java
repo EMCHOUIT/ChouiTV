@@ -99,7 +99,7 @@ public class SettingsActivity extends Activity {
         head.setOrientation(LinearLayout.HORIZONTAL);
         head.setGravity(Gravity.CENTER_VERTICAL);
         TextView title = new TextView(this);
-        title.setText("تلفزيونك");
+        title.setText("ChouiTV");
         title.setTextColor(0xFFF6EFE0);
         title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 34);
         title.setTypeface(font("ThmanyahDisplay-Bold"));
@@ -343,7 +343,7 @@ public class SettingsActivity extends Activity {
             new Runnable() { public void run() { pickOnOff("تعديل وقت الصلاة", prefs.prayerAdjOn(), v -> prefs.setPrayerAdjOn(v)); } });
         if (prefs.prayerAdjOn()) for (int k = 0; k < PrayerAdj.COUNT; k++) adjRow(k);
         sec(4);
-        header("الشاشة الرئيسية (تلفزيونك)");
+        header("الشاشة الرئيسية (ChouiTV)");
         // up to three cards left of the clock; each place takes any card, or «بدون» (the ones after it move up)
         for (int k = 0; k < Prefs.HOME_CARDS; k++) {
             final int place = k;
@@ -827,7 +827,7 @@ public class SettingsActivity extends Activity {
         try {
             startActivity(new Intent().setClassName("ma.chouitv.home", "ma.chouitv.home.DockActivity"));
         } catch (RuntimeException e) {
-            toast("ثبّت الواجهة الرئيسية «تلفزيونك» أولاً");
+            toast("ثبّت الواجهة الرئيسية «ChouiTV» أولاً");
         }
     }
 
@@ -1659,7 +1659,7 @@ public class SettingsActivity extends Activity {
     private void migrationPickDream() {
         new Dlg(this).setTitle("اختر شاشة التوقف")
             .setMessage("انتقلت إعداداتك ومهامك وصورك إلى هذا التطبيق. ستفتح إعدادات التلفزيون: اختر «تفضيلات الجهاز» ثم «شاشة التوقف»."
-                + " ستجد «شاشة تلفزيونك» مرتين: المحدَّدة الآن هي القديمة، فاختر الأخرى. هي شاشة هذا التطبيق نفسه."
+                + " ستجد شاشتين: «شاشة تلفزيونك» القديمة و«شاشة ChouiTV» الجديدة. المحدَّدة الآن هي القديمة، فاختر الجديدة. هي شاشة هذا التطبيق نفسه."
                 + " حتى تختارها تبقى الشاشة القديمة تعمل كما هي.")
             .setPositiveButton("فتح الإعدادات", (d, i) -> openDreamSettings())
             .setNegativeButton("إلغاء", null).show();

@@ -180,7 +180,7 @@ public final class SelfUpdate {
         }
         p.edit().putString("updPlan", android.text.TextUtils.join("|", plan)).putInt("updTarget", latest).putLong("updStartedAt", now)
                 .putString("updWhy", "").putLong("updFailedAt", 0).apply();
-        toast(c, "تحديث تلفزيونك " + latest + ": في شاشة التثبيت حرّك الريموت يمينًا إلى «تثبيت» ثم اضغط OK");
+        toast(c, "تحديث ChouiTV " + latest + ": في شاشة التثبيت حرّك الريموت يمينًا إلى «تثبيت» ثم اضغط OK");
         String ui = launchUi(c);
         if (ui != null) { clearPlan(c); deleteAll(d); return fail(c, ui); }
         return "installing version " + latest;
@@ -310,7 +310,7 @@ public final class SelfUpdate {
         abandonCurrent(c);
         clearPlan(c);
         deleteAll(dir(c));
-        toast(c, userDeclined ? "أُلغي تحديث تلفزيونك" : "لم يكتمل تحديث تلفزيونك");
+        toast(c, userDeclined ? "أُلغي تحديث ChouiTV" : "لم يكتمل تحديث ChouiTV");
     }
 
     /** every package of the plan is installed (or this app was replaced by the new one: the plan is then found empty at the next check) */
