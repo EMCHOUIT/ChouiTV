@@ -9,9 +9,11 @@ import android.os.PowerManager;
  * Plays the adhan when its alarm goes off — pausing a surah that is playing and resuming it after —
  * and sets the next alarm again after a reboot, a clock change or an update.
  *
- * The adhan only starts while the TV is on: an alarm that arrives in standby is skipped, and none is
- * made up after a reboot; one that is playing stops when the screen goes off. (Without the exact-alarm
- * permission Android may deliver the alarm itself minutes late; the adhan then plays when it arrives.)
+ * The adhan only starts while the TV is on and on time: an alarm that arrives in standby is skipped, and none is
+ * made up after a reboot; one that is playing stops when the screen goes off. A TV in standby may also deliver the
+ * alarm only when it is switched on again, long after the prayer: AdhanDue.stale() skips it then, so switching the TV
+ * on never starts an adhan whose time has passed. (Without the exact-alarm permission Android may deliver the alarm
+ * itself minutes late: the grace is longer, and the adhan plays when it arrives within it.)
  */
 public class AdhanReceiver extends BroadcastReceiver {
     /** an alarm without its prayer time (one set by an older version): the same adhan never plays twice within this */
@@ -31,7 +33,8 @@ public class AdhanReceiver extends BroadcastReceiver {
 
         long now = System.currentTimeMillis();
         long due = intent.getLongExtra(AdhanScheduler.EXTRA_DUE, 0);
-        if (prefs.adhanOn() && screenOn(context) && !alreadyPlayed(prefs, due, now)) {
+        if (prefs.adhanOn() && screenOn(context) && !AdhanDue.stale(due, now, AdhanScheduler.exactAllowed(context))
+                && !alreadyPlayed(prefs, due, now)) {
             if (due > 0) prefs.setLastDue(due); else prefs.setLastAlarmAt(now);
             MusicService.adhan(context, prefs.playVoice(context), null, 0);
         }
