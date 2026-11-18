@@ -325,13 +325,14 @@ The **Channels** app sits beside ChouiTV in the dock and shows **live** Moroccan
 > [!NOTE]
 > 📺 **Works on Android TV and Google TV sets** (tested on a Xiaomi TV running Android 11). The app comes from the [ChouiTV releases](https://github.com/EMCHOUIT/ChouiTV/releases/latest), and updates arrive with a press of **OK**, from a version file signed by the owner.
 
-There are **three ways** to install ChouiTV. The simplest goes through your phone, and it has its own repository: [**ChouiTV Companion**](https://github.com/EMCHOUIT/ChouiTV-Installer).
+There are **four ways** to install ChouiTV. The simplest goes through your phone, and it has its own repository: [**ChouiTV Companion**](https://github.com/EMCHOUIT/ChouiTV-Installer).
 
 | | Option | For whom | Time |
 |---|---|---|---|
 | 📱 | [**Option 1: from your phone**](#install-phone) ⭐ | everyone, no computer | about 2 minutes |
 | 🤖 | [**Option 2: with an AI**](#install-ai) | you have a computer and an assistant | about 40 minutes, no commands |
 | 🛠️ | [**Option 3: by hand with ADB**](#install-adb) | you want full control | five minutes and a few commands |
+| 📥 | [**Option 4: from the TV, with Downloader**](#install-downloader) | no phone, no computer | a few minutes |
 
 <a id="install-phone"></a>
 
@@ -479,6 +480,18 @@ channels/build-channels.sh        # result: channels/out/channels-release.apk
 adb install -r channels/out/channels-release.apk
 ```
 </details>
+
+<a id="install-downloader"></a>
+
+### 📥 Option 4: straight from the TV, with Downloader
+
+No phone, no computer. Install the free **Downloader** app (by AFTVnews) from your TV's app store, open it and type this code in the address box:
+
+> **9833321**
+
+It downloads the latest `chouitv-home.apk`: the code always points to the newest version. When the TV asks, allow Downloader to install unknown apps, then press **Install**. If the code does not work, type the full address instead: `https://github.com/EMCHOUIT/ChouiTV/releases/latest/download/chouitv-home.apk` (code 9833321 is only a shortcut to it).
+
+This option only installs the app. The guided setup and the optional TV cleanup are done by [option 1](#install-phone) (ChouiTV Companion). Updates arrive on their own afterwards.
 
 <p align="center"><a href="https://github.com/EMCHOUIT/ChouiTV/releases/latest"><img src="docs/media/install-button.png" alt="Download the latest release" width="420"></a></p>
 

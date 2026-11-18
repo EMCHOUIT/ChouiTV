@@ -340,13 +340,14 @@
 
 <div dir="rtl" align="right">
 
-هناك **ثلاث طرق** لتثبيت ChouiTV، وأسهلها من هاتفك، ولها مستودعها الخاص: [**ChouiTV Companion**](https://github.com/EMCHOUIT/ChouiTV-Installer).
+هناك **أربع طرق** لتثبيت ChouiTV، وأسهلها من هاتفك، ولها مستودعها الخاص: [**ChouiTV Companion**](https://github.com/EMCHOUIT/ChouiTV-Installer).
 
 | | الخيار | لمن | المدة |
 |---|---|---|---|
 | 📱 | [**الخيار 1: من هاتفك**](#install-phone) ⭐ | للجميع، بلا كمبيوتر | نحو دقيقتين |
 | 🤖 | [**الخيار 2: بالذكاء الاصطناعي**](#install-ai) | لديك حاسوب ومساعد ذكي | نحو 40 دقيقة دون أوامر |
 | 🛠️ | [**الخيار 3: يدويًا بـ ADB**](#install-adb) | تريد التحكم الكامل | خمس دقائق وبضعة أوامر |
+| 📥 | [**الخيار 4: من التلفزيون مباشرة بتطبيق Downloader**](#install-downloader) | بلا هاتف وبلا كمبيوتر | بضع دقائق |
 
 <a id="install-phone"></a>
 
@@ -491,6 +492,18 @@ channels/build-channels.sh        # النتيجة: channels/out/channels-releas
 adb install -r channels/out/channels-release.apk
 ```
 </details>
+
+<a id="install-downloader"></a>
+
+### 📥 الخيار 4: مباشرة من التلفزيون بتطبيق Downloader
+
+بلا هاتف وبلا كمبيوتر. ثبّت تطبيق **Downloader** المجاني (من AFTVnews) من متجر تطبيقات تلفزيونك، ثم افتحه واكتب هذا الرمز في خانة العنوان:
+
+> **9833321**
+
+سيُنزّل آخر `chouitv-home.apk`: الرمز يقود دائمًا إلى أحدث إصدار. عندما يطلب التلفزيون ذلك، اسمح لـ Downloader بتثبيت التطبيقات من مصادر غير معروفة، ثم اضغط **تثبيت**. وإن لم يعمل الرمز فاكتب العنوان كاملًا: `https://github.com/EMCHOUIT/ChouiTV/releases/latest/download/chouitv-home.apk` (الرمز 9833321 مجرد اختصار له).
+
+هذا الخيار يثبّت التطبيق فقط. الإعداد الموجَّه وتنظيف التلفزيون الاختياري يتمّان بـ[الخيار 1](#install-phone) (ChouiTV Companion). وتصل التحديثات بعد ذلك من تلقاء نفسها.
 
 <p align="center"><a href="https://github.com/EMCHOUIT/ChouiTV/releases/latest"><img src="docs/media/install-button.png" alt="نزّل أحدث إصدار" width="420"></a></p>
 
