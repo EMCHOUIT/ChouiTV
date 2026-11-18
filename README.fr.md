@@ -485,11 +485,27 @@ adb install -r channels/out/channels-release.apk
 
 ### 📥 Option 4 : directement depuis la télé, avec Downloader
 
-Ni téléphone, ni ordinateur. Installez l'appli gratuite **Downloader** (d'AFTVnews) depuis la boutique d'applis de votre télé, ouvrez-la et tapez ce code dans la zone d'adresse :
+Ni téléphone, ni ordinateur, ni compte. Il vous faut une télé Android TV ou Google TV et sa télécommande. Quatre étapes courtes :
 
-> **9833321**
+<p align="center"><img src="docs/media/guide-downloader-1-fr.png" alt="Étape 1 : dans la boutique d'applis de la télé, cherchez Downloader (appli gratuite) et appuyez sur Installer" width="100%"></p>
 
-Elle télécharge le dernier `chouitv-home.apk` : le code mène toujours à la version la plus récente. Quand la télé le demande, autorisez Downloader à installer des applis de sources inconnues, puis appuyez sur **Installer**. Si le code ne marche pas, tapez plutôt l'adresse complète : `https://github.com/EMCHOUIT/ChouiTV/releases/latest/download/chouitv-home.apk` (le code 9833321 n'en est qu'un raccourci).
+**1. Installez l'appli Downloader.** Cherchez-la dans la boutique d'applis de votre télé (appli gratuite d'AFTVnews), naviguez avec les flèches puis appuyez sur **OK** sur « Installer ».
+
+<p align="center"><img src="docs/media/guide-downloader-2-fr.png" alt="Étape 2 : ouvrez Downloader et tapez le code 9833321 dans la zone d'adresse, puis choisissez Go. Ce n'est pas un mot de passe, pas de compte GitHub" width="100%"></p>
+
+**2. Tapez le code dans la zone d'adresse.** Ouvrez Downloader et tapez le code **9833321** dans la grande zone du haut, puis choisissez **Go**. Ce n'est **pas un mot de passe** et vous n'avez **pas besoin de compte GitHub** : c'est seulement un raccourci vers le téléchargement de ChouiTV, qui mène toujours à la dernière version.
+
+<p align="center"><img src="docs/media/guide-downloader-3-fr.png" alt="Étape 3 : quand la télé le demande, activez le bouton à côté de Downloader pour l'autoriser à installer des applis de sources inconnues" width="100%"></p>
+
+**3. Autorisez l'installation.** Quand la télé demande l'autorisation d'installer des applis de « sources inconnues », ouvrez les réglages et activez le bouton à côté de **Downloader**. Cela ne se fait qu'une seule fois ; revenez ensuite dans Downloader.
+
+<p align="center"><img src="docs/media/guide-downloader-4-fr.png" alt="Étape 4 : appuyez sur Installer puis sur Ouvrir" width="100%"></p>
+
+**4. Appuyez sur « Installer » puis « Ouvrir ».** ChouiTV est prêt sur votre télé.
+
+<p align="center"><img src="docs/media/guide-downloader-5-fr.png" alt="Si le code ne marche pas : tapez l'adresse complète https://github.com/EMCHOUIT/ChouiTV/releases/latest/download/chouitv-home.apk sur une seule ligne, sans espaces" width="100%"></p>
+
+**Si le code ne marche pas**, tapez plutôt l'adresse complète, sur une seule ligne et sans espaces : `https://github.com/EMCHOUIT/ChouiTV/releases/latest/download/chouitv-home.apk` (le code 9833321 n'en est qu'un raccourci).
 
 Cette option installe seulement l'appli. L'installation guidée et le nettoyage facultatif de la télé sont faits par l'[option 1](#install-phone) (ChouiTV Companion). Les mises à jour arrivent ensuite toutes seules.
 
